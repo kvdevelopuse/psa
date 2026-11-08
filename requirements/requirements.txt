@@ -1,0 +1,13 @@
+i need to develop an application for a sports academy. it will have functionalities to manage the following:
+-> Student registration
+-> Sports
+-> Batches and Locations 
+-> Coaches 
+-> Transport
+-> Student batch assignment 
+-> Student Transport assignment.
+-> Student attendance 
+-> Coach to daily sessions 
+-> Student fee payment 
+-> Batch and Location assignment
+We will do each functionality in separate phases. we will start with Student registration. The sample forms are in design_files\student_registration. i need to have a unique registration number to identify a student. the registration number will be in the format PSA-0001. The registration form will have all fields as per the images in student_registration folder

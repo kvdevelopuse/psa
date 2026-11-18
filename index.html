@@ -17,11 +17,12 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .app{display:flex;min-height:100vh}
 /* sidebar */
-.side{width:268px;flex:none;background:#7A1428;color:#E8C3BC;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.side{width:268px;flex:none;background:#7A1428;color:#E8C3BC;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden}
 .brand{flex:none;position:relative;overflow:hidden;padding:20px 22px 20px;background:#9C1C33}
 .brand a{position:relative;display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}
 .brand p{position:relative;margin:12px 0 0;font-family:'Young Serif',Georgia,serif;font-weight:700;font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:#E8C3BC}
-.nav{flex:1;display:flex;flex-direction:column;gap:2px;padding:14px 14px}
+.nav{flex:1;min-height:0;display:flex;flex-direction:column;gap:2px;padding:14px 14px}
+.nav.navfoot{flex:none;padding:10px 14px 14px;box-shadow:inset 0 1px 0 #8E2338} /* Help, pinned to the bottom */
 .nav .grp{padding:12px 14px 4px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#E8C3BC}
 .nav .grp:first-child{padding-top:0}
 .nav a{display:flex;align-items:center;gap:12px;min-height:40px;padding:0 14px;border-radius:8px;text-decoration:none;font-size:15px;color:#FBEFE6;font-weight:500}
@@ -141,8 +142,6 @@ textarea.in{height:auto;padding:12px 14px;line-height:1.5;resize:vertical}
 .kv .k{font-size:13px;font-weight:600;color:#4A3A35}.kv .v{font-size:16px;font-weight:500;white-space:pre-wrap;word-break:break-word}
 .dethead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 24px;padding:28px 32px;border-bottom:1px solid #EDE4D6}
 .ini{flex:none;width:36px;height:36px;border-radius:50%;background:#9C1C33;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-family:'Young Serif',Georgia,serif;font-weight:700;font-size:15px;letter-spacing:.04em}
-.frame{width:36px;height:42px;flex:none;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px #7A1428;font-family:'Young Serif',Georgia,serif;font-weight:800;font-size:15px;color:#9C1C33;background:#FFFDF9}
-.frame.off{box-shadow:inset 0 0 0 2px #CDBFAE}
 .seg{display:flex;padding:4px;border-radius:10px;background:#EFE6D8}
 .seg button{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;border:0;border-radius:7px;background:transparent;font-weight:600;font-size:14px;color:#4A3A35;cursor:pointer}
 .seg button.on{background:#FFFDF9;box-shadow:0 1px 2px rgba(42,22,25,.12);font-weight:700;color:#2A1619}
@@ -210,8 +209,6 @@ th.sticky{background:#F3ECE1}
 .prof .bandtop{position:relative;height:112px;background:#9C1C33;overflow:hidden}
 .prof .bandtop .big{position:absolute;left:260px;bottom:18px;font-family:'Young Serif',Georgia,serif;font-weight:800;font-size:120px;line-height:.8;color:#8E2338}
 .prof .bandtop .bk{position:absolute;left:20px;top:16px;color:#fff}
-.photo{width:132px;height:160px;margin-top:-48px;flex:none;position:relative;background:#FFFDF9;box-shadow:inset 0 0 0 3px #7A1428,0 8px 24px rgba(42,22,25,.18);display:flex;align-items:center;justify-content:center;font-family:'Young Serif',Georgia,serif;font-weight:800;font-size:56px;color:#9C1C33}
-.photo.off{box-shadow:inset 0 0 0 3px #CDBFAE,0 8px 24px rgba(42,22,25,.18);color:#A08F86}
 .ptabs{display:flex;gap:4px;padding:0 20px;border-top:1px solid #EDE4D6}
 .ptabs button{display:flex;align-items:center;gap:8px;min-height:52px;padding:0 14px;border:0;background:transparent;font-size:15px;color:#6E5D57;font-weight:600;cursor:pointer}
 .ptabs button.on{color:#2A1619;font-weight:700;box-shadow:inset 0 -3px 0 #7A1428}
@@ -293,7 +290,7 @@ tr.unpaid td:first-child{box-shadow:inset 4px 0 0 #9C1C33}
 .seg button.on{box-shadow:0 1px 3px rgba(42,22,25,.14)}
 .empty b{color:#9C1C33}
 .brand p,.top h1,.cardhead h2,.empty b,.bigtitle,.band h3,.monthnav .ml,.dh h2,.tot span,.bt-card .nm,.hp-h h2,.stat .v,.prof .bandtop .big{text-transform:none;letter-spacing:0;font-weight:400}
-.count,.chip,.nav .badge,.ini,.frame,.seg .n,.datebtn .dd,.photo{font-family:'Source Sans 3',system-ui,sans-serif;letter-spacing:0}
+.count,.chip,.nav .badge,.ini,.seg .n,.datebtn .dd{font-family:'Source Sans 3',system-ui,sans-serif;letter-spacing:0}
 .stat .v{font-size:40px}
 ::selection{background:#F0CFCF;color:#2A1619}
 @media print{
@@ -369,10 +366,38 @@ tr.unpaid td:first-child{box-shadow:inset 4px 0 0 #9C1C33}
 .pl-typ{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700;white-space:nowrap}
 .pl-typ.c{background:#7A1428;color:#fff}.pl-typ.s{background:#F6E3E3;color:#7A1428}
 
+/* pagination */
+.pg{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;padding:14px 28px;border-top:1px solid #EDE4D6;background:#FBF6EE}
+.pg.in{padding:12px 0 0;border-top:0;background:transparent}
+.pg-info{font-size:14px;color:#6E5D57}.pg-info b{color:#2A1619;font-variant-numeric:tabular-nums}
+.pg-btns{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.pg-btns button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:38px;height:38px;padding:0 12px;border:0;border-radius:8px;background:#FFFDF9;box-shadow:inset 0 0 0 1px #DCCFBC;font:700 14px 'Source Sans 3',sans-serif;color:#2A1619;cursor:pointer;font-variant-numeric:tabular-nums}
+.pg-btns button:hover:not(:disabled){background:#F6E3E3;color:#7A1428}
+.pg-btns button.on{background:#9C1C33;color:#fff;box-shadow:none;cursor:default}
+.pg-btns button:disabled{color:#DCCFBC;box-shadow:inset 0 0 0 1px #EDE4D6;cursor:not-allowed}
+.pg-btns button:focus-visible{outline:3px solid #7A1428;outline-offset:1px}
+.pg-gap{padding:0 2px;color:#A08F86}
+
+/* tables with a footer (pager or total row) scroll inside so the footer stays on screen */
+.tw.fit{overflow:auto}
+.tw.fit thead th{position:sticky;top:0;z-index:3!important;box-shadow:inset 0 -1px 0 #E6DCCD}
+.tw.fit thead th.sticky{z-index:5!important}
+.tw.fit tfoot td,.tw.fit tr.sum>*{position:sticky;bottom:0;z-index:3!important}
+.tw.fit tr.sum>.sticky{z-index:5!important}
+.tw.fit tr.sum>*,.tw.fit tfoot tr:not(.ex-tot) td{background:#F3ECE1}
+.tw.fit tr.sum>*,.tw.fit tfoot td{box-shadow:inset 0 1px 0 #E6DCCD}.tw.fit .ex-tot td{box-shadow:inset 0 2px 0 #9C1C33}
+
+/* P & L expenses */
+.ex-tot td{background:#F6E3E3;color:#7A1428;font-weight:800;font-size:16px;border-top:2px solid #9C1C33;border-bottom:0}
+
 /* tournaments */
 .dlg.xw{max-width:1080px}
 .ck{width:20px;height:20px;margin:0;accent-color:#9C1C33;cursor:pointer;vertical-align:middle}
 .cnt{align-self:flex-end;font-size:12px;color:#6E5D57}
+/* the menu never scrolls: shorter windows get a tighter menu */
+@media (max-height:860px){.side .nav a{min-height:37px}.nav.navfoot{padding:8px 14px 10px}}
+@media (max-height:740px){.nav{gap:0;padding:8px 14px}.side .nav .grp{padding:7px 14px 2px}.side .nav a{min-height:35px}.nav.navfoot{padding:5px 14px 7px}.side .brand{height:64px}.side .brand img{height:44px}}
+@media (max-height:660px){.nav{padding:6px 14px}.side .nav .grp{padding:4px 14px 1px;font-size:10px}.side .nav a{min-height:32px;font-size:15px}.nav.navfoot{padding:4px 14px 5px}.side .brand{height:56px}.side .brand img{height:38px}}
 </style>
 </head>
 <body>
@@ -405,7 +430,6 @@ const money2 = (n) => Number(n || 0).toLocaleString('en-US', { minimumFractionDi
 const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const squash = (s) => String(s || '').trim().replace(/\s+/g, ' ');
 const digits = (s) => String(s || '').replace(/\D/g, '');
-const initials = (n) => String(n || '').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('') || '?';
 const ageOf = (dob) => { if (!dob) return null; const b = toD(dob); let a = NOW.getFullYear() - b.getFullYear(); const m = NOW.getMonth() - b.getMonth(); if (m < 0 || (m === 0 && NOW.getDate() < b.getDate())) a--; return a; };
 const q = (s) => '“' + s + '”';
 const daysText = (ids) => DAYS.filter((d) => (ids || []).includes(d[0])).map((d) => d[1]).join(', ');
@@ -462,8 +486,8 @@ function seed(keepPw) {
     v: 2,
     seq: { student: 0 },
     settings: { academyName: '', academyPhone: '', academyEmail: '', lockMinutes: '', passwordChanged: keepPw || '', regPrefix: '', regSep: '', docsFolder: '', backupFolder: '', maxUploadMb: '', startWithWindows: false, logo: null,
-      regFee: '', overdueDay: '', book: '', start: '', nextNo: '', address: '', phone: '', email: '' },
-    locations: [], batches: [], routes: [], coaches: [], students: [], tournaments: [], plCats: [], plSubs: [], plHist: [],
+      regFee: '', overdueDay: '', book: '', start: '', nextNo: '', address: '', phone: '', email: '', pageSize: 10 },
+    locations: [], batches: [], routes: [], coaches: [], students: [], tournaments: [], plCats: [], plSubs: [], plHist: [], expenses: [], expHist: [],
     brec: {}, trec: {}, dues: [], duesRun: {},
     att: { absent: {}, plans: {}, overrides: {}, coachMin: {} },
     backups: []
@@ -475,13 +499,14 @@ const SAMPLE_DATA = {"v":2,"seq":{"student":75},"settings":{"academyName":"Peak 
 
 /* ============ state ============ */
 let S;
-const SETTING_DEFAULTS = { academyName: '', academyPhone: '', academyEmail: '', lockMinutes: '', passwordChanged: '', regPrefix: '', regSep: '', docsFolder: '', backupFolder: '', maxUploadMb: '', startWithWindows: false, logo: null };
+const SETTING_DEFAULTS = { academyName: '', academyPhone: '', academyEmail: '', lockMinutes: '', passwordChanged: '', regPrefix: '', regSep: '', docsFolder: '', backupFolder: '', maxUploadMb: '', startWithWindows: false, logo: null, pageSize: 10 };
 function load() {
   try { const raw = localStorage.getItem(KEY); if (raw) S = JSON.parse(raw); } catch (e) { /* ignore */ }
   if (!S) { let pw = ''; try { const old = JSON.parse(localStorage.getItem('psa_student_app_v1') || 'null'); pw = (old && old.settings && old.settings.passwordChanged) || ''; } catch (e) { /* none */ } S = Object.assign(JSON.parse(JSON.stringify(SAMPLE_DATA)), { backups: [] }); S.settings.passwordChanged = pw; }
   Object.keys(SETTING_DEFAULTS).forEach((k) => { if (S.settings[k] === undefined) S.settings[k] = SETTING_DEFAULTS[k]; });
   if (!S.tournaments) S.tournaments = []; // data saved before tournaments existed
   plEnsure(); // data saved before the P & L master existed
+  exEnsure(); // data saved before expenses existed
   (S.backups || []).forEach((b) => { delete b.data; });
   save();
 }
@@ -532,7 +557,7 @@ const backBtn = (label, fn) => '<button type="button" class="back" onclick="' + 
 const errTxt = (t) => (t ? '<span class="err">' + h(t) + '</span>' : '');
 const sel = (v, o) => (String(v) === String(o) ? ' selected' : '');
 const emptyBox = (title, text, btn) => '<div class="empty"><b>' + h(title) + '</b><span class="muted">' + h(text) + '</span>' + (btn || '') + '</div>';
-const topbar = (eyebrow, title, right, tabs) => '<header class="top' + (tabs ? '' : ' notabs') + '"><div><div class="eyebrow">' + h(eyebrow) + '</div><div class="tt"><h1>' + h(title) + '</h1>' + helpBtn() + '</div></div><div class="topr">' + (right ? '<div class="acts">' + right + '</div>' : '') + '<div class="who"><a href="#settings" onclick="go(\'settings\')" class="iconbtn' + (U.page === 'settings' ? ' on' : '') + '" title="Settings" aria-label="Settings"' + (U.page === 'settings' ? ' aria-current="page"' : '') + '><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></a><span class="whotxt">Signed in as <strong>' + h(AUTH.store().user) + '</strong></span><button type="button" class="btn b-white" onclick="AUTH.logout()" title="Sign out" aria-label="Sign out"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg><span class="solbl">Sign out</span></button></div></div></header>' + (tabs || '');
+const topbar = (eyebrow, title, right, tabs) => '<header class="top' + (tabs ? '' : ' notabs') + '"><div><div class="eyebrow">' + h(eyebrow) + '</div><div class="tt"><h1>' + h(title) + '</h1>' + helpBtn() + '</div></div><div class="topr">' + (right ? '<div class="acts">' + right + '</div>' : '') + '<div class="who"><a href="#settings" onclick="go(\'settings\')" class="iconbtn' + (U.page === 'settings' ? ' on' : '') + '" style="position:relative" title="' + (backupOverdue() ? 'Settings · backup overdue' : 'Settings') + '" aria-label="' + (backupOverdue() ? 'Settings, backup overdue' : 'Settings') + '"' + (U.page === 'settings' ? ' aria-current="page"' : '') + '><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>' + (backupOverdue() ? '<span aria-hidden="true" style="position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:#C9A04A;box-shadow:0 0 0 2px #F6E3E3"></span>' : '') + '</a><span class="whotxt">Signed in as <strong>' + h(AUTH.store().user) + '</strong></span><button type="button" class="btn b-white" onclick="AUTH.logout()" title="Sign out" aria-label="Sign out"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg><span class="solbl">Sign out</span></button></div></div></header>' + (tabs || '');
 const monthNav = (ym, fn) => '<div class="monthnav"><button type="button" class="ar" aria-label="Previous month" onclick="' + fn + '(-1)">' + I.left + '</button><span class="ml">' + ymLabel(ym) + '</span><button type="button" class="ar" aria-label="Next month" onclick="' + fn + '(1)">' + I.right + '</button>' + (ym !== CUR_YM ? '<button type="button" class="btn b-link sm" onclick="' + fn + '(0)">This month</button>' : '') + '</div>';
 const statusFilter = (val, fn, id) => '<div style="display:inline-flex;align-items:center;gap:10px"><label for="' + id + '" class="lbl">Status</label><select id="' + id + '" class="sel" onchange="' + fn + '(this.value)"><option value="all"' + sel(val, 'all') + '>All</option><option value="active"' + sel(val, 'active') + '>Active</option><option value="inactive"' + sel(val, 'inactive') + '>Inactive</option></select></div>';
 const fxCls = (bad) => (bad ? ' bad' : '');
@@ -559,6 +584,9 @@ const MENU = [
   ['Fees', [
     ['fees', 'Fee payment', '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>'],
     ['reports', 'Reports', '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>']
+  ]],
+  ['P & L', [
+    ['expenses', 'Expenses', '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4M16 15h1"/>']
   ]]
 ];
 function sidebar() {
@@ -567,21 +595,73 @@ function sidebar() {
   MENU.forEach(([g, items]) => {
     nav += '<span class="grp">' + g + '</span>';
     items.forEach(([k, label, path]) => {
-      nav += '<a href="#' + k + '" onclick="go(\'' + k + '\')" class="' + (U.page === k ? 'on' : '') + '"' + (U.page === k ? ' aria-current="page"' : '') + '><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>' + h(label) + (k === 'fees' && od ? '<span class="badge" aria-label="' + od + ' overdue">' + od + '</span>' : '') + (k === 'backup' && backupOverdue() ? '<span style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:#C9A04A" aria-label="Backup overdue"></span>' : '') + '</a>';
+      nav += '<a href="#' + k + '" onclick="go(\'' + k + '\')" class="' + (U.page === k ? 'on' : '') + '"' + (U.page === k ? ' aria-current="page"' : '') + '><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>' + h(label) + (k === 'fees' && od ? '<span class="badge" aria-label="' + od + ' overdue">' + od + '</span>' : '')  + '</a>';
     });
   });
   return '<nav class="side" aria-label="Main"><div class="brand"><a href="#batches" aria-label="Peak Sports Academy home"><img src="' + LOGO_SIDE + '" alt="Peak Sports Academy"></a></div>' +
-    '<div class="nav">' + nav + helpNav() + '</div></nav>';
+    '<div class="nav">' + nav + '</div><div class="nav navfoot">' + helpNav() + '</div></nav>';
+}
+/* ============ pagination: rows per page set in Settings › Lists ============ */
+const pageSize = () => { const n = parseInt(S.settings.pageSize, 10); return n >= 5 && n <= 100 ? n : 10; }; // Settings › Lists, default 10
+let PG = {}; // current page of each list; cleared when another menu page opens (dialog lists keep theirs on the dialog)
+function paged(key, arr, sig, o) {
+  o = o || {}; const box = o.dlg && U.dlg ? (U.dlg._pg || (U.dlg._pg = {})) : PG;
+  const st = box[key] || (box[key] = { p: 1, sig: sig });
+  if (st.sig !== sig) { st.p = 1; st.sig = sig; } // filters or search changed: back to page 1
+  const size = pageSize(); const pages = Math.max(1, Math.ceil(arr.length / size)); if (st.p > pages) st.p = pages;
+  const from = (st.p - 1) * size;
+  return { rows: arr.slice(from, from + size), from, pager: pager(key, st.p, pages, arr.length, from, o.inner) };
+}
+// shown only when a list has more than one page
+function pager(key, p, pages, n, from, inner) {
+  if (pages < 2) return '';
+  const go = (i) => 'onclick="pgGo(\'' + key + '\',' + i + ')"';
+  let nums = '', last = 0;
+  const keep = (i) => i === 1 || i === pages || Math.abs(i - p) <= 1 || (i === 2 && p === 4) || (i === pages - 1 && p === pages - 3); // never hide just one page behind "…"
+  for (let i = 1; i <= pages; i++) {
+    if (!keep(i)) continue;
+    if (i - last > 1) nums += '<span class="pg-gap" aria-hidden="true">…</span>';
+    nums += '<button type="button" class="pg-n' + (i === p ? ' on' : '') + '"' + (i === p ? ' aria-current="page"' : '') + ' aria-label="Page ' + i + '" ' + go(i) + '>' + i + '</button>'; last = i;
+  }
+  return '<nav class="pg' + (inner ? ' in' : '') + '" id="pg-' + key + '" aria-label="Pages"><span class="pg-info">Showing <b>' + (from + 1) + '–' + Math.min(from + pageSize(), n) + '</b> of <b>' + n + '</b></span>' +
+    '<div class="pg-btns"><button type="button"' + (p === 1 ? ' disabled' : '') + ' ' + go(p - 1) + '>' + I.left + 'Previous</button>' + nums + '<button type="button"' + (p === pages ? ' disabled' : '') + ' ' + go(p + 1) + '>Next' + I.right + '</button></div></nav>';
+}
+function pgGo(key, p) {
+  const st = (U.dlg && U.dlg._pg && U.dlg._pg[key]) || PG[key]; if (!st) return;
+  st.p = p; render();
+  const nav = document.getElementById('pg-' + key); if (!nav) return;
+  const tw = nav.previousElementSibling; if (tw && tw.classList.contains('tw')) tw.scrollTop = 0;
+  if (!nav.closest('.dlg')) { const top = nav.closest('.sec') || nav.closest('.card'); if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ block: 'start' }); }
+  const b = nav.querySelector('.pg-n.on'); if (b) b.focus({ preventScroll: true });
 }
 const PAGES = {};
+// a table with a footer (pager, total row, or an attendance grid's legend) gets a height that keeps the footer on screen
+function fitTables() {
+  const vh = window.innerHeight;
+  document.querySelectorAll('.main .tw').forEach((tw) => {
+    const nx = tw.nextElementSibling; const pg = nx && nx.classList.contains('pg') ? nx : null;
+    if (!pg && !tw.classList.contains('cal') && !tw.querySelector('tfoot, tr.sum')) { tw.classList.remove('fit'); tw.style.maxHeight = ''; return; }
+    tw.classList.add('fit');
+    let foot = 0; for (let el = nx; el; el = el.nextElementSibling) foot += el.offsetHeight; // pager, legend and notes under the table stay in view too
+    const top = tw.getBoundingClientRect().top + window.scrollY;
+    const room = top < vh - 320 ? vh - top - foot - 28 : vh - foot - 120; // first screen: fill to the bottom; further down: one screen high
+    tw.style.maxHeight = Math.max(260, Math.floor(room)) + 'px';
+  });
+}
+let RK = '';
+window.addEventListener('resize', () => fitTables());
 function render() {
   const fn = PAGES[U.page] || PAGES.batches;
+  const rk = U.page + '|' + ((U.v && U.v.view) || '');
+  const keep = rk === RK ? Array.from(document.querySelectorAll('.main .tw'), (t) => [t.scrollTop, t.scrollLeft]) : null; RK = rk;
   DP.close();
   document.getElementById('root').innerHTML = '<div class="app">' + sidebar() + '<main class="main" data-page="' + U.page + '">' + fn() + '</main></div>' + (U.help ? helpPanel() : '') + (U.dlg ? DIALOGS[U.dlg.type]() : '');
   DP.enhance();
+  fitTables();
+  if (keep) document.querySelectorAll('.main .tw').forEach((t, i) => { if (keep[i]) { t.scrollTop = keep[i][0]; t.scrollLeft = keep[i][1]; } });
   if (U.refocus) { const el = document.getElementById(U.refocus); U.refocus = null; if (el) { el.focus(); const n = el.value.length; try { el.setSelectionRange(n, n); } catch (e) { /* not a text input */ } } }
 }
-function go(page) { U = Object.assign(freshU(), { page }); DP.bad = {}; render(); window.scrollTo(0, 0); }
+function go(page) { U = Object.assign(freshU(), { page }); PG = {}; DP.bad = {}; render(); window.scrollTo(0, 0); }
 window.addEventListener('hashchange', () => { const p = location.hash.slice(1) || 'batches'; if (p !== U.page) go(PAGES[p] ? p : 'batches'); });
 const DIALOGS = {};
 function closeDlg() { U.dlg = null; render(); }
@@ -642,8 +722,9 @@ function batchList() {
   let rows = shown.map((b) => {
     const n = classDatesOf(b, CUR_YM).length;
     return '<tr class="row" ondblclick="B.open(\'' + b.id + '\')" title="Double-click to open"><td><div style="font-weight:700">' + h(b.name) + '</div><div class="small muted">' + h(b.description || '') + '</div></td><td><span class="chip">' + h(locName(b.locationId)) + '</span></td><td>' + h(b.age) + '</td><td>' + h(daysText(b.days)) + '</td><td class="r num" style="font-weight:600;white-space:nowrap">AED ' + money(b.fee) + '</td><td class="r"><div style="font-weight:700" class="num">' + n + '</div><div class="tiny muted">' + (b.classes ? 'Max ' + b.classes : 'No max set') + '</div></td><td>' + statusPill(b.active) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="B.open(\'' + b.id + '\')" aria-label="Open ' + h(b.name) + '">Open</button></td></tr>';
-  }).join('');
-  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:1000px"><thead><tr><th>Batch</th><th>Location</th><th>Age category</th><th>Class days</th><th class="r">Monthly fee</th><th class="r">Classes this month</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+  });
+  const P = paged('batches', rows, filter);
+  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:1000px"><thead><tr><th>Batch</th><th>Location</th><th>Age category</th><th>Class days</th><th class="r">Monthly fee</th><th class="r">Classes this month</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
     : S.batches.length ? emptyBox(filter === 'inactive' ? 'No inactive batches' : 'No active batches', 'Change the Status filter to see other batches.') : emptyBox('No batches yet', 'Create the first batch.', '<button type="button" class="btn b-blue lg" onclick="B.newB()">New batch</button>');
   return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>All batches</h2><span class="count">' + plural(shown.length, 'batch', 'batches') + '</span>' + statusFilter(filter, 'B.filter', 'bf') + '</div><span class="small muted">Double-click a row to open its details.</span></div>' + table + '</section></div>';
 }
@@ -653,15 +734,16 @@ function batchDetail() {
   const cur = classDatesOf(b, CUR_YM); const shown = classDatesOf(b, ym);
   const studs = studentsInBatch(b.id);
   const tile = (k, v, n) => '<div class="tile' + (n ? ' full' : '') + '"><span class="k">' + k + '</span><span class="v' + (n ? ' n' : '') + '">' + h(v) + '</span></div>';
-  const dates = shown.map((iso, i) => '<tr><td class="num" style="font-weight:700;color:#6E5D57">' + (i + 1) + '</td><td style="font-weight:700">' + fmtShort(iso) + '</td><td>' + pill('p-up', 'Class') + '</td></tr>').join('');
-  const st = studs.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t"><thead><tr><th>Reg. no.</th><th>Student</th><th>Effective date</th></tr></thead><tbody>' + studs.map((s) => { const r = S.brec[s.id]; return '<tr><td><span class="chip">' + s.reg + '</span></td><td style="font-weight:700">' + h(s.name) + '</td><td>' + fmtD(r.effective) + '</td></tr>'; }).join('') + '</tbody></table></div>'
+  const dP = paged('batchDates', shown.map((iso, i) => '<tr><td class="num" style="font-weight:700;color:#6E5D57">' + (i + 1) + '</td><td style="font-weight:700">' + fmtShort(iso) + '</td><td>' + pill('p-up', 'Class') + '</td></tr>'), b.id + ym, { inner: 1 }); const dates = dP.rows.join('');
+  const sP = paged('batchStu', studs.map((s) => { const r = S.brec[s.id]; return '<tr><td><span class="chip">' + s.reg + '</span></td><td style="font-weight:700">' + h(s.name) + '</td><td>' + fmtD(r.effective) + '</td></tr>'; }), b.id, { inner: 1 });
+  const st = studs.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t"><thead><tr><th>Reg. no.</th><th>Student</th><th>Effective date</th></tr></thead><tbody>' + sP.rows.join('') + '</tbody></table></div>' + sP.pager
     : '<div class="empty" style="background:#F3ECE1;border-radius:10px;box-shadow:inset 0 0 0 2px #E6DCCD;padding:32px"><b style="font-size:22px">No students assigned</b><span class="muted small">Students are assigned from the student details page.</span></div>';
   return '<div class="page wide tight">' + backBtn('Back to batches', 'B.list()') + flashHtml() +
     '<section class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">Batch details</span><h2 class="bigtitle">' + h(b.name) + '</h2><div class="acts" style="gap:8px"><span class="chip">' + h(locName(b.locationId)) + '</span><span class="chip">' + h(b.age) + '</span>' + statusPill(b.active) + '</div></div>' +
     '<div class="acts" style="align-items:flex-end"><div style="display:flex;flex-direction:column;gap:4px;padding:12px 16px;border-radius:8px;background:#F7F2EA;min-width:200px"><span class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6E5D57">This month</span><span class="cond" style="font-weight:800;font-size:26px">' + plural(cur.length, 'class', 'classes') + '</span><span class="tiny muted">' + ymLabel(CUR_YM) + '</span></div><button type="button" class="btn b-white lg" onclick="B.edit()">' + I.edit + 'Edit details</button><button type="button" class="btn lg ' + (b.active ? 'b-danger' : 'b-green') + '" onclick="B.toggleActive()">' + (b.active ? 'Deactivate' : 'Activate') + '</button></div></div>' +
     '<div class="sec">' + band('A', 'Details') + '<div class="tiles">' + tile('Location', locName(b.locationId)) + tile('Age category', b.age) + tile('Class days', daysText(b.days)) + tile('Monthly fee', 'AED ' + money(b.fee)) + tile('Classes per month', b.classes ? String(b.classes) : 'Not set') + tile('Description', b.description || '—', true) + '</div></div>' +
     '<div class="sec">' + band('B', 'Class dates') + '<div class="acts" style="justify-content:space-between">' + monthNav(ym, 'B.month') + '<span class="pill p-up" style="font-size:14px;padding:6px 12px">' + plural(shown.length, 'class', 'classes') + '</span></div><p style="margin:0;font-size:14px;color:#4A3A35">Worked out from the class days. These are the dates that get an attendance row for each student in the batch.</p>' +
-    '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t"><thead><tr><th style="width:64px">#</th><th>Date</th><th>Status</th></tr></thead><tbody>' + (dates || '<tr><td colspan="3" class="muted">No class dates in ' + ymLabel(ym) + '.</td></tr>') + '</tbody></table></div></div>' +
+    '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t"><thead><tr><th style="width:64px">#</th><th>Date</th><th>Status</th></tr></thead><tbody>' + (dates || '<tr><td colspan="3" class="muted">No class dates in ' + ymLabel(ym) + '.</td></tr>') + '</tbody></table></div>' + dP.pager + '</div>' +
     '<div class="sec">' + band('C', 'Students') + st + '</div></section></div>';
 }
 function batchForm() {
@@ -681,9 +763,9 @@ function batchForm() {
     '<div class="foot"><span class="msg' + (any ? ' bad' : '') + '">' + (any ? 'Fix the highlighted fields to save this batch.' : editing ? 'Changes apply to the coming months.' : 'The new batch is added to the list as Active.') + '</span><div class="acts"><button type="button" class="btn b-white lg" onclick="B.formBack()">Cancel</button><button type="submit" class="btn b-blue lg">' + (editing ? 'Save changes' : 'Save batch') + I.check + '</button></div></div></form></div>';
 }
 function locList() {
-  const rows = S.locations.map((l) => '<tr class="row" ondblclick="B.openLoc(\'' + l.id + '\')" title="Double-click to edit"><td><span class="chip" style="font-size:17px;padding:3px 10px">' + h(l.name) + '</span></td><td style="color:#4A3A35">' + h(l.description || '—') + '</td><td class="r num" style="font-weight:700">' + S.batches.filter((b) => b.locationId === l.id).length + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="B.openLoc(\'' + l.id + '\')">Edit</button></td></tr>').join('');
+  const P = paged('locations', S.locations.map((l) => '<tr class="row" ondblclick="B.openLoc(\'' + l.id + '\')" title="Double-click to edit"><td><span class="chip" style="font-size:17px;padding:3px 10px">' + h(l.name) + '</span></td><td style="color:#4A3A35">' + h(l.description || '—') + '</td><td class="r num" style="font-weight:700">' + S.batches.filter((b) => b.locationId === l.id).length + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="B.openLoc(\'' + l.id + '\')">Edit</button></td></tr>'), '');
   return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts"><h2>All locations</h2><span class="count">' + plural(S.locations.length, 'location') + '</span></div><span class="small muted">Double-click a row to edit it.</span></div>' +
-    (S.locations.length ? '<div class="tw"><table class="t" style="min-width:640px"><thead><tr><th>Location</th><th>Description</th><th class="r">Batches</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + rows + '</tbody></table></div>' : emptyBox('No locations yet', 'Add a location before creating batches.', '<button type="button" class="btn b-blue lg" onclick="B.newLoc()">New location</button>')) + '</section></div>';
+    (S.locations.length ? '<div class="tw"><table class="t" style="min-width:640px"><thead><tr><th>Location</th><th>Description</th><th class="r">Batches</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager : emptyBox('No locations yet', 'Add a location before creating batches.', '<button type="button" class="btn b-blue lg" onclick="B.newLoc()">New location</button>')) + '</section></div>';
 }
 function locForm() {
   const f = U.f; const err = f._sub ? B.locErr() : ''; const l = U.v.id ? byId(S.locations, U.v.id) : null;
@@ -732,16 +814,18 @@ PAGES.transport = function () {
 function routeList() {
   const filter = U.v.filter || 'active';
   const shown = S.routes.filter((r) => filter === 'all' || (filter === 'active' ? r.active : !r.active)).sort((a, b) => a.routeNumber.localeCompare(b.routeNumber, undefined, { numeric: true, sensitivity: 'base' }));
-  const rows = shown.map((r) => '<tr class="row" ondblclick="T.open(\'' + r.id + '\')" title="Double-click to open"><td><div style="display:flex;align-items:center;gap:12px"><span class="ini" aria-hidden="true">' + I.bus + '</span><span style="font-weight:700;word-break:break-word">' + h(r.routeNumber) + '</span></div></td><td style="padding-top:22px"><span class="clip">' + h(r.location) + '</span></td><td style="padding-top:22px"><span class="clip">' + h(r.landmark || '—') + '</span></td><td class="r num" style="padding-top:22px;font-weight:600;white-space:nowrap">' + money(r.fee) + ' AED</td><td style="padding-top:22px;font-weight:600"><span class="clip">' + h(r.driverName) + '</span></td><td class="num" style="padding-top:22px;white-space:nowrap">' + h(r.mobile || '—') + '</td><td style="padding-top:22px"><span class="clip">' + h(r.description || '—') + '</span></td><td style="padding-top:22px;color:#6E5D57"><span class="clip">' + h(r.remarks || '—') + '</span></td><td style="padding-top:22px">' + statusPill(r.active) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="T.open(\'' + r.id + '\')">Open</button></td></tr>').join('');
-  const body = shown.length ? '<div class="tw"><table class="t" style="min-width:1300px"><thead><tr><th>Route number</th><th>Location</th><th>Landmark</th><th class="r">Monthly fee</th><th>Driver name</th><th>Driver mobile</th><th>Description</th><th>Remarks</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+  const rows = shown.map((r) => '<tr class="row" ondblclick="T.open(\'' + r.id + '\')" title="Double-click to open"><td><div style="display:flex;align-items:center;gap:12px"><span class="ini" aria-hidden="true">' + I.bus + '</span><span style="font-weight:700;word-break:break-word">' + h(r.routeNumber) + '</span></div></td><td style="padding-top:22px"><span class="clip">' + h(r.location) + '</span></td><td style="padding-top:22px"><span class="clip">' + h(r.landmark || '—') + '</span></td><td class="r num" style="padding-top:22px;font-weight:600;white-space:nowrap">' + money(r.fee) + ' AED</td><td style="padding-top:22px;font-weight:600"><span class="clip">' + h(r.driverName) + '</span></td><td class="num" style="padding-top:22px;white-space:nowrap">' + h(r.mobile || '—') + '</td><td style="padding-top:22px"><span class="clip">' + h(r.description || '—') + '</span></td><td style="padding-top:22px;color:#6E5D57"><span class="clip">' + h(r.remarks || '—') + '</span></td><td style="padding-top:22px">' + statusPill(r.active) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="T.open(\'' + r.id + '\')">Open</button></td></tr>');
+  const P = paged('routes', rows, filter);
+  const body = shown.length ? '<div class="tw"><table class="t" style="min-width:1300px"><thead><tr><th>Route number</th><th>Location</th><th>Landmark</th><th class="r">Monthly fee</th><th>Driver name</th><th>Driver mobile</th><th>Description</th><th>Remarks</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
     : S.routes.length ? emptyBox(filter === 'inactive' ? 'No inactive routes' : 'No active routes', 'Change the Status filter to see other routes.') : emptyBox('No routes yet', 'Add the academy\'s transport routes and their drivers.', '<button type="button" class="btn b-blue lg" onclick="T.newR()">New route</button>');
   return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>All routes</h2><span class="count">' + plural(shown.length, 'route') + '</span>' + statusFilter(filter, 'T.filter', 'tf') + '</div><span class="small muted">Double-click a row to open it.</span></div>' + body + '</section></div>';
 }
 function routeForm() {
   const f = U.f; const e = f._sub ? T.errs() : {}; const r = U.v.id ? routeOf(U.v.id) : null; const n = Object.values(e).filter(Boolean).length;
   const studs = r ? studentsOnRoute(r.id) : [];
+  const sP = paged('routeStu', studs.map((s) => { const x = S.trec[s.id]; return '<tr><td><span class="chip">' + s.reg + '</span></td><td style="font-weight:700">' + h(s.name) + '</td><td>' + fmtD(x.effective) + '</td></tr>'; }), r ? r.id : '');
   const fld = (id, k, label, req, max, ph, extra) => '<div class="fld"><label for="' + id + '">' + label + (req ? ' <span class="req">*</span>' : '') + '</label><input id="' + id + '" class="in' + fxCls(e[k]) + '" maxlength="' + max + '" value="' + h(f[k]) + '" oninput="setF(\'' + k + '\',this.value)" placeholder="' + ph + '">' + errTxt(e[k]) + (extra || '') + '</div>';
-  const stuSec = r ? '<section class="card"><div class="cardhead"><div class="acts"><h2>Students on this route</h2><span class="count">' + plural(studs.length, 'student') + '</span></div></div>' + (studs.length ? '<div class="tw"><table class="t"><thead><tr><th>Reg. no.</th><th>Student</th><th>Effective date</th></tr></thead><tbody>' + studs.map((s) => { const x = S.trec[s.id]; return '<tr><td><span class="chip">' + s.reg + '</span></td><td style="font-weight:700">' + h(s.name) + '</td><td>' + fmtD(x.effective) + '</td></tr>'; }).join('') + '</tbody></table></div>' : emptyBox('No students on this route', 'Students are assigned from the student details page.')) + '</section>' : '';
+  const stuSec = r ? '<section class="card"><div class="cardhead"><div class="acts"><h2>Students on this route</h2><span class="count">' + plural(studs.length, 'student') + '</span></div></div>' + (studs.length ? '<div class="tw"><table class="t"><thead><tr><th>Reg. no.</th><th>Student</th><th>Effective date</th></tr></thead><tbody>' + sP.rows.join('') + '</tbody></table></div>' + sP.pager : emptyBox('No students on this route', 'Students are assigned from the student details page.')) + '</section>' : '';
   return '<div class="page tight">' + backBtn('Back to transport', 'T.list()') + flashHtml() +
     '<form class="card" onsubmit="event.preventDefault();T.save()" novalidate><div class="formhead" style="flex-direction:row;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px"><div style="display:flex;flex-direction:column;gap:6px"><span class="eyebrow">' + (r ? 'Route details' : 'Peak Sports Academy') + '</span><h2 class="bigtitle">' + h(r ? (f.routeNumber || r.routeNumber) : 'New route') + '</h2><span class="small muted">Fields marked <span class="req">*</span> are required.</span></div>' +
     (r ? '<div class="acts">' + statusPill(r.active) + '<button type="button" class="btn lg ' + (r.active ? 'b-danger' : 'b-green') + '" onclick="T.toggleActive()">' + (r.active ? 'Deactivate' : 'Activate') + '</button></div>' : '') + '</div>' +
@@ -804,8 +888,9 @@ PAGES.coaches = function () {
 function coachList() {
   const filter = U.v.filter || 'active';
   const shown = S.coaches.filter((c) => filter === 'all' || (filter === 'active' ? c.active : !c.active)).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
-  const rows = shown.map((c) => { return '<tr class="row" ondblclick="C.open(\'' + c.id + '\')" title="Double-click to open"><td><div style="display:flex;align-items:center;gap:12px"><span class="ini" aria-hidden="true">' + initials(c.name) + '</span><span style="font-weight:700">' + h(c.name) + '</span></div></td><td class="num" style="padding-top:22px;white-space:nowrap">' + h(c.phone || '—') + '</td><td style="padding-top:22px"><span class="clip">' + h(c.description || '—') + '</span></td><td style="padding-top:22px;color:#6E5D57"><span class="clip">' + h(c.remarks || '—') + '</span></td><td style="padding-top:22px">' + statusPill(c.active) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="C.open(\'' + c.id + '\')">Open</button></td></tr>'; }).join('');
-  const body = shown.length ? '<div class="tw"><table class="t" style="min-width:960px"><thead><tr><th style="width:22%">Coach</th><th>Phone number</th><th>Description</th><th>Remarks</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+  const rows = shown.map((c) => { return '<tr class="row" ondblclick="C.open(\'' + c.id + '\')" title="Double-click to open"><td><div style="display:flex;align-items:center;gap:12px"><span style="font-weight:700">' + h(c.name) + '</span></div></td><td class="num" style="white-space:nowrap">' + h(c.phone || '—') + '</td><td><span class="clip">' + h(c.description || '—') + '</span></td><td style="color:#6E5D57"><span class="clip">' + h(c.remarks || '—') + '</span></td><td>' + statusPill(c.active) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="C.open(\'' + c.id + '\')">Open</button></td></tr>'; });
+  const P = paged('coaches', rows, filter);
+  const body = shown.length ? '<div class="tw"><table class="t" style="min-width:960px"><thead><tr><th style="width:22%">Coach</th><th>Phone number</th><th>Description</th><th>Remarks</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
     : S.coaches.length ? emptyBox(filter === 'inactive' ? 'No inactive coaches' : 'No active coaches', 'Change the Status filter to see other coaches.') : emptyBox('No coaches yet', 'Add the academy\'s coaches here.', '<button type="button" class="btn b-blue lg" onclick="C.newC()">New coach</button>');
   return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>All coaches</h2><span class="count">' + plural(shown.length, 'coach', 'coaches') + '</span>' + statusFilter(filter, 'C.filter', 'cf') + '</div><span class="small muted">Double-click a row to open it.</span></div>' + body + '</section></div>';
 }
@@ -820,15 +905,17 @@ function coachDetails() {
       : used ? '<span class="small muted" title="Used by attendance">Used by attendance · can\'t be changed</span>'
         : '<div class="acts" style="gap:8px;justify-content:flex-end"><button type="button" class="btn b-soft sm" onclick="C.editRate(\'' + k.id + '\')">Edit</button><button type="button" class="btn b-white sm" style="color:#9C1C33" onclick="C.askDel(\'' + k.id + '\')">Delete</button></div>';
     return { html: '<tr><td style="font-weight:700">' + fmtD(k.from) + '</td><td class="small muted">' + (nxt ? 'Until ' + fmtD(isoOf(new Date(toD(nxt.from).getTime() - 86400000))) : 'No end date') + '</td><td class="r num" style="font-weight:700">' + k.rate + '</td><td>' + p + '</td><td class="r">' + acts + '</td></tr>' };
-  }).reverse().map((x) => x.html).join('');
-  const hist = (c.history || []).slice().reverse().map((x) => '<tr><td class="num" style="white-space:nowrap;color:#4A3A35">' + fmtWhen(x.at) + '</td><td style="font-weight:700">' + h(x.field) + '</td><td style="white-space:pre-wrap;color:#4A3A35">' + h(x.oldValue) + '</td><td style="white-space:pre-wrap;color:#4A3A35">' + h(x.newValue) + '</td></tr>').join('');
+  }).reverse().map((x) => x.html);
+  const rP = paged('coachRates', rows, c.id, { inner: 1 });
+  const hist = (c.history || []).slice().reverse().map((x) => '<tr><td class="num" style="white-space:nowrap;color:#4A3A35">' + fmtWhen(x.at) + '</td><td style="font-weight:700">' + h(x.field) + '</td><td style="white-space:pre-wrap;color:#4A3A35">' + h(x.oldValue) + '</td><td style="white-space:pre-wrap;color:#4A3A35">' + h(x.newValue) + '</td></tr>');
+  const hP = paged('coachHist', hist, c.id, { inner: 1 });
   return '<div class="page wide tight">' + backBtn('Back to coaches', 'C.list()') + flashHtml() +
     '<article class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">Coach details</span><h2 class="bigtitle">' + h(c.name) + '</h2><span>' + statusPill(c.active) + '</span></div><div class="acts"><button type="button" class="btn b-white lg" onclick="C.edit()">' + I.edit + 'Edit details</button><button type="button" class="btn lg ' + (c.active ? 'b-danger' : 'b-green') + '" onclick="C.toggleActive()">' + (c.active ? 'Deactivate' : 'Activate') + '</button></div></div>' +
     '<section class="sec">' + band('A', 'Coach details') + '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))"><div class="kv"><span class="k">Name</span><span class="v">' + h(c.name) + '</span></div><div class="kv"><span class="k">Phone number</span><span class="v num">' + h(c.phone || '—') + '</span></div><div class="kv full"><span class="k">Description</span><span class="v">' + h(c.description || '—') + '</span></div></div></section>' +
     '<section class="sec">' + band('B', 'Remarks') + '<div class="kv"><span class="k">Remarks</span><span class="v">' + h(c.remarks || '—') + '</span></div></section>' +
     '<section class="sec">' + band('C', 'Session rate') + '<div class="acts" style="justify-content:space-between"><span class="small muted" style="max-width:640px">Coaches are paid per session. One session is one batch class, whatever its length. Each session uses the rate in effect on its date. To change the rate from a date, add a new rate.</span><button type="button" class="btn b-blue" onclick="C.newRate()">' + I.plus + 'New rate</button></div>' +
-    (list.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:720px"><thead><tr><th>Effective from</th><th>Period</th><th class="r">Rate (AED per session)</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + rows + '</tbody></table></div>' : '<span class="muted">No session rate yet. Sessions without a rate show no amount in Coach attendance.</span>') + '</section>' +
-    '<section class="sec">' + band('D', 'Change history') + (hist ? '<div class="tw" style="border-radius:8px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:760px;font-size:14px"><thead><tr><th style="width:18%">Date and time</th><th style="width:18%">Change</th><th>Old value</th><th>New value</th></tr></thead><tbody>' + hist + '</tbody></table></div>' : '<span class="muted">No changes recorded yet.</span>') + '</section></article></div>';
+    (list.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:720px"><thead><tr><th>Effective from</th><th>Period</th><th class="r">Rate (AED per session)</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + rP.rows.join('') + '</tbody></table></div>' + rP.pager : '<span class="muted">No session rate yet. Sessions without a rate show no amount in Coach attendance.</span>') + '</section>' +
+    '<section class="sec">' + band('D', 'Change history') + (hist.length ? '<div class="tw" style="border-radius:8px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:760px;font-size:14px"><thead><tr><th style="width:18%">Date and time</th><th style="width:18%">Change</th><th>Old value</th><th>New value</th></tr></thead><tbody>' + hP.rows.join('') + '</tbody></table></div>' + hP.pager : '<span class="muted">No changes recorded yet.</span>') + '</section></article></div>';
 }
 function coachForm() {
   const f = U.f; const e = f._sub ? C.errs() : {}; const c = U.v.id ? coachOf(U.v.id) : null; const n = (e.name ? 1 : 0) + (e.phone ? 1 : 0);
@@ -855,7 +942,7 @@ const plCat = (id) => byId(S.plCats, id);
 const plSub = (id) => byId(S.plSubs, id);
 const plSubsOf = (cid) => S.plSubs.filter((s) => s.catId === cid).sort((a, b) => plCmp(a.code, b.code));
 const plCatsSorted = () => S.plCats.slice().sort((a, b) => plCmp(a.code, b.code));
-const plLinked = (sid) => 0; // records that use a sub category; none until expense entries are added
+const plLinked = (sid) => (S.expenses || []).filter((x) => x.subId === sid).length; // expenses that use a sub category
 const plOff = (d) => 'Inactive (inactivated ' + fmtD(d) + ')';
 const plNames = (list) => list.map((s) => s.code).join(', ');
 const PL_HIST = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4M12 8v4l3 2"/></svg>';
@@ -1020,11 +1107,12 @@ function plList() {
   const shown = rows.filter(hit); const nSub = shown.filter((r) => r.s).length;
   const tr = shown.map((r) => (r.s
     ? '<tr class="row" ondblclick="PL.openSub(\'' + r.s.id + '\')" title="Double-click to open"><td>' + plCatBtn(r.c) + '</td><td style="font-weight:700;word-break:break-word">' + h(r.s.code) + '</td><td style="color:#4A3A35"><span class="clip">' + h(r.s.description || '—') + '</span></td>' + (showSt ? '<td>' + statusPill(r.s.active) + '</td>' : '') + '<td class="r"><button type="button" class="btn b-soft sm" onclick="PL.openSub(\'' + r.s.id + '\')">Open</button></td></tr>'
-    : '<tr class="row" ondblclick="PL.openCat(\'' + r.c.id + '\')" title="Double-click to open the category"><td>' + plCatBtn(r.c) + '</td><td class="pl-none">No sub category yet</td><td class="muted">—</td>' + (showSt ? '<td>' + statusPill(r.c.active) + '</td>' : '') + '<td class="r"><button type="button" class="btn b-soft sm" onclick="PL.openCat(\'' + r.c.id + '\')">Open category</button></td></tr>')).join('');
+    : '<tr class="row" ondblclick="PL.openCat(\'' + r.c.id + '\')" title="Double-click to open the category"><td>' + plCatBtn(r.c) + '</td><td class="pl-none">No sub category yet</td><td class="muted">—</td>' + (showSt ? '<td>' + statusPill(r.c.active) + '</td>' : '') + '<td class="r"><button type="button" class="btn b-soft sm" onclick="PL.openCat(\'' + r.c.id + '\')">Open category</button></td></tr>'));
+  const P = paged('pl', tr, PLF.cat + '|' + PLF.status + '|' + PLF.q);
   const catOpts = [['all', 'All categories']].concat(plCatsSorted().map((c) => [c.id, c.code + (c.active ? '' : ' (inactive)')]));
   const filters = '<div class="acts" style="gap:12px 16px;padding:16px 28px;border-bottom:1px solid #EDE4D6;background:#FBF6EE">' + plSel('pl-fc', 'Category', PLF.cat, 'PL.setCat', catOpts, 200) + statusFilter(st, 'PL.setStatus', 'pl-fs') +
     '<div class="search" style="max-width:440px">' + I.search + '<input id="pl-q" aria-label="Search" value="' + h(PLF.q) + '" oninput="PL.search(this)" placeholder="Search category code, sub category code or description"></div></div>';
-  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:960px"><thead><tr><th style="width:22%">Category code</th><th style="width:24%">Sub category code</th><th>Description</th>' + (showSt ? '<th style="width:120px">Status</th>' : '') + '<th style="width:150px"><span class="sr">Actions</span></th></tr></thead><tbody>' + tr + '</tbody></table></div>'
+  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:960px"><thead><tr><th style="width:22%">Category code</th><th style="width:24%">Sub category code</th><th>Description</th>' + (showSt ? '<th style="width:120px">Status</th>' : '') + '<th style="width:150px"><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
     : S.plCats.length ? emptyBox('Nothing matches', 'Change the filters or the search to see other sub categories.')
       : emptyBox('No categories yet', 'Add a category, then add its sub categories.', '<button type="button" class="btn b-blue lg" onclick="PL.newCat()">New category</button>');
   return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>All sub categories</h2><span class="count">' + plural(nSub, 'sub category', 'sub categories') + '</span></div><span class="small muted">Double-click a row to open the sub category. Click a category code to open the category.</span></div>' + filters + table + '</section></div>';
@@ -1058,11 +1146,12 @@ const plActs = (on, kind) => '<div class="acts"><button type="button" class="btn
   '<button type="button" class="btn lg b-white" style="color:#9C1C33" onclick="PL.askDel(\'' + kind + '\')">' + PL_TRASH + 'Delete</button></div>';
 function plCatDetail() {
   const c = plCat(U.v.id); const subs = plSubsOf(c.id);
-  const rows = subs.map((s) => '<tr class="row" ondblclick="PL.openSub(\'' + s.id + '\')" title="Double-click to open"><td style="font-weight:700;word-break:break-word">' + h(s.code) + '</td><td style="color:#4A3A35"><span class="clip">' + h(s.description || '—') + '</span></td><td>' + statusPill(s.active) + '</td><td class="num">' + (s.active ? '—' : fmtD(s.inactiveFrom)) + '</td></tr>').join('');
+  const rows = subs.map((s) => '<tr class="row" ondblclick="PL.openSub(\'' + s.id + '\')" title="Double-click to open"><td style="font-weight:700;word-break:break-word">' + h(s.code) + '</td><td style="color:#4A3A35"><span class="clip">' + h(s.description || '—') + '</span></td><td>' + statusPill(s.active) + '</td><td class="num">' + (s.active ? '—' : fmtD(s.inactiveFrom)) + '</td></tr>');
+  const P = paged('plCatSubs', rows, c.id, { inner: 1 });
   return '<div class="page wide tight">' + backBtn('Back to P & L', 'PL.list()') + flashHtml() +
     '<section class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px;min-width:0"><span class="eyebrow">Category details</span><h2 class="bigtitle">' + h(c.code) + '</h2><div class="acts" style="gap:8px">' + statusPill(c.active) + '<span class="chip">' + plural(subs.length, 'sub category', 'sub categories') + '</span></div></div>' + plActs(c.active, 'c') + '</div>' +
     '<div class="sec">' + band('A', 'Details') + '<div class="tiles">' + plTile('Category code', c.code) + plTile('Status', c.active ? 'Active' : 'Inactive') + plTile('Inactivated date', c.active ? '—' : fmtD(c.inactiveFrom)) + plTile('Description', c.description || '—', true) + '</div></div>' +
-    '<div class="sec">' + band('B', 'Sub categories') + (subs.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:720px"><thead><tr><th style="width:28%">Sub category code</th><th>Description</th><th style="width:120px">Status</th><th style="width:160px">Inactivated date</th></tr></thead><tbody>' + rows + '</tbody></table></div><span class="small muted">Double-click a sub category to open it.</span>'
+    '<div class="sec">' + band('B', 'Sub categories') + (subs.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:720px"><thead><tr><th style="width:28%">Sub category code</th><th>Description</th><th style="width:120px">Status</th><th style="width:160px">Inactivated date</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager + '<span class="small muted">Double-click a sub category to open it.</span>'
       : '<div class="empty" style="background:#F3ECE1;border-radius:10px;box-shadow:inset 0 0 0 2px #E6DCCD;padding:32px"><b style="font-size:22px">No sub categories</b><span class="muted small">Add one with New sub category on the P &amp; L page.</span></div>') + '</div></section></div>';
 }
 function plSubDetail() {
@@ -1080,11 +1169,12 @@ function plHistory() {
   const list = S.plHist.map((x, i) => Object.assign({ i, gi: gTop[x.g || 'i' + i] }, x))
     .filter((x) => (v.type === 'all' || x.type === v.type) && (v.cat === 'all' || x.cat === v.cat) && (!qq || [x.code, x.cat, x.change, x.old, x.nw, fmtWhen(x.at), typeName(x.type)].some((y) => String(y || '').toLowerCase().includes(qq))))
     .sort((a, b) => b.gi - a.gi || a.i - b.i); // newest action first; entries of one action in the order they were done
-  const rows = list.map((x) => '<tr><td class="num" style="white-space:nowrap;color:#4A3A35">' + fmtWhen(x.at) + '</td><td><span class="pl-typ ' + x.type + '">' + typeName(x.type) + '</span></td><td style="font-weight:700;word-break:break-word">' + h(x.code) + (x.type === 's' && x.cat ? '<div class="tiny muted" style="font-weight:500">in ' + h(x.cat) + '</div>' : '') + '</td><td style="font-weight:600">' + h(x.change) + '</td><td style="color:#4A3A35;word-break:break-word">' + h(x.old) + '</td><td style="color:#4A3A35;word-break:break-word">' + h(x.nw) + '</td></tr>').join('');
+  const rows = list.map((x) => '<tr><td class="num" style="white-space:nowrap;color:#4A3A35">' + fmtWhen(x.at) + '</td><td><span class="pl-typ ' + x.type + '">' + typeName(x.type) + '</span></td><td style="font-weight:700;word-break:break-word">' + h(x.code) + (x.type === 's' && x.cat ? '<div class="tiny muted" style="font-weight:500">in ' + h(x.cat) + '</div>' : '') + '</td><td style="font-weight:600">' + h(x.change) + '</td><td style="color:#4A3A35;word-break:break-word">' + h(x.old) + '</td><td style="color:#4A3A35;word-break:break-word">' + h(x.nw) + '</td></tr>');
+  const P = paged('plHist', rows, v.type + '|' + v.cat + '|' + (v.q || ''));
   const filters = '<div class="acts" style="gap:12px 16px;padding:16px 28px;border-bottom:1px solid #EDE4D6;background:#FBF6EE">' + plSel('plh-t', 'Type', v.type, 'PL.histSet.bind(null,\'type\')', [['all', 'All'], ['c', 'Category'], ['s', 'Sub category']]) +
     plSel('plh-c', 'Category', v.cat, 'PL.histSet.bind(null,\'cat\')', [['all', 'All categories']].concat(cats.map((c) => [c, c])), 200) +
     '<div class="search" style="max-width:420px">' + I.search + '<input id="plh-q" aria-label="Search history" value="' + h(v.q || '') + '" oninput="PL.histSearch(this)" placeholder="Search code, change or values"></div></div>';
-  const body = list.length ? '<div class="tw"><table class="t" style="min-width:1100px;font-size:14px"><thead><tr><th style="width:15%">Date and time</th><th style="width:11%">Type</th><th style="width:16%">Code</th><th style="width:17%">Change</th><th>Old value</th><th>New value</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+  const body = list.length ? '<div class="tw"><table class="t" style="min-width:1100px;font-size:14px"><thead><tr><th style="width:15%">Date and time</th><th style="width:11%">Type</th><th style="width:16%">Code</th><th style="width:17%">Change</th><th>Old value</th><th>New value</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
     : emptyBox(S.plHist.length ? 'Nothing matches' : 'No changes yet', S.plHist.length ? 'Change the filters or the search.' : 'Changes to categories and sub categories are listed here.');
   return '<div class="page wide tight">' + backBtn('Back to P & L', 'PL.list()') + '<section class="card"><div class="cardhead"><div class="acts"><h2>P &amp; L history</h2><span class="count">' + plural(list.length, 'change') + '</span></div><span class="small muted">Newest first. Deleted categories and sub categories stay in the history.</span></div>' + filters + body + '</section></div>';
 }
@@ -1123,6 +1213,161 @@ DIALOGS.plDel = function () {
     '<div class="db"><div class="note" style="background:#F6E3E3">' + PL_WARN + '<span>Delete <strong>' + h(s.code) + '</strong>? ' + tail + '</span></div>' +
     '<div class="infobox"><span class="small muted">Delete is allowed only when no records use this sub category. Once records use it, deactivate it instead.</span></div></div>' +
     '<div class="df"><button type="button" class="btn b-white" onclick="closeDlg()">Keep sub category</button><button type="button" class="btn b-red" onclick="PL.saveDel()">' + PL_TRASH + 'Delete sub category</button></div>');
+};
+/* ============ P & L › EXPENSES ============ */
+function exEnsure() { if (!Array.isArray(S.expenses)) S.expenses = []; if (!Array.isArray(S.expHist)) S.expHist = []; }
+const exOf = (id) => byId(S.expenses, id);
+const exCatOf = (x) => { const s = plSub(x.subId); return s ? plCat(s.catId) : null; }; // category comes from the sub category, so moving a sub category moves its expenses
+const exCode = (o) => (o ? o.code + (o.active ? '' : ' (inactive)') : '—');
+const exPair = (x) => { const s = plSub(x.subId), c = exCatOf(x); return (c ? c.code : '—') + ' · ' + (s ? s.code : '—'); };
+const exSum = (x) => fmtD(x.date) + ' · ' + exPair(x) + ' · AED ' + money2(x.amount) + ' · ' + x.description + (x.invoiceNo ? ' · Invoice ' + x.invoiceNo : '');
+const exCmp = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : (b.at || '').localeCompare(a.at || '')); // newest date first
+const exUsable = () => plCatsSorted().filter((c) => c.active && plSubsOf(c.id).some((s) => s.active)); // active categories with an active sub category
+const EX_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>';
+let EXF = { ym: '', cat: 'all', sub: 'all' }; // list filters, kept while moving between Expenses screens
+let EX_G = null;
+function exLog(id, label, pair, change, old, nw) {
+  if (!EX_G) { EX_G = uid('g'); Promise.resolve().then(() => { EX_G = null; }); }
+  S.expHist.push({ at: new Date().toISOString(), g: EX_G, exId: id, label, pair, change, old: old || '—', nw: nw || '—' });
+}
+const EX = {
+  view: () => U.v.view || 'list',
+  ym: () => EXF.ym || CUR_YM,
+  list: () => { U.v = { view: 'list' }; U.f = null; render(); },
+  month: (k) => { EXF.ym = k === 0 ? CUR_YM : ymShift(EX.ym(), k); U.flash = null; render(); },
+  setCat: (v) => { EXF.cat = v; const s = plSub(EXF.sub); if (v !== 'all' && s && s.catId !== v) EXF.sub = 'all'; U.flash = null; render(); },
+  setSub: (v) => { EXF.sub = v; U.flash = null; render(); },
+  open: (id) => { U.v = { view: 'detail', id }; U.f = null; U.flash = null; render(); window.scrollTo(0, 0); },
+  hist: () => { U.v = { view: 'hist', q: '' }; U.f = null; U.flash = null; render(); window.scrollTo(0, 0); },
+  histSearch: (el) => { U.v.q = el.value; U.refocus = el.id; render(); },
+  // form
+  newEx: () => {
+    if (!exUsable().length) { flash('There is no active P & L sub category. Add or reactivate one in Masters › P & L first.', true); render(); return; }
+    const c = EXF.cat !== 'all' && exUsable().some((x) => x.id === EXF.cat) ? EXF.cat : '';
+    const s = plSub(EXF.sub); const sid = c && s && s.active && s.catId === c ? s.id : '';
+    U.v = { view: 'form', id: null }; U.f = { date: TODAY, catId: c, subId: sid, description: '', invoiceNo: '', remarks: '', amount: '', _sub: false }; U.flash = null; render(); window.scrollTo(0, 0);
+  },
+  edit: () => { const x = exOf(U.v.id); const c = exCatOf(x); U.v = { view: 'form', id: x.id }; U.f = { date: x.date, catId: c ? c.id : '', subId: x.subId, description: x.description, invoiceNo: x.invoiceNo || '', remarks: x.remarks || '', amount: String(x.amount), _sub: false }; U.flash = null; render(); },
+  leave: () => (U.v.id ? EX.open(U.v.id) : EX.list()),
+  pickCat: (v) => { U.f.catId = v; const s = plSub(U.f.subId); if (!s || s.catId !== v) U.f.subId = ''; render(); },
+  setAmt: (el) => {
+    let v = String(el.value).replace(/[^\d.]/g, ''); const i = v.indexOf('.');
+    if (i >= 0) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/\./g, '').slice(0, 2);
+    v = v.replace(/^0+(?=\d)/, ''); if (v.startsWith('.')) v = '0' + v;
+    el.value = v; setF('amount', v);
+  },
+  errs: () => {
+    const f = U.f; const x = U.v.id ? exOf(U.v.id) : null; const c = plCat(f.catId), s = plSub(f.subId); const a = parseFloat(f.amount);
+    const keptC = x && exCatOf(x) && exCatOf(x).id === f.catId, keptS = x && x.subId === f.subId;
+    return {
+      date: f.date ? '' : 'Enter the date.',
+      catId: !c ? 'Choose a category.' : !c.active && !keptC ? 'This category is inactive. Choose an active category.' : '',
+      subId: !s || s.catId !== f.catId ? 'Choose a sub category.' : !s.active && !keptS ? 'This sub category is inactive. Choose an active sub category.' : '',
+      description: squash(f.description) ? '' : 'Enter the description.',
+      amount: !f.amount ? 'Enter the amount.' : !(a > 0) ? 'The amount must be more than zero.' : ''
+    };
+  },
+  save: () => {
+    const e = EX.errs(); if (Object.values(e).some(Boolean)) { U.f._sub = true; render(); return; }
+    const f = U.f; const v = { date: f.date, subId: f.subId, description: squash(f.description), invoiceNo: squash(f.invoiceNo), remarks: f.remarks.trim(), amount: Math.round(parseFloat(f.amount) * 100) / 100 };
+    if (U.v.id) {
+      const x = exOf(U.v.id); const oldPair = exPair(x); const ch = [];
+      if (x.date !== v.date) ch.push(['Date changed', fmtD(x.date), fmtD(v.date)]);
+      if (x.subId !== v.subId) ch.push(['Category · sub category changed', oldPair, exPair(v)]);
+      if (x.description !== v.description) ch.push(['Description changed', x.description, v.description]);
+      if ((x.invoiceNo || '') !== v.invoiceNo) ch.push(['Invoice number changed', x.invoiceNo || '—', v.invoiceNo || '—']);
+      if ((x.remarks || '') !== v.remarks) ch.push(['Remarks changed', x.remarks || '—', v.remarks || '—']);
+      if (x.amount !== v.amount) ch.push(['Amount changed', money2(x.amount), money2(v.amount)]);
+      Object.assign(x, v);
+      ch.forEach((c) => exLog(x.id, fmtD(x.date) + ' · ' + x.description, exPair(x), c[0], c[1], c[2]));
+      if (!ch.length) { flash('No changes to save'); U.v = { view: 'detail', id: x.id }; U.f = null; render(); return; }
+      save(); flash('Expense saved'); U.v = { view: 'detail', id: x.id };
+    } else {
+      const x = Object.assign({ id: uid('ex'), at: new Date().toISOString() }, v); S.expenses.push(x);
+      exLog(x.id, fmtD(x.date) + ' · ' + x.description, exPair(x), 'Created', '—', exSum(x));
+      save(); EXF.ym = x.date.slice(0, 7); flash('Expense added' + (x.date.slice(0, 7) !== CUR_YM ? ' to ' + ymLabel(x.date.slice(0, 7)) : '')); U.v = { view: 'list' };
+    }
+    U.f = null; render(); window.scrollTo(0, 0);
+  },
+  askDel: () => { U.dlg = { type: 'exDel', id: U.v.id }; U.flash = null; render(); },
+  saveDel: () => {
+    const x = exOf(U.dlg.id); exLog(x.id, fmtD(x.date) + ' · ' + x.description, exPair(x), 'Deleted', exSum(x), '—');
+    S.expenses = S.expenses.filter((y) => y.id !== x.id); save(); U.dlg = null; U.v = { view: 'list' }; U.f = null; flash('Expense deleted'); render(); window.scrollTo(0, 0);
+  }
+};
+PAGES.expenses = function () {
+  plEnsure(); exEnsure();
+  let v = EX.view();
+  if (v === 'detail' && !exOf(U.v.id)) { U.v = { view: 'list' }; v = 'list'; }
+  const right = v === 'list' ? '<button type="button" class="btn b-white" onclick="EX.hist()">' + PL_HIST + 'History</button><button type="button" class="btn b-red" onclick="EX.newEx()">' + I.plus + 'New expense</button>' : '';
+  const body = v === 'form' ? exForm() : v === 'detail' ? exDetail() : v === 'hist' ? exHistory() : exList();
+  return topbar('P & L', v === 'hist' ? 'Expenses history' : 'Expenses', right) + body;
+};
+function exList() {
+  if (EXF.cat !== 'all' && !plCat(EXF.cat)) EXF.cat = 'all';
+  if (EXF.sub !== 'all' && (!plSub(EXF.sub) || (EXF.cat !== 'all' && plSub(EXF.sub).catId !== EXF.cat))) EXF.sub = 'all';
+  const ym = EX.ym();
+  const shown = S.expenses.filter((x) => x.date.slice(0, 7) === ym && (EXF.sub === 'all' ? (EXF.cat === 'all' || (exCatOf(x) && exCatOf(x).id === EXF.cat)) : x.subId === EXF.sub)).sort(exCmp);
+  const total = shown.reduce((a, x) => a + x.amount, 0);
+  const tr = shown.map((x) => { const c = exCatOf(x), s = plSub(x.subId);
+    return '<tr class="row" ondblclick="EX.open(\'' + x.id + '\')" title="Double-click to open"><td class="num" style="white-space:nowrap;font-weight:700">' + fmtD(x.date) + '</td><td style="word-break:break-word">' + h(c ? c.code : '—') + '</td><td style="word-break:break-word">' + h(s ? s.code : '—') + '</td><td style="font-weight:600;word-break:break-word">' + h(x.description) + '</td><td style="word-break:break-word">' + h(x.invoiceNo || '—') + '</td><td style="color:#4A3A35"><span class="clip">' + h(x.remarks || '—') + '</span></td><td class="r num" style="font-weight:700;white-space:nowrap">' + money2(x.amount) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="EX.open(\'' + x.id + '\')">Open</button></td></tr>'; });
+  const P = paged('expenses', tr, ym + '|' + EXF.cat + '|' + EXF.sub);
+  const catOpts = [['all', 'All categories']].concat(plCatsSorted().map((c) => [c.id, exCode(c)]));
+  const subList = EXF.cat === 'all' ? plCatsSorted().flatMap((c) => plSubsOf(c.id).map((s) => [s.id, c.code + ' · ' + exCode(s)])) : plSubsOf(EXF.cat).map((s) => [s.id, exCode(s)]);
+  const filters = '<div class="acts" style="gap:12px 20px;padding:16px 28px;border-bottom:1px solid #EDE4D6;background:#FBF6EE">' + monthNav(ym, 'EX.month') +
+    plSel('ex-fc', 'Category', EXF.cat, 'EX.setCat', catOpts, 200) + plSel('ex-fs', 'Sub category', EXF.sub, 'EX.setSub', [['all', 'All sub categories']].concat(subList), 220) + '</div>';
+  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:1100px"><thead><tr><th style="width:128px">Date</th><th style="width:11%">Category</th><th style="width:12%">Sub category</th><th>Description</th><th style="width:12%">Invoice number</th><th style="width:15%">Remarks</th><th class="r" style="width:132px">Amount (AED)</th><th style="width:92px"><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody>' +
+      '<tfoot><tr class="ex-tot"><td colspan="6">Total · ' + plural(shown.length, 'expense') + '</td><td class="r num">' + money2(total) + '</td><td></td></tr></tfoot></table></div>' + P.pager
+    : S.expenses.length ? emptyBox('No expenses here', 'No expenses in ' + ymLabel(ym) + ' for these filters. Change the month or the filters.')
+      : emptyBox('No expenses yet', 'Add the first expense with New expense.', '<button type="button" class="btn b-blue lg" onclick="EX.newEx()">New expense</button>');
+  return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Expenses · ' + h(ymLabel(ym)) + '</h2><span class="count">' + plural(shown.length, 'expense') + '</span></div><span class="small muted">Newest date first. Double-click a row to open it.</span></div>' + filters + table + '</section></div>';
+}
+function exForm() {
+  const f = U.f; const e = f._sub ? EX.errs() : {}; const x = U.v.id ? exOf(U.v.id) : null; const n = Object.values(e).filter(Boolean).length;
+  const keepC = x ? exCatOf(x) : null, keepS = x ? plSub(x.subId) : null;
+  const cats = plCatsSorted().filter((c) => exUsable().includes(c) || (keepC && c.id === keepC.id));
+  const subs = f.catId ? plSubsOf(f.catId).filter((s) => s.active || (keepS && s.id === keepS.id)) : [];
+  const opt = (o, val) => '<option value="' + o.id + '"' + sel(val, o.id) + '>' + h(exCode(o)) + '</option>';
+  return '<div class="page tight">' + backBtn(x ? 'Back to expense details' : 'Back to expenses', 'EX.leave()') +
+    '<form class="card" onsubmit="event.preventDefault();EX.save()" novalidate><div class="formhead"><span class="eyebrow">' + (x ? 'Edit expense' : 'Peak Sports Academy') + '</span><h2 class="bigtitle">' + (x ? h(x.description) : 'New expense') + '</h2><span class="small muted">Fields marked <span class="req">*</span> are required.</span></div>' +
+    '<section class="sec">' + band('A', 'Expense details') +
+    '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">' +
+    '<div class="fld"><label for="ex-date">Date <span class="req">*</span></label><input id="ex-date" type="date" class="in' + fxCls(e.date) + '" value="' + h(f.date) + '" onchange="setF(\'date\',this.value)">' + (e.date ? errTxt(e.date) : '<span class="hint">Defaults to today. Any date can be used.</span>') + '</div>' +
+    '<div class="fld"><label for="ex-cat">Category <span class="req">*</span></label><select id="ex-cat" class="in' + fxCls(e.catId) + '" onchange="EX.pickCat(this.value)"><option value="" disabled' + (f.catId ? '' : ' selected') + '>Select category</option>' + cats.map((c) => opt(c, f.catId)).join('') + '</select>' + (e.catId ? errTxt(e.catId) : '<span class="hint">Only active categories are listed.</span>') + '</div>' +
+    '<div class="fld"><label for="ex-sub">Sub category <span class="req">*</span></label><select id="ex-sub" class="in' + fxCls(e.subId) + '"' + (f.catId ? '' : ' disabled') + ' onchange="setF(\'subId\',this.value)"><option value="" disabled' + (f.subId ? '' : ' selected') + '>' + (f.catId ? 'Select sub category' : 'Select a category first') + '</option>' + subs.map((s) => opt(s, f.subId)).join('') + '</select>' + (e.subId ? errTxt(e.subId) : '<span class="hint">Only active sub categories are listed.</span>') + '</div>' +
+    '<div class="fld"><label for="ex-amt">Amount <span class="req">*</span></label><div class="suffix' + fxCls(e.amount) + '"><input id="ex-amt" inputmode="decimal" autocomplete="off" value="' + h(f.amount) + '" oninput="EX.setAmt(this)" placeholder="0.00"><span>AED</span></div>' + (e.amount ? errTxt(e.amount) : '<span class="hint">More than zero. Up to 2 decimal places.</span>') + '</div>' +
+    '<div class="fld" style="grid-column:1/-1"><label for="ex-desc">Description <span class="req">*</span></label><input id="ex-desc" class="in' + fxCls(e.description) + '" maxlength="255" value="' + h(f.description) + '" oninput="setF(\'description\',this.value);PL.cnt(this,255)" placeholder="What the expense was for">' + (e.description ? errTxt(e.description) : '<span class="hint">Up to 255 characters.</span>') + '<span class="pl-cc" id="ex-desc-n">' + f.description.length + ' / 255</span></div>' +
+    '<div class="fld" style="grid-column:1/-1"><label for="ex-inv">Invoice number</label><input id="ex-inv" class="in" maxlength="255" autocomplete="off" value="' + h(f.invoiceNo) + '" oninput="setF(\'invoiceNo\',this.value);PL.cnt(this,255)" placeholder="Supplier invoice or bill number"><span class="hint">Optional. Up to 255 characters.</span><span class="pl-cc" id="ex-inv-n">' + f.invoiceNo.length + ' / 255</span></div>' +
+    '</div></section>' +
+    '<section class="sec">' + band('B', 'Remarks') + '<div class="fld"><label for="ex-rem">Remarks</label><textarea id="ex-rem" class="in" rows="4" maxlength="510" oninput="setF(\'remarks\',this.value);PL.cnt(this,510)" placeholder="Optional notes, e.g. invoice or receipt number">' + h(f.remarks) + '</textarea><span class="pl-cc" id="ex-rem-n">' + f.remarks.length + ' / 510</span></div></section>' +
+    plFoot(n, x ? 'Changes are recorded in the expenses history.' : 'The expense is listed under the month of its date.', 'EX.leave()', x ? 'Save changes' : 'Save expense') + '</form></div>';
+}
+function exDetail() {
+  const x = exOf(U.v.id); const c = exCatOf(x), s = plSub(x.subId);
+  return '<div class="page wide tight">' + backBtn('Back to expenses', 'EX.list()') + flashHtml() +
+    '<section class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px;min-width:0"><span class="eyebrow">Expense details</span><h2 class="bigtitle" style="word-break:break-word">' + h(x.description) + '</h2><div class="acts" style="gap:8px"><span class="chip">' + fmtD(x.date) + '</span><span class="chip" style="font-weight:800">AED ' + money2(x.amount) + '</span></div></div>' +
+    '<div class="acts"><button type="button" class="btn b-white lg" onclick="EX.edit()">' + I.edit + 'Edit details</button><button type="button" class="btn lg b-white" style="color:#9C1C33" onclick="EX.askDel()">' + PL_TRASH + 'Delete</button></div></div>' +
+    '<div class="sec">' + band('A', 'Details') + '<div class="tiles">' + plTile('Date', fmtD(x.date)) + plTile('Category', exCode(c)) + plTile('Sub category', exCode(s)) + plTile('Amount (AED)', money2(x.amount)) + plTile('Description', x.description, true) + plTile('Invoice number', x.invoiceNo || '—', true) + '</div></div>' +
+    '<div class="sec">' + band('B', 'Remarks') + '<div class="tiles">' + plTile('Remarks', x.remarks || '—', true) + '</div></div></section></div>';
+}
+function exHistory() {
+  const v = U.v; const qq = (v.q || '').trim().toLowerCase();
+  const gTop = {}; S.expHist.forEach((x, i) => { gTop[x.g || 'i' + i] = i; });
+  const list = S.expHist.map((x, i) => Object.assign({ i, gi: gTop[x.g || 'i' + i] }, x))
+    .filter((x) => !qq || [x.label, x.pair, x.change, x.old, x.nw, fmtWhen(x.at)].some((y) => String(y || '').toLowerCase().includes(qq)))
+    .sort((a, b) => b.gi - a.gi || a.i - b.i);
+  const rows = list.map((x) => '<tr><td class="num" style="white-space:nowrap;color:#4A3A35">' + fmtWhen(x.at) + '</td><td style="font-weight:700;word-break:break-word">' + h(x.label) + '<div class="tiny muted" style="font-weight:500">' + h(x.pair) + '</div></td><td style="font-weight:600">' + h(x.change) + '</td><td style="color:#4A3A35;word-break:break-word">' + h(x.old) + '</td><td style="color:#4A3A35;word-break:break-word">' + h(x.nw) + '</td></tr>');
+  const P = paged('exHist', rows, v.q || '');
+  const filters = '<div class="acts" style="gap:12px 16px;padding:16px 28px;border-bottom:1px solid #EDE4D6;background:#FBF6EE"><div class="search" style="max-width:440px">' + I.search + '<input id="exh-q" aria-label="Search history" value="' + h(v.q || '') + '" oninput="EX.histSearch(this)" placeholder="Search expense, change or values"></div></div>';
+  const body = list.length ? '<div class="tw"><table class="t" style="min-width:1100px;font-size:14px"><thead><tr><th style="width:15%">Date and time</th><th style="width:24%">Expense</th><th style="width:15%">Change</th><th>Old value</th><th>New value</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
+    : emptyBox(S.expHist.length ? 'Nothing matches' : 'No changes yet', S.expHist.length ? 'Change the search.' : 'New, changed and deleted expenses are listed here.');
+  return '<div class="page wide tight">' + backBtn('Back to expenses', 'EX.list()') + '<section class="card"><div class="cardhead"><div class="acts"><h2>Expenses history</h2><span class="count">' + plural(list.length, 'change') + '</span></div><span class="small muted">Newest first. Deleted expenses stay in the history.</span></div>' + filters + body + '</section></div>';
+}
+DIALOGS.exDel = function () {
+  const x = exOf(U.dlg.id);
+  return dlgWrap(dlgHead('Delete expense', x.description, fmtD(x.date) + ' · ' + exPair(x) + ' · AED ' + money2(x.amount)) +
+    '<div class="db"><div class="note" style="background:#F6E3E3">' + PL_WARN + '<span>Delete this expense? This can’t be undone. The expenses history keeps a record of the delete.</span></div></div>' +
+    '<div class="df"><button type="button" class="btn b-white" onclick="closeDlg()">Keep expense</button><button type="button" class="btn b-red" onclick="EX.saveDel()">' + PL_TRASH + 'Delete expense</button></div>');
 };
 /* ============ STUDENTS ============ */
 const NATIONALITIES = ['Emirati', 'Indian', 'Pakistani', 'Sri Lankan', 'Bangladeshi', 'Nepali', 'Filipino', 'British', 'Australian', 'South African', 'Egyptian', 'Jordanian', 'Lebanese', 'Syrian', 'Other'];
@@ -1200,15 +1445,16 @@ function studentList(kind) {
   let head, rows;
   if (kind === 'registration') {
     head = '<th>Reg. no.</th><th>Student</th><th>Batch</th><th>Route</th><th>Phone</th><th>Joined</th>' + (tab === 'all' ? '<th>Status</th>' : '') + '<th class="r">Actions</th>';
-    rows = shown.map((s) => { const b = activeBatchRec(s.id), t = activeRouteRec(s.id); return '<tr class="row" ondblclick="ST.open(\'' + s.id + '\')" title="Double-click to open"><td style="padding-top:20px"><span class="chip">' + s.reg + '</span></td><td><div style="display:flex;align-items:center;gap:12px"><span class="frame' + (s.active ? '' : ' off') + '">' + initials(s.name) + '</span><span style="display:flex;flex-direction:column;gap:1px"><span style="font-weight:700">' + h(s.name) + '</span><span class="small muted">' + h(metaOf(s)) + '</span></span></div></td><td style="padding-top:20px;font-weight:600">' + (b ? h(batchOf(b.batchId).name) : '<span class="muted">—</span>') + '</td><td style="padding-top:20px;font-weight:600">' + (t ? h(routeOf(t.routeId).routeNumber) : '<span class="muted">—</span>') + '</td><td class="num" style="padding-top:20px;white-space:nowrap">' + h(phoneOf(s)) + '</td><td style="padding-top:20px;white-space:nowrap">' + fmtD(s.joinDate) + '</td>' + (tab === 'all' ? '<td style="padding-top:20px">' + pill(s.active ? 'p-on' : 'p-off', s.active ? 'Active' : 'Inactive', 1) + '</td>' : '') + '<td class="r" style="white-space:nowrap;padding-top:16px"><button type="button" class="btn b-link sm" onclick="ST.open(\'' + s.id + '\')">View</button>' + (s.active ? '<button type="button" class="btn b-white sm" onclick="U.v.from=U.page;ST.edit(\'' + s.id + '\')">Edit</button>' : '') + '</td></tr>'; }).join('');
+    rows = shown.map((s) => { const b = activeBatchRec(s.id), t = activeRouteRec(s.id); return '<tr class="row" ondblclick="ST.open(\'' + s.id + '\')" title="Double-click to open"><td><span class="chip">' + s.reg + '</span></td><td><div style="display:flex;align-items:center;gap:12px"><span style="display:flex;flex-direction:column;gap:1px"><span style="font-weight:700">' + h(s.name) + '</span><span class="small muted">' + h(metaOf(s)) + '</span></span></div></td><td style="font-weight:600">' + (b ? h(batchOf(b.batchId).name) : '<span class="muted">—</span>') + '</td><td style="font-weight:600">' + (t ? h(routeOf(t.routeId).routeNumber) : '<span class="muted">—</span>') + '</td><td class="num" style="white-space:nowrap">' + h(phoneOf(s)) + '</td><td style="white-space:nowrap">' + fmtD(s.joinDate) + '</td>' + (tab === 'all' ? '<td>' + pill(s.active ? 'p-on' : 'p-off', s.active ? 'Active' : 'Inactive', 1) + '</td>' : '') + '<td class="r" style="white-space:nowrap"><button type="button" class="btn b-link sm" onclick="ST.open(\'' + s.id + '\')">View</button>' + (s.active ? '<button type="button" class="btn b-white sm" onclick="U.v.from=U.page;ST.edit(\'' + s.id + '\')">Edit</button>' : '') + '</td></tr>'; });
   } else {
     head = '<th>Reg. no.</th><th>Student</th><th>Batch</th><th>Route</th><th>Status</th><th class="r">Actions</th>';
-    rows = shown.map((s) => { const b = activeBatchRec(s.id), t = activeRouteRec(s.id); return '<tr class="row" ondblclick="ST.open(\'' + s.id + '\')" title="Double-click to open"><td style="padding-top:20px"><span class="chip">' + s.reg + '</span></td><td><div style="display:flex;align-items:center;gap:12px"><span class="frame' + (s.active ? '' : ' off') + '">' + initials(s.name) + '</span><span style="display:flex;flex-direction:column;gap:1px"><span style="font-weight:700">' + h(s.name) + '</span><span class="small muted">' + h(metaOf(s)) + '</span></span></div></td><td style="padding-top:20px;font-weight:600">' + (b ? h(batchOf(b.batchId).name) : '<span class="muted">—</span>') + '</td><td style="padding-top:20px;font-weight:600">' + (t ? h(routeOf(t.routeId).routeNumber) : '<span class="muted">—</span>') + '</td><td style="padding-top:20px">' + pill(s.active ? 'p-on' : 'p-off', s.active ? 'Active' : 'Inactive', 1) + '</td><td class="r" style="padding-top:16px"><button type="button" class="btn b-soft sm" onclick="ST.open(\'' + s.id + '\')">Open</button></td></tr>'; }).join('');
+    rows = shown.map((s) => { const b = activeBatchRec(s.id), t = activeRouteRec(s.id); return '<tr class="row" ondblclick="ST.open(\'' + s.id + '\')" title="Double-click to open"><td><span class="chip">' + s.reg + '</span></td><td><div style="display:flex;align-items:center;gap:12px"><span style="display:flex;flex-direction:column;gap:1px"><span style="font-weight:700">' + h(s.name) + '</span><span class="small muted">' + h(metaOf(s)) + '</span></span></div></td><td style="font-weight:600">' + (b ? h(batchOf(b.batchId).name) : '<span class="muted">—</span>') + '</td><td style="font-weight:600">' + (t ? h(routeOf(t.routeId).routeNumber) : '<span class="muted">—</span>') + '</td><td>' + pill(s.active ? 'p-on' : 'p-off', s.active ? 'Active' : 'Inactive', 1) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="ST.open(\'' + s.id + '\')">Open</button></td></tr>'; });
   }
+  const P = paged('students', rows, kind + '|' + tab + '|' + qq);
   const segB = (k, lab, n, col) => '<button type="button" role="tab" aria-selected="' + (tab === k) + '" class="' + (tab === k ? 'on' : '') + '" onclick="ST.tab(\'' + k + '\')">' + lab + ' <span class="n" style="color:' + col + '">' + n + '</span></button>';
   return '<div class="page wide">' + flashHtml() + '<div class="acts" style="gap:16px"><div class="seg" role="tablist" aria-label="Status filter">' + segB('active', 'Active', nA, '#9C1C33') + segB('inactive', 'Inactive', nI, '#6E5D57') + segB('all', 'All', S.students.length, '#7A1428') + '</div>' +
     '<div class="search"><label for="lsearch" class="sr">Filter this list</label>' + I.search + '<input id="lsearch" type="search" value="' + h(U.v.q || '') + '" oninput="ST.search(this)" placeholder="Registration no., name, Emirates ID, passport or either phone"></div></div>' +
-    '<section class="card">' + (shown.length ? '<div class="tw"><table class="t" style="min-width:900px"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div><div style="padding:14px 28px" class="small muted">Showing <strong style="color:#2A1619">' + shown.length + '</strong> of <strong style="color:#2A1619">' + S.students.length + '</strong> students</div>'
+    '<section class="card">' + (shown.length ? '<div class="tw"><table class="t" style="min-width:900px"><thead><tr>' + head + '</tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + (P.pager || '<div style="padding:14px 28px" class="small muted">Showing <strong style="color:#2A1619">' + shown.length + '</strong> of <strong style="color:#2A1619">' + S.students.length + '</strong> students</div>')
       : emptyBox(S.students.length ? 'No students found' : 'No students yet', S.students.length ? 'Change the filter or the search.' : 'Register the first student.')) + '</section>' +
     '<p style="margin:0" class="small muted">' + (kind === 'assignment' ? 'Double-click a student to open their details page. <strong>Assign batch</strong> and <strong>Assign transport</strong> are at the top of that page.' : 'The list opens on <strong>Active</strong>. Inactive students keep their record, documents and history and can be reactivated from their details page.') + '</p></div>';
 }
@@ -1258,7 +1504,7 @@ function studentProfile() {
   if (U.v.tab === 'documents') body = profDocs(s); else if (U.v.tab === 'history') body = profHistory(s); else if (U.v.tab === 'tournaments') body = profTournaments(s); else if (U.v.tab === 'fees') body = profFees(s); else body = profDetails(s);
   return topbar('Peak Sports Academy', 'Students') + '<div class="page wide tight">' + flashHtml() +
     '<section class="card prof"><div class="bandtop"><span class="big" aria-hidden="true">' + s.reg.replace(/^\D+/, '') + '</span><button type="button" class="back bk" onclick="ST.backToList()">' + I.back + 'Back to students</button></div>' +
-    '<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 28px;padding:0 28px 22px"><div class="photo' + (s.active ? '' : ' off') + '">' + initials(s.name) + '</div><div style="flex:999 1 320px;display:flex;flex-direction:column;gap:10px;padding-top:18px"><div class="acts" style="gap:12px"><h2 class="cond" style="margin:0;font-weight:800;font-size:40px;line-height:1;text-transform:uppercase">' + h(s.name) + '</h2><span class="chip" style="font-size:17px">' + s.reg + '</span>' + pill(s.active ? 'p-on' : 'p-off', s.active ? 'Active' : 'Inactive', 1) + '</div><span style="font-size:15px;color:#4A3A35">' + h(line) + '</span>' + acts + '</div></div>' +
+    '<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 28px;padding:0 28px 22px"><div style="flex:999 1 320px;display:flex;flex-direction:column;gap:10px;padding-top:18px"><div class="acts" style="gap:12px"><h2 class="cond" style="margin:0;font-weight:800;font-size:40px;line-height:1;text-transform:uppercase">' + h(s.name) + '</h2><span class="chip" style="font-size:17px">' + s.reg + '</span>' + pill(s.active ? 'p-on' : 'p-off', s.active ? 'Active' : 'Inactive', 1) + '</div><span style="font-size:15px;color:#4A3A35">' + h(line) + '</span>' + acts + '</div></div>' +
     '<nav class="ptabs" aria-label="Profile sections">' + tabHtml + '</nav></section>' + body + '</div>';
 }
 function recCard(kind, s) {
@@ -1305,9 +1551,10 @@ function profDocs(s) {
 }
 function profHistory(s) {
   const row = (kind) => { const r = kind === 'batch' ? S.brec[s.id] : S.trec[s.id]; const lab = kind === 'batch' ? 'Batch' : 'Transport'; if (!r) return '<tr><td style="font-weight:700">' + lab + '</td><td class="muted">Not assigned</td><td>—</td><td>—</td><td>—</td></tr>'; const it = kind === 'batch' ? batchOf(r.batchId).name : routeOf(r.routeId).routeNumber; return '<tr><td style="font-weight:700">' + lab + '</td><td>' + h(it) + '</td><td>' + fmtD(r.effective) + '</td><td>' + fmtD(r.inactivated) + '</td><td>' + statusPill(r.active) + '</td></tr>'; };
-  const list = s.history.slice().sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0)).map((x) => '<tr><td class="num" style="white-space:nowrap;color:#4A3A35">' + fmtWhen(x.at) + '<div class="tiny muted">by admin</div></td><td>' + pill('p-up', x.type) + '</td><td style="font-weight:700">' + h(x.title) + '</td><td>' + (x.old || x.nw ? h(x.old || '—') + ' → ' + h(x.nw || '—') : '<span class="muted">—</span>') + '</td><td class="small" style="color:#4A3A35">' + h(x.note || '') + '</td></tr>').join('');
+  const list = s.history.slice().sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0)).map((x) => '<tr><td class="num" style="white-space:nowrap;color:#4A3A35">' + fmtWhen(x.at) + '<div class="tiny muted">by admin</div></td><td>' + pill('p-up', x.type) + '</td><td style="font-weight:700">' + h(x.title) + '</td><td>' + (x.old || x.nw ? h(x.old || '—') + ' → ' + h(x.nw || '—') : '<span class="muted">—</span>') + '</td><td class="small" style="color:#4A3A35">' + h(x.note || '') + '</td></tr>');
+  const P = paged('stuHist', list, s.id, { inner: 1 });
   return '<section class="card"><div class="sec">' + band('A', 'Batch & transport') + '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t"><thead><tr><th>Type</th><th>Batch / route</th><th>Effective date</th><th>Inactivated date</th><th>Status</th></tr></thead><tbody>' + row('batch') + row('transport') + '</tbody></table></div></div>' +
-    '<div class="sec">' + band('B', 'Changes to this student') + '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:860px;font-size:14px"><thead><tr><th>Date and time</th><th>Type</th><th>Change</th><th>Old → New</th><th>Note</th></tr></thead><tbody>' + (list || '<tr><td colspan="5" class="muted">No changes yet.</td></tr>') + '</tbody></table></div></div></section>';
+    '<div class="sec">' + band('B', 'Changes to this student') + '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:860px;font-size:14px"><thead><tr><th>Date and time</th><th>Type</th><th>Change</th><th>Old → New</th><th>Note</th></tr></thead><tbody>' + (P.rows.join('') || '<tr><td colspan="5" class="muted">No changes yet.</td></tr>') + '</tbody></table></div>' + P.pager + '</div></section>';
 }
 /* ============ TOURNAMENTS & SQUADS ============ */
 // tournament: { id, name, description, age, from, to, dobFrom, dobTo, completed, squad: [{ sid, added }] }
@@ -1362,7 +1609,8 @@ const TN = {
   dq: (el) => { U.dlg.q = el.value; U.refocus = el.id; render(); },
   db: (v) => { U.dlg.batch = v; render(); },
   pick: (sid) => { const d = U.dlg; if (d.sel[sid]) delete d.sel[sid]; else d.sel[sid] = true; render(); },
-  pickAll: (on) => { const d = U.dlg; TN.shown(tourOf(U.v.tid)).forEach((s) => { if (on) d.sel[s.id] = true; else delete d.sel[s.id]; }); render(); },
+  sig: (t) => t.id + '|' + U.dlg.q + '|' + U.dlg.batch,
+  pickAll: (on) => { const d = U.dlg; const t = tourOf(U.v.tid); paged('squadAdd', TN.shown(t), TN.sig(t), { dlg: 1 }).rows.forEach((s) => { if (on) d.sel[s.id] = true; else delete d.sel[s.id]; }); render(); },
   add: () => {
     const t = tourOf(U.v.tid); const ok = TN.eligible(t).map((s) => s.id); const ids = Object.keys(U.dlg.sel).filter((id) => ok.includes(id)); if (!ids.length) return;
     ids.forEach((sid) => t.squad.push({ sid, added: TODAY })); save(); U.dlg = null; flash(plural(ids.length, 'student') + ' added to ' + t.name); render();
@@ -1377,9 +1625,10 @@ PAGES.tournaments = function () {
 function tourList() {
   const filter = U.v.filter || 'all';
   const shown = toursSorted().filter((t) => filter === 'all' || (filter === 'completed' ? t.completed : !t.completed));
-  const rows = shown.map((t) => { const n = tourDays(t); return '<tr class="row" ondblclick="TN.edit(\'' + t.id + '\')" title="Double-click to edit"><td style="max-width:300px"><div style="font-weight:700">' + h(t.name) + '</div><div class="small muted">' + h(t.description || '') + '</div></td><td><span class="chip">' + h(t.age) + '</span></td><td style="white-space:nowrap"><div>' + fmtD(t.from) + '</div><div class="small muted">to ' + fmtD(t.to) + ' · ' + plural(n, 'day') + '</div></td><td class="small" style="max-width:220px;color:#4A3A35">' + h(cutText(t)) + '</td><td class="r"><span class="count">' + plural(t.squad.length, 'student') + '</span></td><td>' + tourPill(t) + '</td><td class="r"><button type="button" class="btn b-white sm" onclick="TN.edit(\'' + t.id + '\')" aria-label="Edit ' + h(t.name) + '">' + I.edit + 'Edit</button></td></tr>'; }).join('');
+  const rows = shown.map((t) => { const n = tourDays(t); return '<tr class="row" ondblclick="TN.edit(\'' + t.id + '\')" title="Double-click to edit"><td style="max-width:300px"><div style="font-weight:700">' + h(t.name) + '</div><div class="small muted">' + h(t.description || '') + '</div></td><td><span class="chip">' + h(t.age) + '</span></td><td style="white-space:nowrap"><div>' + fmtD(t.from) + '</div><div class="small muted">to ' + fmtD(t.to) + ' · ' + plural(n, 'day') + '</div></td><td class="small" style="max-width:220px;color:#4A3A35">' + h(cutText(t)) + '</td><td class="r"><span class="count">' + plural(t.squad.length, 'student') + '</span></td><td>' + tourPill(t) + '</td><td class="r"><button type="button" class="btn b-white sm" onclick="TN.edit(\'' + t.id + '\')" aria-label="Edit ' + h(t.name) + '">' + I.edit + 'Edit</button></td></tr>'; });
+  const P = paged('tours', rows, filter);
   const fsel = '<div style="display:inline-flex;align-items:center;gap:10px"><label for="tf" class="lbl">Status</label><select id="tf" class="sel" onchange="TN.filter(this.value)"><option value="all"' + sel(filter, 'all') + '>All</option><option value="open"' + sel(filter, 'open') + '>Open</option><option value="completed"' + sel(filter, 'completed') + '>Completed</option></select></div>';
-  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:1060px"><thead><tr><th>Tournament</th><th>Age category</th><th>Tournament dates</th><th>Eligible date of birth</th><th class="r">Squad</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:1060px"><thead><tr><th>Tournament</th><th>Age category</th><th>Tournament dates</th><th>Eligible date of birth</th><th class="r">Squad</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
     : S.tournaments.length ? emptyBox(filter === 'open' ? 'No open tournaments' : 'No completed tournaments', 'Change the Status filter to see other tournaments.') : emptyBox('No tournaments yet', 'Create the first tournament.', '<button type="button" class="btn b-blue lg" onclick="TN.newT()">New tournament</button>');
   return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>All tournaments</h2><span class="count">' + plural(shown.length, 'tournament') + '</span>' + fsel + '</div><span class="small muted">Double-click a row to edit it.</span></div>' + table + '</section></div>';
 }
@@ -1414,34 +1663,36 @@ function squadsPage() {
     const s = studentOf(m.sid); if (!s) return '';
     const b = activeBatchRec(s.id); const age = ageOf(s.dob);
     const flags = (s.active ? '' : pill('p-off', 'Inactive')) + (inCut(t, s.dob) ? '' : pill('p-bad', 'Outside cut-off'));
-    return '<tr><td style="padding-top:20px"><span class="chip">' + s.reg + '</span></td><td><div style="display:flex;align-items:center;gap:12px"><span class="frame' + (s.active ? '' : ' off') + '">' + initials(s.name) + '</span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700">' + h(s.name) + '</span><span class="small muted">' + h(s.gender || '') + '</span>' + (flags ? '<span class="acts" style="gap:6px">' + flags + '</span>' : '') + '</span></div></td><td style="white-space:nowrap"><div>' + fmtD(s.dob) + '</div><div class="small muted">' + (age != null ? age + ' yrs today' : '') + '</div></td><td>' + (b ? h(batchOf(b.batchId).name) : '<span class="muted">—</span>') + '</td><td style="white-space:nowrap">' + fmtD(m.added) + '</td><td class="r"><button type="button" class="btn b-link sm" onclick="TN.remove(\'' + s.id + '\')" aria-label="Remove ' + h(s.name) + ' from the squad">Remove</button></td></tr>';
-  }).join('');
+    return '<tr><td><span class="chip">' + s.reg + '</span></td><td><div style="display:flex;align-items:center;gap:12px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700">' + h(s.name) + '</span><span class="small muted">' + h(s.gender || '') + '</span>' + (flags ? '<span class="acts" style="gap:6px">' + flags + '</span>' : '') + '</span></div></td><td style="white-space:nowrap"><div>' + fmtD(s.dob) + '</div><div class="small muted">' + (age != null ? age + ' yrs today' : '') + '</div></td><td>' + (b ? h(batchOf(b.batchId).name) : '<span class="muted">—</span>') + '</td><td style="white-space:nowrap">' + fmtD(m.added) + '</td><td class="r"><button type="button" class="btn b-link sm" onclick="TN.remove(\'' + s.id + '\')" aria-label="Remove ' + h(s.name) + ' from the squad">Remove</button></td></tr>';
+  }).filter(Boolean);
+  const P = paged('squad', rows, t.id);
   const nFlag = t.squad.filter((m) => { const s = studentOf(m.sid); return s && (!s.active || !inCut(t, s.dob)); }).length;
   return '<div class="page wide">' + flashHtml() + head + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Squad</h2><span class="count">' + plural(t.squad.length, 'student') + '</span></div><span class="small muted">' + h(t.name) + '</span></div>' +
-    (t.squad.length ? '<div class="tw"><table class="t" style="min-width:900px"><thead><tr><th>Reg. no.</th><th>Student</th><th>Date of birth</th><th>Batch</th><th>Added on</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+    (t.squad.length ? '<div class="tw"><table class="t" style="min-width:900px"><thead><tr><th>Reg. no.</th><th>Student</th><th>Date of birth</th><th>Batch</th><th>Added on</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager +
       (nFlag ? '<div style="padding:14px 28px" class="small muted">' + plural(nFlag, 'student is', 'students are') + ' flagged: inactive, or born outside the current cut-off dates. They stay in the squad until removed.</div>' : '')
       : emptyBox('No students in this squad', 'Use Add students to pick eligible students.')) + '</section></div>';
 }
 DIALOGS.squadAdd = function () {
   const d = U.dlg; const t = tourOf(U.v.tid); const shown = TN.shown(t); const elig = TN.eligible(t);
   const nSel = Object.keys(d.sel).filter((id) => elig.some((s) => s.id === id)).length;
-  const allOn = shown.length && shown.every((s) => d.sel[s.id]);
+  const P = paged('squadAdd', shown, TN.sig(t), { dlg: 1, inner: 1 }); const allOn = P.rows.length && P.rows.every((s) => d.sel[s.id]);
   const outside = S.students.filter((s) => s.active && !inCut(t, s.dob)).length;
-  const rows = shown.map((s) => { const on = !!d.sel[s.id]; const b = activeBatchRec(s.id); const age = ageOf(s.dob); return '<tr' + (on ? ' style="background:#FBF0F0"' : '') + '><td style="width:56px"><input type="checkbox" class="ck"' + (on ? ' checked' : '') + ' onchange="TN.pick(\'' + s.id + '\')" aria-label="Select ' + h(s.name) + '"></td><td><span class="chip">' + s.reg + '</span></td><td><div style="display:flex;align-items:center;gap:12px"><span class="frame">' + initials(s.name) + '</span><span style="display:flex;flex-direction:column;gap:1px"><span style="font-weight:700">' + h(s.name) + '</span><span class="small muted">' + h(s.gender || '') + '</span></span></div></td><td style="white-space:nowrap"><div>' + fmtD(s.dob) + '</div><div class="small muted">' + (age != null ? age + ' yrs today' : '') + '</div></td><td>' + (b ? h(batchOf(b.batchId).name) : '<span class="muted">—</span>') + '</td></tr>'; }).join('');
+  const rows = P.rows.map((s) => { const on = !!d.sel[s.id]; const b = activeBatchRec(s.id); const age = ageOf(s.dob); return '<tr' + (on ? ' style="background:#FBF0F0"' : '') + '><td style="width:56px"><input type="checkbox" class="ck"' + (on ? ' checked' : '') + ' onchange="TN.pick(\'' + s.id + '\')" aria-label="Select ' + h(s.name) + '"></td><td><span class="chip">' + s.reg + '</span></td><td><div style="display:flex;align-items:center;gap:12px"><span style="display:flex;flex-direction:column;gap:1px"><span style="font-weight:700">' + h(s.name) + '</span><span class="small muted">' + h(s.gender || '') + '</span></span></div></td><td style="white-space:nowrap"><div>' + fmtD(s.dob) + '</div><div class="small muted">' + (age != null ? age + ' yrs today' : '') + '</div></td><td>' + (b ? h(batchOf(b.batchId).name) : '<span class="muted">—</span>') + '</td></tr>'; }).join('');
   const batches = S.batches.map((b) => '<option value="' + b.id + '"' + sel(d.batch, b.id) + '>' + h(b.name) + '</option>').join('');
   return '<div class="ov" role="presentation"><section class="dlg w xw" role="dialog" aria-modal="true" aria-labelledby="dlg-t">' + dlgHead('Add students', t.name, t.age + ' · ' + cutText(t)) +
     '<div class="db"><div class="note">' + I.info + '<span>Shows <strong>active</strong> students born within the tournament’s cut-off dates who are not in this squad yet.</span></div>' +
     '<div class="acts" style="gap:12px"><div class="search"><label for="sa-q" class="sr">Search students</label>' + I.search + '<input id="sa-q" type="search" value="' + h(d.q) + '" oninput="TN.dq(this)" placeholder="Registration no. or name"></div><label for="sa-b" class="sr">Batch</label><select id="sa-b" class="sel" style="height:44px;min-width:200px" onchange="TN.db(this.value)"><option value="">All batches</option>' + batches + '</select></div>' +
-    (shown.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD;max-height:52vh;overflow:auto"><table class="t"><thead><tr><th style="width:56px"><input type="checkbox" class="ck"' + (allOn ? ' checked' : '') + ' onchange="TN.pickAll(this.checked)" aria-label="Select all shown students"></th><th>Reg. no.</th><th>Student</th><th>Date of birth</th><th>Batch</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+    (shown.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD;max-height:52vh;overflow:auto"><table class="t"><thead><tr><th style="width:56px"><input type="checkbox" class="ck"' + (allOn ? ' checked' : '') + ' onchange="TN.pickAll(this.checked)" aria-label="Select all students on this page"></th><th>Reg. no.</th><th>Student</th><th>Date of birth</th><th>Batch</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + P.pager
       : '<div class="empty" style="background:#F3ECE1;border-radius:10px;padding:32px"><b style="font-size:22px">No students to show</b><span class="muted small">' + (elig.length ? 'Change the search or the batch filter.' : 'Every eligible active student is already in this squad.') + '</span></div>') +
     '<span class="small muted">' + plural(elig.length, 'eligible student') + ' not in the squad · ' + plural(outside, 'active student') + ' ' + (outside === 1 ? 'is' : 'are') + ' outside the cut-off dates and not shown.</span></div>' +
     '<div class="df" style="justify-content:space-between;align-items:center"><strong style="color:#9C1C33">' + nSel + ' selected</strong><div class="acts"><button type="button" class="btn b-white lg" onclick="closeDlg()">Cancel</button><button type="button" class="btn b-blue lg"' + (nSel ? '' : ' disabled') + ' onclick="TN.add()">' + I.check + 'Add ' + plural(nSel, 'student') + '</button></div></div></section></div>';
 };
 function profTournaments(s) {
   const ts = toursOf(s.id).sort((a, b) => (a.from < b.from ? 1 : a.from > b.from ? -1 : 0));
-  const rows = ts.map((t) => { const m = t.squad.find((x) => x.sid === s.id); return '<tr class="row" onclick="TN.open(\'' + t.id + '\')" title="Open this squad" style="cursor:pointer"><td><div style="font-weight:700">' + h(t.name) + '</div><div class="small muted">' + h(t.description || '') + '</div></td><td><span class="chip">' + h(t.age) + '</span></td><td style="white-space:nowrap">' + fmtD(t.from) + '</td><td style="white-space:nowrap">' + fmtD(t.to) + '</td><td style="white-space:nowrap">' + fmtD(m.added) + '</td><td>' + tourPill(t) + '</td></tr>'; }).join('');
+  const rows = ts.map((t) => { const m = t.squad.find((x) => x.sid === s.id); return '<tr class="row" onclick="TN.open(\'' + t.id + '\')" title="Open this squad" style="cursor:pointer"><td><div style="font-weight:700">' + h(t.name) + '</div><div class="small muted">' + h(t.description || '') + '</div></td><td><span class="chip">' + h(t.age) + '</span></td><td style="white-space:nowrap">' + fmtD(t.from) + '</td><td style="white-space:nowrap">' + fmtD(t.to) + '</td><td style="white-space:nowrap">' + fmtD(m.added) + '</td><td>' + tourPill(t) + '</td></tr>'; });
+  const P = paged('stuTours', rows, s.id, { inner: 1 });
   return '<section class="card"><div class="sec">' + band('A', 'Tournaments played', '<span style="font-size:16px">' + plural(ts.length, 'tournament') + '</span>') +
-    (ts.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:860px"><thead><tr><th>Tournament</th><th>Age category</th><th>From date</th><th>To date</th><th>Added to squad</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+    (ts.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:860px"><thead><tr><th>Tournament</th><th>Age category</th><th>From date</th><th>To date</th><th>Added to squad</th><th>Status</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
       : '<div class="empty" style="background:#F3ECE1;border-radius:10px;box-shadow:inset 0 0 0 2px #E6DCCD;padding:32px"><b style="font-size:22px">No tournaments yet</b><span class="muted small">This student is not in any tournament squad.</span></div>') +
     '<span class="small muted">Students are added to tournaments from Students › Tournaments › Squads. Click a tournament to open its squad.</span></div></section>';
 }
@@ -1735,14 +1986,15 @@ PAGES.fees = function () {
     const act = d.payment ? '<button type="button" class="btn b-link sm" onclick="F.edit(\'' + d.id + '\')">Edit</button><button type="button" class="btn b-white sm" style="width:40px;padding:0;color:#9C1C33" aria-label="Print receipt" title="Print receipt" onclick="F.receipt(\'' + d.id + '\')">' + I.print + '</button>'
       : '<button type="button" class="btn b-link sm" onclick="F.adjust(\'' + d.id + '\')">Adjust</button><button type="button" class="btn b-red sm" onclick="F.collect(\'' + d.id + '\')">Collect</button>';
     const sub = (v, first) => (v ? money(v) + (first ? '<span style="display:block;margin-top:3px;font-size:12px;font-weight:700;color:#9C1C33">1st month</span>' : '') : '<span class="muted">—</span>');
-    return '<tr><td><button type="button" class="namebtn" onclick="openStudentFees(\'' + s.id + '\')"><span class="frame">' + initials(s.name) + '</span><span style="display:flex;flex-direction:column;gap:3px"><span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px"><span class="nm" style="font-weight:700">' + h(s.name) + '</span><span class="chip">' + s.reg + '</span></span><span class="small muted">' + h(studentLine(s)) + '</span></span></button></td><td class="r num" style="padding-top:20px">' + sub(d.batchFee, d.batchFirst) + '</td><td class="r num" style="padding-top:20px">' + sub(d.transportFee, d.transportFirst) + '</td><td class="r num" style="padding-top:20px">' + sub(d.regFee) + '</td><td class="r num" style="padding-top:20px">' + (d.discount ? '<span style="color:#9C1C33;font-weight:700">−' + money(d.discount.amount) + '</span>' : '<span class="muted">—</span>') + '</td><td class="r num" style="padding-top:20px;font-weight:700">' + money(dueTotal(d)) + '</td><td style="padding-top:20px">' + stp + '</td><td style="padding-top:20px;white-space:nowrap">' + payCol + '</td><td class="r" style="white-space:nowrap;padding-top:16px">' + act + '</td></tr>';
-  }).join('');
+    return '<tr><td><button type="button" class="namebtn" onclick="openStudentFees(\'' + s.id + '\')"><span style="display:flex;flex-direction:column;gap:3px"><span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px"><span class="nm" style="font-weight:700">' + h(s.name) + '</span><span class="chip">' + s.reg + '</span></span><span class="small muted">' + h(studentLine(s)) + '</span></span></button></td><td class="r num">' + sub(d.batchFee, d.batchFirst) + '</td><td class="r num">' + sub(d.transportFee, d.transportFirst) + '</td><td class="r num">' + sub(d.regFee) + '</td><td class="r num">' + (d.discount ? '<span style="color:#9C1C33;font-weight:700">−' + money(d.discount.amount) + '</span>' : '<span class="muted">—</span>') + '</td><td class="r num" style="font-weight:700">' + money(dueTotal(d)) + '</td><td>' + stp + '</td><td style="white-space:nowrap">' + payCol + '</td><td class="r" style="white-space:nowrap">' + act + '</td></tr>';
+  });
+  const P = paged('fees', rows, ym + '|' + tab + '|' + bf + '|' + qq);
   const inactive = S.students.filter((s) => !s.active);
   return topbar('Fees', 'Fee collection') + '<div class="page wide">' + flashHtml() +
     '<div class="acts" style="gap:12px 16px">' + monthNav(ym, 'F.month') + '<span class="small muted" style="flex:1 1 260px">' + (ym <= CUR_YM ? 'Dues created on <strong style="color:#2A1619">' + fmtD(ym + '-01') + '</strong> for ' + plural(all.length, 'student') + ' · ' + (overdueSet() ? 'overdue after the <strong style="color:#2A1619">' + S.settings.overdueDay + 'th</strong>' : '<strong style="color:#9C1C33">overdue day not set in Settings</strong>') : 'Dues for ' + ymLabel(ym) + ' are created on ' + fmtD(ym + '-01') + '.') + '</span><button type="button" class="btn b-white" onclick="F.exportCsv()">' + I.down + 'Export to Excel</button></div>' +
     '<div class="stats"><button type="button" class="stat statbtn' + (tab === 'all' ? ' on' : '') + '" style="--c:#9C1C33" aria-pressed="' + (tab === 'all') + '" title="Show all dues" onclick="F.tab(\'all\')"><span class="k">Due this month</span><span class="v">' + money(tot) + ' <small>AED</small></span><span class="s">' + plural(all.length, 'monthly due') + '</span></button><button type="button" class="stat statbtn' + (tab === 'paid' ? ' on' : '') + '" style="--c:#2F6B3A" aria-pressed="' + (tab === 'paid') + '" title="Show paid dues" onclick="F.tab(\'paid\')"><span class="k">Collected</span><span class="v">' + money(coll) + ' <small>AED</small></span><span class="s">' + paid.length + ' paid · ' + pct + '% of the month</span><div style="margin-top:6px;height:8px;border-radius:999px;background:#EFE6D8;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:#2F6B3A"></div></div></button><button type="button" class="stat statbtn' + (tab === 'overdue' ? ' on' : '') + '" style="--c:#9C1C33" aria-pressed="' + (tab === 'overdue') + '" title="Show overdue dues" onclick="F.tab(\'overdue\')"><span class="k">Overdue</span><span class="v">' + money(odAmt) + ' <small>AED</small></span><span class="s">' + od.length + (overdueSet() ? ' unpaid after ' + fmtD(overdueFrom(ym)).slice(0, 6) : ' · overdue day not set') + '</span></button><button type="button" class="stat statbtn' + (tab === 'discounted' ? ' on' : '') + '" style="--c:#7D540B" aria-pressed="' + (tab === 'discounted') + '" title="Show discounted dues" onclick="F.tab(\'discounted\')"><span class="k">Discounts</span><span class="v">' + money(discAmt) + ' <small>AED</small></span><span class="s">' + plural(disc.length, 'due') + ' adjusted this month</span></button></div>' +
     '<div class="acts" style="gap:16px"><div class="seg" role="tablist">' + seg('all', 'All', all.length, '#7A1428') + seg('pending', 'Pending', pend.length, '#6E5D57') + seg('overdue', 'Overdue', od.length, '#9C1C33') + seg('paid', 'Paid', paid.length, '#2F6B3A') + '</div><label for="fbatch" class="sr">Batch</label><select id="fbatch" class="sel" style="height:44px;background:#FFFDF9;box-shadow:inset 0 0 0 1px #DCCFBC" onchange="F.batch(this.value)"><option value="">All batches</option>' + S.batches.map((b) => '<option value="' + b.id + '"' + sel(bf, b.id) + '>' + h(b.name) + '</option>').join('') + '</select><div class="search"><label for="fsearch" class="sr">Filter this list</label>' + I.search + '<input id="fsearch" type="search" value="' + h(U.v.q || '') + '" oninput="F.search(this)" placeholder="Reg. no., name or receipt no."></div></div>' +
-    '<section class="card">' + (shown.length ? '<div class="tw"><table class="t" style="min-width:1080px;font-size:14px"><thead><tr><th>Student</th><th class="r">Batch</th><th class="r">Transport</th><th class="r">Regn. fee</th><th class="r">Discount</th><th class="r">Due AED</th><th>Status</th><th>Payment</th><th class="r">Action</th></tr></thead><tbody>' + rows + '</tbody></table></div><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:14px 28px" class="small muted"><span>Showing <strong style="color:#2A1619">' + shown.length + '</strong> of <strong style="color:#2A1619">' + all.length + '</strong> dues</span><span>Total due <strong style="color:#2A1619">' + money(tot) + ' AED</strong> · Collected <strong style="color:#2F6B3A">' + money(coll) + ' AED</strong> · Overdue <strong style="color:#9C1C33">' + money(odAmt) + ' AED</strong></span></div>' : emptyBox(all.length ? 'No dues match' : 'No dues for ' + ymLabel(ym), all.length ? 'Change the filters or the search.' : ym > CUR_YM ? 'Dues are created on the 1st of the month.' : 'No active student had a batch or transport this month.')) + '</section>' +
+    '<section class="card">' + (shown.length ? '<div class="tw"><table class="t" style="min-width:1080px;font-size:14px"><thead><tr><th>Student</th><th class="r">Batch</th><th class="r">Transport</th><th class="r">Regn. fee</th><th class="r">Discount</th><th class="r">Due AED</th><th>Status</th><th>Payment</th><th class="r">Action</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager + '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:14px 28px" class="small muted"><span>' + (P.pager ? 'Matching' : 'Showing') + ' <strong style="color:#2A1619">' + shown.length + '</strong> of <strong style="color:#2A1619">' + all.length + '</strong> dues</span><span>Total due <strong style="color:#2A1619">' + money(tot) + ' AED</strong> · Collected <strong style="color:#2F6B3A">' + money(coll) + ' AED</strong> · Overdue <strong style="color:#9C1C33">' + money(odAmt) + ' AED</strong></span></div>' : emptyBox(all.length ? 'No dues match' : 'No dues for ' + ymLabel(ym), all.length ? 'Change the filters or the search.' : ym > CUR_YM ? 'Dues are created on the 1st of the month.' : 'No active student had a batch or transport this month.')) + '</section>' +
     '<div class="note">' + I.info + '<span>A due is created on the 1st of each month for every active student, from their batch fee and transport fee. Inactive students get no new dues' + (inactive.length ? ': <strong>' + inactive.map((s) => s.reg + ' ' + h(s.name)).join(', ') + '</strong> ' + (inactive.length === 1 ? 'is' : 'are') + ' inactive' : '') + '. Each due is paid in full, in one payment.</span></div></div>';
 };
 /* ============ REPORTS ============ */
@@ -1855,7 +2107,7 @@ function collectPage() {
   if (f.mode === 'Cheque') det = '<div style="margin-top:22px;padding:18px;border-radius:10px;background:#F3ECE1;box-shadow:inset 0 0 0 1px #E6DCCD;display:flex;flex-direction:column;gap:14px"><span class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6E5D57">Cheque details · optional</span><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px 20px"><div class="fld"><label for="c-no">Cheque no.</label><input id="c-no" class="in" maxlength="20" value="' + h(f.chequeNo) + '" oninput="setF(\'chequeNo\',this.value)"></div><div class="fld"><label for="c-bank">Bank</label><input id="c-bank" class="in" maxlength="100" value="' + h(f.bank) + '" oninput="setF(\'bank\',this.value)"></div><div class="fld"><label for="c-date">Cheque date</label><input id="c-date" type="date" class="in" value="' + h(f.chequeDate) + '" onchange="setF(\'chequeDate\',this.value)"></div></div></div>';
   const total = dueTotal(d);
   return topbar('Fees · ' + dueLabel(d), 'Collect payment') + '<div class="page">' + backBtn(U.v.back === 'student' ? 'Back to ' + s.name : 'Back to fee collection · ' + ymLabel(d.month), 'F.leaveCollect()') +
-    '<section class="card" style="display:flex;flex-wrap:wrap;align-items:center;gap:16px 20px;padding:18px 22px;box-shadow:0 0 0 1px #E6DCCD,inset 6px 0 0 #7A1428"><span class="frame" style="width:56px;height:66px;font-size:24px">' + initials(s.name) + '</span><div style="flex:1 1 280px;display:flex;flex-direction:column;gap:6px"><div class="acts" style="gap:10px"><h2 class="cond" style="margin:0;font-weight:800;font-size:30px;line-height:1;text-transform:uppercase">' + h(s.name) + '</h2><span class="chip">' + s.reg + '</span></div><span class="small" style="color:#4A3A35">' + (b ? h(b.name) + ' · ' + h(locName(b.locationId)) + ' · ' + daysText(b.days) : 'No batch') + ' · ' + (t ? h(t.routeNumber) : 'No transport') + '</span></div>' + (st === 'Overdue' ? pill('p-bad', 'Overdue · ' + plural(daysLate(d), 'day'), 1) : pill('p-pend', 'Pending', 1)) + '</section>' +
+    '<section class="card" style="display:flex;flex-wrap:wrap;align-items:center;gap:16px 20px;padding:18px 22px;box-shadow:0 0 0 1px #E6DCCD,inset 6px 0 0 #7A1428"><div style="flex:1 1 280px;display:flex;flex-direction:column;gap:6px"><div class="acts" style="gap:10px"><h2 class="cond" style="margin:0;font-weight:800;font-size:30px;line-height:1;text-transform:uppercase">' + h(s.name) + '</h2><span class="chip">' + s.reg + '</span></div><span class="small" style="color:#4A3A35">' + (b ? h(b.name) + ' · ' + h(locName(b.locationId)) + ' · ' + daysText(b.days) : 'No batch') + ' · ' + (t ? h(t.routeNumber) : 'No transport') + '</span></div>' + (st === 'Overdue' ? pill('p-bad', 'Overdue · ' + plural(daysLate(d), 'day'), 1) : pill('p-pend', 'Pending', 1)) + '</section>' +
     '<form style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start" onsubmit="event.preventDefault();F.saveCollect()" novalidate><div style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px">' +
     '<section class="card" style="padding:24px">' + band('A', dueLabel(d) + (d.kind === 'monthly' ? ' due' : ''), d.kind === 'monthly' ? '<button type="button" class="btn sm" style="background:rgba(255,255,255,.14);color:#fff;min-height:32px" onclick="F.adjust(\'' + d.id + '\')">' + I.edit + 'Adjust</button>' : '') + '<div style="margin-top:8px">' + lines + '<div style="display:flex;align-items:baseline;gap:16px;padding:16px 0 0"><span class="cond" style="flex:1;font-weight:800;font-size:20px;letter-spacing:.06em;text-transform:uppercase">Total due</span><span class="cond" style="font-weight:800;font-size:30px">' + money(total) + ' AED</span></div></div></section>' +
     '<section class="card" style="padding:24px">' + band('B', 'Payment') + '<div class="grid" style="margin-top:20px"><div class="fld"><label for="p-date">Paid on <span class="req">*</span></label><input id="p-date" type="date" max="' + TODAY + '" class="in' + fxCls(e.date) + '" value="' + h(f.date) + '" onchange="setF(\'date\',this.value);render()">' + (e.date ? errTxt(e.date) : '<span class="hint">Today or an earlier date. Future dates are not allowed.</span>') + '</div><div class="fld"><label for="p-amt">Amount received</label><div class="suffix" style="background:#F7F2EA;box-shadow:inset 0 0 0 1px #DCCFBC;color:#6E5D57;padding-left:14px;gap:6px">' + I.lock + '<input id="p-amt" readonly value="' + money(total) + '" style="padding-left:4px"><span>AED</span></div><span class="hint">Full payment only. It always equals the total due.</span></div></div>' +
@@ -1963,10 +2215,11 @@ function profFees(s) {
     const act = d.payment ? '<a href="javascript:void 0" onclick="F.receipt(\'' + d.id + '\')" style="font-weight:600;text-decoration:none">' + d.payment.receiptNo + '</a>' + (s.active ? '<button type="button" class="btn b-link sm" onclick="F.edit(\'' + d.id + '\')">Edit</button>' : '')
       : '<button type="button" class="btn b-link sm" onclick="F.adjust(\'' + d.id + '\')">Adjust</button><button type="button" class="btn b-red sm" onclick="F.collect(\'' + d.id + '\',\'student\')">Collect</button>';
     return '<tr><td style="white-space:nowrap;font-weight:700">' + (d.kind === 'registration' ? '<span style="display:flex;align-items:center;gap:10px">' + ymLabel(d.month) + '<span class="pill p-up" style="border-radius:4px;font-size:12px;text-transform:uppercase;letter-spacing:.06em">Registration fee</span></span>' : ymLabel(d.month)) + '</td>' + cells + '<td class="r num" style="font-weight:700">' + money(dueTotal(d)) + (d.kind === 'monthly' && d.regFee ? '<span class="tiny muted" style="display:block">incl. reg. fee ' + money(d.regFee) + '</span>' : '') + '</td><td>' + stp + '</td><td style="white-space:nowrap">' + (d.payment ? fmtD(d.payment.date) + '<span class="small muted" style="display:block">' + h(d.payment.mode) + '</span>' : '—') + '</td><td class="r" style="white-space:nowrap">' + act + '</td></tr>';
-  }).join('');
+  });
+  const P = paged('stuFees', rows, s.id + '|' + yr);
   return '<section class="card" style="display:flex;flex-wrap:wrap">' + stat('Outstanding', money(outstanding) + ' AED', outstanding ? 'Unpaid dues' : 'Nothing due right now', outstanding ? '#9C1C33' : '#2F6B3A') + stat('Paid in ' + yr, money(paidAmt) + ' AED', plural(paidYr.length, 'payment')) + stat('Monthly fee now', money(nowFee) + ' AED', (b ? 'Batch ' + money(b.fee) : 'No batch') + (t ? ' + ' + h(t.routeNumber) + ' ' + money(t.fee) : '')) + stat('Last payment', last ? fmtD(last.payment.date) : '—', last ? h(last.payment.mode) + ' · ' + last.payment.receiptNo : 'No payments yet') + '</section>' +
     '<section class="card"><div class="cardhead" style="padding:16px 20px"><h2 class="cond" style="letter-spacing:.06em">Fee ledger</h2><div class="acts"><label for="yr" class="lbl">Year</label><select id="yr" class="sel" onchange="U.v.year=this.value;render()">' + years.map((y) => '<option' + sel(yr, y) + '>' + y + '</option>').join('') + '</select></div></div>' +
-    (rows ? '<div class="tw"><table class="t" style="min-width:940px;font-size:14px"><thead><tr><th>Month</th><th class="r">Batch</th><th class="r">Transport</th><th class="r">Discount</th><th class="r">Due (AED)</th><th>Status</th><th>Paid on</th><th class="r">Receipt</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : emptyBox('No dues in ' + yr, 'Dues appear once the student has a batch or transport.')) + '</section>' +
+    (rows.length ? '<div class="tw"><table class="t" style="min-width:940px;font-size:14px"><thead><tr><th>Month</th><th class="r">Batch</th><th class="r">Transport</th><th class="r">Discount</th><th class="r">Due (AED)</th><th>Status</th><th>Paid on</th><th class="r">Receipt</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager : emptyBox('No dues in ' + yr, 'Dues appear once the student has a batch or transport.')) + '</section>' +
     '<div class="note">' + I.info + '<span>Every due and payment is also written to the student\'s History. If the student is marked inactive, no new dues are created from the next month; an unpaid due stays here until it is collected.</span></div>';
 }
 /* ============ ATTENDANCE (students) ============ */
@@ -1985,8 +2238,9 @@ const AT = {
   ym: () => U.v.ym || CUR_YM,
   setBatch: (id) => { U.v.batchId = id; U.flash = null; render(); },
   month: (k) => { U.v.ym = k === 0 ? CUR_YM : ymShift(AT.ym(), k); U.flash = null; render(); },
-  goGrid: () => { U.v = { view: 'grid', batchId: U.v.batchId, ym: U.v.ym }; U.dlg = null; U.flash = null; render(); },
-  openStudent: (sid) => { U.v = { view: 'student', batchId: U.v.batchId, ym: U.v.ym, studentId: sid }; U.flash = null; render(); window.scrollTo(0, 0); },
+  search: (el) => { U.v.q = el.value; U.refocus = el.id; render(); },
+  goGrid: () => { U.v = { view: 'grid', batchId: U.v.batchId, ym: U.v.ym, q: U.v.q }; U.dlg = null; U.flash = null; render(); },
+  openStudent: (sid) => { U.v = { view: 'student', batchId: U.v.batchId, ym: U.v.ym, q: U.v.q, studentId: sid }; U.flash = null; render(); window.scrollTo(0, 0); },
   // click P / A on the monthly sheet: switch and save straight away
   mark: (bid, iso, sid) => {
     if (iso > TODAY || !inBatchOn(sid, bid, iso)) return;
@@ -2029,9 +2283,11 @@ PAGES.attendance = function () {
   const v = U.v.view || 'grid';
   return topbar('Peak Sports Academy', 'Student attendance') + (v === 'student' ? studentAttendance() : attGrid());
 };
+const attSearch = (id, val, fn, ph) => '<div class="acts" style="gap:12px 16px;padding:14px 28px;border-bottom:1px solid #EDE4D6;background:#FBF6EE"><div class="search" style="max-width:440px">' + I.search + '<input id="' + id + '" type="search" aria-label="' + ph + '" value="' + h(val || '') + '" oninput="' + fn + '(this)" placeholder="' + ph + '"></div></div>';
 function attGrid() {
   const b = AT.batch(); if (!b) return '<div class="page wide"><section class="card">' + emptyBox('No batches yet', 'Create a batch in Batches and Locations first.') + '</section></div>';
   const ym = AT.ym(); const dates = classDatesOf(b, ym); const roster = rosterFor(b.id, ym);
+  const qq = (U.v.q || '').trim().toLowerCase(); const found = roster.filter((s) => !qq || s.name.toLowerCase().includes(qq) || s.reg.toLowerCase().includes(qq));
   const opts = S.batches.filter((x) => x.active || x.id === b.id).map((x) => '<option value="' + x.id + '"' + sel(b.id, x.id) + '>' + h(x.name + ' · ' + locName(x.locationId)) + '</option>').join('');
   const cols = dates.map((iso) => {
     const d = toD(iso); const eff = coachesOn(b.id, iso); const names = eff ? eff.ids.map(coachName) : [];
@@ -2039,7 +2295,7 @@ function attGrid() {
     const inner = '<span class="dw">' + DOW[d.getDay()] + '</span><span class="dd">' + d.getDate() + '</span>';
     return '<th scope="col" class="th-date" style="padding:6px 4px;text-align:center;min-width:52px">' + tip + (iso <= TODAY ? '<button type="button" class="datebtn' + (iso === TODAY ? ' today' : '') + '" onclick="AT.openCoaches(\'' + b.id + '\',\'' + iso + '\')" aria-label="Coaches for ' + fmtLong(iso) + '">' + inner + '</button>' : '<span tabindex="0" class="datebtn fut" style="cursor:default" aria-label="' + fmtLong(iso) + ', upcoming">' + inner + '</span>') + '</th>';
   }).join('');
-  const rows = roster.map((s) => {
+  const rows = found.map((s) => {
     let held = 0, abs = 0; const r = S.brec[s.id];
     const cells = dates.map((iso) => {
       if (!inBatchOn(s.id, b.id, iso)) return '<td style="padding:6px 4px;text-align:center" title="' + fmtShort(iso) + ': not in batch"><span class="mark m-n">–</span></td>';
@@ -2049,11 +2305,13 @@ function attGrid() {
     }).join('');
     const note = r.inactivated && r.inactivated <= ym + '-' + pad(daysIn(ym)) ? ' · inactive from ' + fmtShort(r.inactivated) : r.effective >= ym + '-01' ? ' · joined ' + fmtShort(r.effective) : '';
     return '<tr><th scope="row" class="sticky" style="text-align:left;padding:10px 16px 10px 28px;border-bottom:1px solid #EDE4D6;font-weight:400"><button type="button" class="namebtn" onclick="AT.openStudent(\'' + s.id + '\')"><span style="display:flex;flex-direction:column;gap:1px"><span class="nm" style="font-weight:700;font-size:15px">' + h(s.name) + '</span><span class="tiny muted">' + s.reg + h(note) + '</span></span></button></th>' + cells + '<td class="r num" style="position:sticky;right:140px;min-width:110px;width:110px;max-width:110px;box-sizing:border-box;background:#FFFDF9;z-index:1;box-shadow:-1px 0 0 #EDE4D6;font-weight:700;color:' + (abs ? '#9C1C33' : '#A08F86') + '">' + abs + '</td><td class="r num" style="position:sticky;right:0px;min-width:140px;width:140px;max-width:140px;box-sizing:border-box;background:#FFFDF9;z-index:1;font-weight:700">' + (held ? Math.round((held - abs) / held * 100) + '%' : '—') + '</td></tr>';
-  }).join('');
+  });
+  const P = paged('att', rows, b.id + '|' + ym + '|' + qq);
   const body = !dates.length ? emptyBox('No classes this month', 'This batch has no class dates in ' + ymLabel(ym) + '.') : !roster.length ? emptyBox('No students in this batch', 'Assign students to the batch from their details page.')
-    : '<div class="tw att-tw cal"><table class="t" style="min-width:860px"><thead><tr><th scope="col" class="sticky" style="min-width:220px">Student</th>' + cols + '<th class="r" style="position:sticky;right:140px;min-width:110px;width:110px;max-width:110px;box-sizing:border-box;background:#F3ECE1;z-index:1;box-shadow:-1px 0 0 #E6DCCD">Absent</th><th class="r" style="position:sticky;right:0px;min-width:140px;width:140px;max-width:140px;box-sizing:border-box;background:#F3ECE1;z-index:1;">Attendance</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+    : !found.length ? emptyBox('No students match', 'No student in this batch matches ' + q(U.v.q.trim()) + '. Change the search.')
+    : '<div class="tw att-tw cal"><table class="t" style="min-width:860px"><thead><tr><th scope="col" class="sticky" style="min-width:220px">Student</th>' + cols + '<th class="r" style="position:sticky;right:140px;min-width:110px;width:110px;max-width:110px;box-sizing:border-box;background:#F3ECE1;z-index:1;box-shadow:-1px 0 0 #E6DCCD">Absent</th><th class="r" style="position:sticky;right:0px;min-width:140px;width:140px;max-width:140px;box-sizing:border-box;background:#F3ECE1;z-index:1;">Attendance</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager +
     '<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;padding:16px 28px 20px"><div class="legend"><span><span class="mark m-p" style="width:24px;height:22px;font-size:12px">P</span>Present</span><span><span class="mark m-a" style="width:24px;height:22px;font-size:12px">A</span>Absent</span><span><span class="mark m-u" style="width:24px;height:22px"></span>Upcoming</span><span><span class="mark m-n" style="width:24px;height:22px">–</span>Not in batch</span></div><span class="small muted">Everyone counts as present unless marked absent. Click P or A to switch it; it saves straight away. Click a date to see and change its coaches.</span></div>';
-  return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Monthly attendance</h2><span class="count">' + plural(dates.length, 'class', 'classes') + '</span></div><div class="acts" style="gap:12px 20px"><div style="display:inline-flex;align-items:center;gap:10px"><label for="at-batch" class="lbl">Batch</label><select id="at-batch" class="sel" style="min-width:240px" onchange="AT.setBatch(this.value)">' + opts + '</select></div>' + monthNav(ym, 'AT.month') + '</div></div>' + body + '</section></div>';
+  return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Monthly attendance</h2><span class="count">' + plural(dates.length, 'class', 'classes') + '</span></div><div class="acts" style="gap:12px 20px"><div style="display:inline-flex;align-items:center;gap:10px"><label for="at-batch" class="lbl">Batch</label><select id="at-batch" class="sel" style="min-width:240px" onchange="AT.setBatch(this.value)">' + opts + '</select></div>' + monthNav(ym, 'AT.month') + '</div></div>' + (dates.length && roster.length ? attSearch('at-q', U.v.q, 'AT.search', 'Search student name or registration no.') : '') + body + '</section></div>';
 }
 DIALOGS.coaches = function () {
   const d = U.dlg; const b = batchOf(d.bid); const iso = d.iso; const eff = coachesOn(b.id, iso); const isFirst = !eff; const nxt = nextChange(b.id, iso);
@@ -2068,23 +2326,25 @@ DIALOGS.coaches = function () {
     '<div class="acts"><button type="button" class="btn b-blue" onclick="AT.confirmScope()">Apply</button><button type="button" class="btn b-link" onclick="AT.cancelEdit()">Keep current coaches</button></div></div>' : '';
   const picker = d.editCoaches ? '<fieldset style="margin:0;padding:16px 18px;border:0;border-radius:10px;background:#F3ECE1;display:flex;flex-direction:column;gap:12px"><legend class="lbl" style="float:left;padding:0;margin-bottom:4px">' + (isFirst ? 'Coaches for this batch' : 'Change coaches') + ' <span class="req">*</span></legend><div class="choice" style="clear:both">' + opts + '</div>' + (d.pickErr ? errTxt('Pick at least one coach.') : '') +
     (isFirst ? '<span class="small muted">No coaches are assigned to this batch yet. The coaches you pick apply from ' + fmtShort(iso) + ' onward until someone changes them. Attendance can be marked once coaches are saved.</span>' : d.askScope ? scopeBox : '<div class="acts"><button type="button" class="btn b-blue" onclick="AT.applyEdit()">Apply change</button><button type="button" class="btn b-link" onclick="AT.cancelEdit()">Keep current coaches</button></div>') + '</fieldset>' : '';
-  const crow = rowIds.map((cid) => { const r = d.coachRows[cid] || coachMinFor(b, iso, cid); if (!d.coachRows[cid]) d.coachRows[cid] = r; return '<tr><td><span style="display:inline-flex;align-items:center;gap:10px;font-weight:700"><span class="ini" style="width:34px;height:34px;font-size:14px">' + initials(coachName(cid)) + '</span>' + h(coachName(cid)) + '</span></td><td><label for="rm-' + cid + '" class="sr">Remarks for ' + h(coachName(cid)) + '</label><input id="rm-' + cid + '" class="in" style="height:44px;font-size:15px" maxlength="255" value="' + h(r.rem) + '" oninput="AT.rem(\'' + cid + '\',this)" placeholder="Optional note"><span id="rc-' + cid + '" class="tiny muted" style="display:block;margin-top:4px;text-align:right">' + (r.rem || '').length + ' / 255</span></td></tr>'; }).join('');
+  const crow = rowIds.map((cid) => { const r = d.coachRows[cid] || coachMinFor(b, iso, cid); if (!d.coachRows[cid]) d.coachRows[cid] = r; return '<tr><td><span style="display:inline-flex;align-items:center;gap:10px;font-weight:700">' + h(coachName(cid)) + '</span></td><td><label for="rm-' + cid + '" class="sr">Remarks for ' + h(coachName(cid)) + '</label><input id="rm-' + cid + '" class="in" style="height:44px;font-size:15px" maxlength="255" value="' + h(r.rem) + '" oninput="AT.rem(\'' + cid + '\',this)" placeholder="Optional note"><span id="rc-' + cid + '" class="tiny muted" style="display:block;margin-top:4px;text-align:right">' + (r.rem || '').length + ' / 255</span></td></tr>'; });
+  const cP = paged('dayCoaches', crow, b.id + '|' + iso, { dlg: 1, inner: 1 });
   const source = !isFirst && !d.scope && !d.editCoaches ? (eff.override ? 'Coaches changed for this date only. The usual coaches return on the next class.' : (eff.from === iso ? 'Coaches set from this date' : 'Coaches carried from ' + fmtLong(eff.from)) + (nxt ? ' · they change on ' + fmtLong(nxt.from) : ' · they stay until changed')) : '';
   return dlgWrap(dlgHead('Coaches', fmtLong(iso), b.name + ' · ' + locName(b.locationId)) +
     '<div class="db"><div class="acts" style="justify-content:space-between;align-items:flex-start"><span class="small" style="flex:1 1 300px;color:#4A3A35">Each coach listed here is paid <strong style="color:#2A1619">one session</strong> for this class. If a coach didn\'t come, remove them with Change coaches (only for this date).</span>' + (!isFirst && !d.editCoaches ? '<button type="button" class="btn b-white" onclick="AT.startEdit()">' + I.edit + 'Change coaches</button>' : '') + '</div>' + picker +
-    (rowIds.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:600px"><thead><tr><th style="width:34%">Coach</th><th>Remarks</th></tr></thead><tbody>' + crow + '</tbody></table></div>' : '') +
+    (rowIds.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:600px"><thead><tr><th style="width:34%">Coach</th><th>Remarks</th></tr></thead><tbody>' + cP.rows.join('') + '</tbody></table></div>' + cP.pager : '') +
     (d.scope ? '<span class="pill p-pend" style="align-self:flex-start">' + (d.scope === 'day' ? 'Coach change for ' + fmtShort(iso) + ' only. Not saved yet.' : 'Coach change from ' + fmtShort(iso) + ' onward. Not saved yet.') + '</span>' : '') + (source ? '<span class="small muted">' + h(source) + '</span>' : '') + (saveErr ? '<span role="alert" class="err" style="font-size:13px">' + saveErr + '</span>' : '') + '</div>' +
     '<div class="df"><button type="button" class="btn b-white" onclick="closeDlg()">Cancel</button><button type="button" class="btn b-blue" onclick="AT.saveCoaches()">' + I.check + 'Save</button></div>', true);
 };
 function studentAttendance() {
   const s = studentOf(U.v.studentId); const r = S.brec[s.id]; const b = r ? batchOf(r.batchId) : null; const ym = AT.ym();
   const ds = b ? classDatesOf(b, ym).filter((iso) => inBatchOn(s.id, b.id, iso)) : []; let held = 0, abs = 0;
-  const rows = ds.map((iso, i) => { const fut = iso > TODAY; const a = !fut && !!S.att.absent[akey(b.id, iso, s.id)]; if (!fut) { held++; if (a) abs++; } const eff = coachesOn(b.id, iso); return '<tr><td class="num" style="font-weight:700;color:#6E5D57">' + (i + 1) + '</td><td style="font-weight:600">' + fmtLong(iso) + '</td><td>' + (fut ? pill('p-off', 'Upcoming') : a ? pill('p-bad', 'Absent') : pill('p-on', 'Present')) + '</td><td style="color:#4A3A35">' + (eff ? h(eff.ids.map(coachName).join(', ')) : '—') + '</td></tr>'; }).join('');
+  const rows = ds.map((iso, i) => { const fut = iso > TODAY; const a = !fut && !!S.att.absent[akey(b.id, iso, s.id)]; if (!fut) { held++; if (a) abs++; } const eff = coachesOn(b.id, iso); return '<tr><td class="num" style="font-weight:700;color:#6E5D57">' + (i + 1) + '</td><td style="font-weight:600">' + fmtLong(iso) + '</td><td>' + (fut ? pill('p-off', 'Upcoming') : a ? pill('p-bad', 'Absent') : pill('p-on', 'Present')) + '</td><td style="color:#4A3A35">' + (eff ? h(eff.ids.map(coachName).join(', ')) : '—') + '</td></tr>'; });
+  const P = paged('stuAtt', rows, s.id + '|' + ym, { inner: 1 });
   const stat = (k, v, col) => '<div style="display:flex;flex-direction:column;gap:6px;padding:20px 32px;background:#FFFDF9"><span class="lbl">' + k + '</span><span class="cond" style="font-weight:800;font-size:36px;line-height:1;color:' + col + '">' + v + '</span></div>';
   return '<div class="page wide tight">' + backBtn('Back to ' + (b ? b.name + ' · ' + MONTHS[+ym.slice(5) - 1] : 'attendance'), 'AT.goGrid()') + flashHtml() +
-    '<article class="card"><div class="dethead"><div style="display:flex;align-items:center;gap:18px"><span class="ini" style="width:64px;height:64px;font-size:26px;box-shadow:0 0 0 3px #fff,0 0 0 5px #7A1428">' + initials(s.name) + '</span><div style="display:flex;flex-direction:column;gap:6px"><span class="eyebrow">Student attendance · ' + s.reg + '</span><h2 class="bigtitle">' + h(s.name) + '</h2><span class="acts" style="gap:10px;font-size:15px;font-weight:600;color:#4A3A35">' + (b ? h(b.name + ' · ' + locName(b.locationId)) : 'No batch') + ' ' + statusPill(s.active) + '</span></div></div>' + monthNav(ym, 'AT.month') + '</div>' +
+    '<article class="card"><div class="dethead"><div style="display:flex;align-items:center;gap:18px"><div style="display:flex;flex-direction:column;gap:6px"><span class="eyebrow">Student attendance · ' + s.reg + '</span><h2 class="bigtitle">' + h(s.name) + '</h2><span class="acts" style="gap:10px;font-size:15px;font-weight:600;color:#4A3A35">' + (b ? h(b.name + ' · ' + locName(b.locationId)) : 'No batch') + ' ' + statusPill(s.active) + '</span></div></div>' + monthNav(ym, 'AT.month') + '</div>' +
     '<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:#EDE4D6;border-bottom:1px solid #EDE4D6">' + stat('Classes so far', held, '#2A1619') + stat('Present', held - abs, '#2F6B3A') + stat('Absent', abs, '#9C1C33') + stat('Attendance', held ? Math.round((held - abs) / held * 100) + '%' : '—', '#9C1C33') + '</div>' +
-    '<section class="sec">' + band('A', 'Class dates') + (rows ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:640px"><thead><tr><th style="width:64px">#</th><th>Date</th><th>Status</th><th>Coaches</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : '<span class="muted">No class dates for this student in ' + ymLabel(ym) + '.</span>') + '</section></article></div>';
+    '<section class="sec">' + band('A', 'Class dates') + (rows.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:640px"><thead><tr><th style="width:64px">#</th><th>Date</th><th>Status</th><th>Coaches</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager : '<span class="muted">No class dates for this student in ' + ymLabel(ym) + '.</span>') + '</section></article></div>';
 }
 
 /* ============ COACH ATTENDANCE ============ */
@@ -2104,14 +2364,16 @@ const sessAmount = (x) => { const k = rateOn(coachOf(x.cid), x.iso); return k ? 
 const CA = {
   ym: () => U.v.ym || CUR_YM,
   month: (k) => { U.v.ym = k === 0 ? CUR_YM : ymShift(CA.ym(), k); render(); },
-  open: (cid) => { U.v = { view: 'statement', ym: CA.ym(), cid }; render(); window.scrollTo(0, 0); },
-  back: () => { U.v = { view: 'grid', ym: CA.ym() }; render(); }
+  search: (el) => { U.v.q = el.value; U.refocus = el.id; render(); },
+  open: (cid) => { U.v = { view: 'statement', ym: CA.ym(), q: U.v.q, cid }; render(); window.scrollTo(0, 0); },
+  back: () => { U.v = { view: 'grid', ym: CA.ym(), q: U.v.q }; render(); }
 };
 PAGES.coachatt = function () { return topbar('Peak Sports Academy', 'Coach attendance') + (U.v.view === 'statement' ? coachStatement() : coachGrid()); };
 const SR = (right, w, bg) => 'position:sticky;right:' + right + 'px;min-width:' + w + 'px;width:' + w + 'px;box-sizing:border-box;background:' + (bg || '#fff') + ';z-index:1;';
 function coachGrid() {
   const ym = CA.ym(); const n = daysIn(ym); const ss = sessionsIn(ym);
-  const coaches = S.coaches.filter((c) => c.active || ss.some((x) => x.cid === c.id)).sort((a, b) => a.name.localeCompare(b.name));
+  const listed = S.coaches.filter((c) => c.active || ss.some((x) => x.cid === c.id)).sort((a, b) => a.name.localeCompare(b.name));
+  const qq = (U.v.q || '').trim().toLowerCase(); const coaches = listed.filter((c) => !qq || c.name.toLowerCase().includes(qq)); // totals add up the coaches that match the search
   const heads = Array.from({ length: n }, (_, i) => { const iso = ym + '-' + pad(i + 1); const d = toD(iso); return '<th style="padding:8px 1px;text-align:center;min-width:34px;' + (iso === TODAY ? 'box-shadow:inset 0 -3px 0 #9C1C33;' : '') + '"><span style="display:block;font-size:10px;letter-spacing:.06em">' + DOW[d.getDay()].slice(0, 2) + '</span><span class="cond" style="font-size:16px;font-weight:800;color:' + (iso > TODAY ? '#A08F86' : '#2A1619') + '">' + (i + 1) + '</span></th>'; }).join('');
   let gSes = 0, gAmt = 0, gNoRate = false; const dayTot = Array(n).fill(0);
   const rows = coaches.map((c) => {
@@ -2126,9 +2388,9 @@ function coachGrid() {
     gSes += mine.length; gAmt += tAmt; if (noRate) gNoRate = true;
     return '<tr><th scope="row" class="sticky" style="text-align:left;padding:8px 14px 8px 28px;border-bottom:1px solid #EDE4D6;font-weight:400;min-width:210px"><button type="button" class="namebtn" onclick="CA.open(\'' + c.id + '\')"><span style="display:flex;flex-direction:column;gap:1px"><span class="nm" style="font-weight:700">' + h(c.name) + '</span><span class="tiny muted">' + (c.active ? 'Active' : 'Inactive') + '</span></span></button></th>' + cells + '<td class="r num" style="font-weight:700;padding-left:14px;' + SR(150, 110) + 'box-shadow:-1px 0 0 #EDE4D6">' + mine.length + '</td><td class="r num" style="font-weight:800;white-space:nowrap;' + SR(0, 150) + '">' + money2(tAmt) + (noRate ? '<span class="tiny" style="display:block;color:#9C1C33;font-weight:600">Rate missing</span>' : '') + '</td></tr>';
   }).join('');
-  const totRow = '<tr style="background:#F3ECE1"><th scope="row" class="sticky" style="text-align:left;padding:12px 14px 12px 28px;background:#F3ECE1;font-family:\'Young Serif\',Georgia,serif;font-weight:400;font-size:17px">Total</th>' + dayTot.map((m) => '<td style="padding:6px 2px;text-align:center;font-weight:700;font-size:12px;color:#6E5D57" class="num">' + (m || '') + '</td>').join('') + '<td class="r num" style="font-weight:800;padding-left:14px;' + SR(150, 110, '#F3ECE1') + 'box-shadow:-1px 0 0 #E6DCCD">' + gSes + '</td><td class="r num" style="font-weight:800;' + SR(0, 150, '#F3ECE1') + '">' + money2(gAmt) + '</td></tr>';
-  return '<div class="page wide" style="max-width:none">' + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Monthly coach sheet</h2><span class="count">' + plural(coaches.length, 'coach', 'coaches') + '</span></div>' + monthNav(ym, 'CA.month') + '</div>' +
-    (coaches.length ? '<div class="tw cal"><table class="t" style="font-size:14px"><thead><tr><th class="sticky" style="min-width:210px">Coach</th>' + heads + '<th class="r" style="padding-left:14px;' + SR(150, 110, '#F3ECE1') + 'box-shadow:-1px 0 0 #E6DCCD">Sessions</th><th class="r" style="' + SR(0, 150, '#F3ECE1') + '">Amount AED</th></tr></thead><tbody>' + rows + totRow + '</tbody></table></div>' : emptyBox('No coaches', 'Add coaches in Coaches.')) +
+  const totRow = '<tr class="sum" style="background:#F3ECE1"><th scope="row" class="sticky" style="text-align:left;padding:12px 14px 12px 28px;background:#F3ECE1;font-family:\'Young Serif\',Georgia,serif;font-weight:400;font-size:17px">Total</th>' + dayTot.map((m) => '<td style="padding:6px 2px;text-align:center;font-weight:700;font-size:12px;color:#6E5D57" class="num">' + (m || '') + '</td>').join('') + '<td class="r num" style="font-weight:800;padding-left:14px;' + SR(150, 110, '#F3ECE1') + 'box-shadow:-1px 0 0 #E6DCCD">' + gSes + '</td><td class="r num" style="font-weight:800;' + SR(0, 150, '#F3ECE1') + '">' + money2(gAmt) + '</td></tr>';
+  return '<div class="page wide" style="max-width:none">' + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Monthly coach sheet</h2><span class="count">' + plural(coaches.length, 'coach', 'coaches') + '</span></div>' + monthNav(ym, 'CA.month') + '</div>' + (listed.length ? attSearch('ca-q', U.v.q, 'CA.search', 'Search coach name') : '') +
+    (coaches.length ? '<div class="tw cal"><table class="t" style="font-size:14px"><thead><tr><th class="sticky" style="min-width:210px">Coach</th>' + heads + '<th class="r" style="padding-left:14px;' + SR(150, 110, '#F3ECE1') + 'box-shadow:-1px 0 0 #E6DCCD">Sessions</th><th class="r" style="' + SR(0, 150, '#F3ECE1') + '">Amount AED</th></tr></thead><tbody>' + rows + totRow + '</tbody></table></div>' : listed.length ? emptyBox('No coaches match', 'No coach matches ' + q(U.v.q.trim()) + '. Change the search.') : emptyBox('No coaches', 'Add coaches in Coaches.')) +
     '<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;padding:16px 28px 20px"><div class="legend"><span><span class="cmin" style="background:#F6E3E3;color:#7A1428">2</span>Sessions that day</span></div><span class="small muted">One batch class = one session, whatever its length. Sessions come from the coaches listed on each date in Student attendance. Hover over a cell to see its batches; click a coach for the statement. Amount = sessions × the session rate on that date.' + (gNoRate ? ' Sessions without a session rate add no amount.' : '') + '</span></div></section></div>';
 }
 function coachStatement() {
@@ -2139,7 +2401,7 @@ function coachStatement() {
   return '<div class="page wide tight">' + backBtn('Back to coach attendance · ' + ymLabel(ym), 'CA.back()') +
     '<article class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">Coach statement</span><h2 class="bigtitle">' + h(c.name) + '</h2><span>' + statusPill(c.active) + '</span></div>' + monthNav(ym, 'CA.month') + '</div>' +
     '<div class="sec"><div class="stats">' + box('Sessions', mine.length) + box('Amount', money2(tAmt) + ' <small>AED</small>') + '</div>' +
-    (rows ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:760px"><thead><tr><th>Date</th><th>Batch</th><th class="r">Sessions</th><th class="r">Rate (AED per session)</th><th class="r">Amount (AED)</th><th>Remarks</th></tr></thead><tbody>' + rows + '<tr style="background:#F3ECE1"><td colspan="2" class="cond" style="font-weight:800;font-size:16px;letter-spacing:.06em;text-transform:uppercase">Total</td><td class="r num" style="font-weight:800">' + mine.length + '</td><td></td><td class="r num" style="font-weight:800">' + money2(tAmt) + '</td><td></td></tr></tbody></table></div>' : '<span class="muted">No sessions for ' + h(c.name) + ' in ' + ymLabel(ym) + '.</span>') +
+    (rows ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:760px"><thead><tr><th>Date</th><th>Batch</th><th class="r">Sessions</th><th class="r">Rate (AED per session)</th><th class="r">Amount (AED)</th><th>Remarks</th></tr></thead><tbody>' + rows + '<tr class="sum" style="background:#F3ECE1"><td colspan="2" class="cond" style="font-weight:800;font-size:16px;letter-spacing:.06em;text-transform:uppercase">Total</td><td class="r num" style="font-weight:800">' + mine.length + '</td><td></td><td class="r num" style="font-weight:800">' + money2(tAmt) + '</td><td></td></tr></tbody></table></div>' : '<span class="muted">No sessions for ' + h(c.name) + ' in ' + ymLabel(ym) + '.</span>') +
     '<span class="small muted">Each line is one session (one batch class), paid at the session rate in effect on its date.</span></div></article></div>';
 }
 
@@ -2150,7 +2412,7 @@ const SET = {
     if (U.f) return; const s = S.settings;
     U.f = { academyName: s.academyName, academyPhone: s.academyPhone, academyEmail: s.academyEmail, lockMinutes: String(s.lockMinutes), regPrefix: s.regPrefix, regSep: s.regSep, updateExisting: false, docsFolder: s.docsFolder, backupFolder: s.backupFolder, maxUploadMb: String(s.maxUploadMb), startWithWindows: !!s.startWithWindows, logo: s.logo || null, logoErr: '',
       curPw: '', newPw: '', cfPw: '', _subPw: false,
-      regFee: s.regFee ? String(s.regFee) : '', overdueDay: String(s.overdueDay), book: s.book, start: s.nextNo ? String(s.nextNo) : '', address: s.address, phone: s.phone, email: s.email, _subF: false, _subR: false, _subG: false };
+      regFee: s.regFee ? String(s.regFee) : '', overdueDay: String(s.overdueDay), book: s.book, start: s.nextNo ? String(s.nextNo) : '', address: s.address, phone: s.phone, email: s.email, pageSize: String(pageSize()), _subF: false, _subR: false, _subG: false, _subL: false };
   },
   jump: (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); U.v.sec = id; document.querySelectorAll('.setnav a').forEach((a) => a.classList.toggle('on', a.dataset.s === id)); },
   // general (Academy, Student numbering, Storage, System) — saved with the bottom bar
@@ -2184,7 +2446,7 @@ const SET = {
   confirmRenumber: async () => {
     const d = U.dlg; if (!d.ack) { d.err = true; render(); return; }
     let sb = null; try { sb = await writeBackup('Safety · before renumber'); } catch (e) { sb = null; }
-    if (!sb || sb.check !== 'Verified') { U.dlg = null; flash('The safety backup could not be saved, so the numbers were not changed. Choose a backup folder on the Backup & restore page first.', true); render(); return; }
+    if (!sb || sb.check !== 'Verified') { U.dlg = null; flash('The safety backup could not be saved, so the numbers were not changed. Choose a backup folder in Settings › Backup first.', true); render(); return; }
     SET.applyGen(); const n = renumberAll(d.prefix, d.sep); U.dlg = null; flash('Settings saved · ' + plural(n, 'student number') + ' and folder' + (n === 1 ? '' : 's') + ' converted'); render();
   },
   // security
@@ -2194,6 +2456,9 @@ const SET = {
   feeErrs: () => { const f = U.f; const r = parseInt(f.regFee, 10), d = parseInt(f.overdueDay, 10); return { regFee: r > 0 ? '' : 'Enter a whole amount above 0.', overdueDay: d >= 1 && d <= 28 ? '' : 'Enter a day from 1 to 28.' }; },
   recErrs: () => { const f = U.f; return { book: !f.book || /^\d{1,5}$/.test(f.book) ? '' : 'Enter up to 5 digits.', start: !f.start || (/^\d{1,5}$/.test(f.start) && +f.start > 0) ? '' : 'Enter up to 5 digits.', email: f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim()) ? 'Enter a valid email address.' : '' }; },
   saveFees: () => { const e = SET.feeErrs(); if (e.regFee || e.overdueDay) { U.f._subF = true; render(); return; } S.settings.regFee = parseInt(U.f.regFee, 10); S.settings.overdueDay = parseInt(U.f.overdueDay, 10); save(); flash('Fee settings saved'); U.f._subF = false; render(); },
+  pageErr: () => { const n = parseInt(U.f.pageSize, 10); return n >= 5 && n <= 100 ? '' : 'Enter a number from 5 to 100.'; },
+  savePage: () => { if (SET.pageErr()) { U.f._subL = true; render(); return; } S.settings.pageSize = parseInt(U.f.pageSize, 10); U.f.pageSize = String(S.settings.pageSize); save(); PG = {}; flash('List settings saved · ' + S.settings.pageSize + ' rows per page'); U.f._subL = false; render(); },
+  resetPage: () => { U.f.pageSize = String(pageSize()); U.f._subL = false; render(); },
   resetFees: () => { const s = S.settings; Object.assign(U.f, { regFee: s.regFee ? String(s.regFee) : '', overdueDay: String(s.overdueDay), _subF: false }); render(); },
   saveRec: () => { const e = SET.recErrs(); if (e.book || e.start || e.email) { U.f._subR = true; render(); return; } const f = U.f; S.settings.book = f.book; S.settings.nextNo = f.start ? parseInt(f.start, 10) : ''; S.settings.address = squash(f.address); S.settings.phone = squash(f.phone); S.settings.email = squash(f.email); save(); flash('Receipt settings saved'); U.f._subR = false; render(); },
   resetRec: () => { const s = S.settings; Object.assign(U.f, { book: s.book, start: s.nextNo ? String(s.nextNo) : '', address: s.address, phone: s.phone, email: s.email, _subR: false }); render(); }
@@ -2204,17 +2469,18 @@ function renumberAll(prefix, sep) {
   save(); return n;
 }
 DIALOGS.renumber = function () {
-  const d = U.dlg; const rows = S.students.slice().sort((a, b) => a.reg.localeCompare(b.reg)).map((s) => { const num = s.reg.replace(/^\D+/, '').replace(/\D/g, ''); return '<tr><td><span class="chip" style="background:#EDE4D6;color:#6E5D57">' + s.reg + '</span></td><td style="color:#6E5D57">→</td><td><span class="chip">' + h(d.prefix + d.sep + num) + '</span></td><td>' + h(s.name) + '</td></tr>'; }).join('');
+  const d = U.dlg; const rows = S.students.slice().sort((a, b) => a.reg.localeCompare(b.reg)).map((s) => { const num = s.reg.replace(/^\D+/, '').replace(/\D/g, ''); return '<tr><td><span class="chip" style="background:#EDE4D6;color:#6E5D57">' + s.reg + '</span></td><td style="color:#6E5D57">→</td><td><span class="chip">' + h(d.prefix + d.sep + num) + '</span></td><td>' + h(s.name) + '</td></tr>'; });
+  const P = paged('renumber', rows, d.prefix + d.sep, { dlg: 1, inner: 1 });
   return dlgWrap(dlgHead('Student numbering', 'Update existing numbers?', plural(S.students.length, 'student') + ' · new format ' + d.prefix + d.sep + '0001') +
-    '<div class="db"><div class="tw" style="max-height:280px;overflow:auto;border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="font-size:14px"><thead><tr><th>Now</th><th></th><th>Becomes</th><th>Student</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
-    '<div class="note">' + I.info + '<span>Every student number and document folder is converted. A safety backup is saved to <strong>' + h(BK_DIR ? BK_DIR.name : FS_OK ? 'the backup folder (choose one on Backup & restore)' : 'Downloads') + '</strong> first. Receipts already printed keep the old number on paper.</span></div>' +
+    '<div class="db"><div class="tw" style="max-height:280px;overflow:auto;border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="font-size:14px"><thead><tr><th>Now</th><th></th><th>Becomes</th><th>Student</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager +
+    '<div class="note">' + I.info + '<span>Every student number and document folder is converted. A safety backup is saved to <strong>' + h(BK_DIR ? BK_DIR.name : FS_OK ? 'the backup folder (choose one in Settings › Backup)' : 'Downloads') + '</strong> first. Receipts already printed keep the old number on paper.</span></div>' +
     '<label class="opt' + (d.ack ? ' on' : '') + '" style="flex:none"><input type="checkbox"' + (d.ack ? ' checked' : '') + ' onchange="U.dlg.ack=this.checked;U.dlg.err=false;render()">I understand every student number will change</label>' + (d.err ? errTxt('Tick the box to continue.') : '') + '</div>' +
     '<div class="df"><button type="button" class="btn b-white" onclick="closeDlg()">Cancel</button><button type="button" class="btn b-blue" onclick="SET.confirmRenumber()">' + I.check + 'Back up and convert</button></div>');
 };
 PAGES.changepw = () => PAGES.settings(); // old link: Change password is now a card in Settings
 PAGES.settings = function (mode) {
   SET.init(); const f = U.f; const st = S.settings;
-  const eg = f._subG ? SET.genErrs() : {}; const ep = f._subPw ? SET.pwErrs() : {}; const ef = f._subF ? SET.feeErrs() : {}; const er = f._subR ? SET.recErrs() : {};
+  const eg = f._subG ? SET.genErrs() : {}; const ep = f._subPw ? SET.pwErrs() : {}; const ef = f._subF ? SET.feeErrs() : {}; const er = f._subR ? SET.recErrs() : {}; const el = f._subL ? SET.pageErr() : '';
   const fld = (id, k, lab, o) => { o = o || {}; const err = o.err; return '<div class="fld' + (o.full ? ' full' : '') + '"' + (o.w ? ' style="width:' + o.w + '"' : '') + '><label for="' + id + '">' + lab + (o.req ? ' <span class="req">*</span>' : '') + '</label><input id="' + id + '"' + (o.type ? ' type="' + o.type + '"' : '') + ' class="in' + fxCls(err) + '"' + (o.max ? ' maxlength="' + o.max + '"' : '') + ' value="' + h(f[k]) + '" ' + (o.on || 'oninput="setF(\'' + k + '\',this.value)"') + (o.ph ? ' placeholder="' + o.ph + '"' : '') + (o.style ? ' style="' + o.style + '"' : '') + '>' + (err ? errTxt(err) : o.hint ? '<span class="hint">' + o.hint + '</span>' : '') + '</div>'; };
   const card = (id, title, body, extra) => '<section id="' + id + '" class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:18px;scroll-margin-top:20px' + (extra || '') + '">' + body.replace('%T%', '<h2 class="cond" style="margin:0;font-weight:800;font-size:24px;letter-spacing:.08em;text-transform:uppercase">' + title + '</h2>') + '</section>';
   const pref = (f.regPrefix || '').trim().toUpperCase() || 'PSA';
@@ -2246,9 +2512,9 @@ PAGES.settings = function (mode) {
     '<p style="margin:0;padding:12px 14px;border-radius:8px;background:#F3ECE1;font-size:14px;line-height:1.5;color:#4A3A35">Unticked: existing students keep their numbers and only new ones use the new format. Ticked: every number and folder is converted after a preview and a safety backup.</p>');
   const storage = card('storage', 'Storage & uploads', '%T%<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">' +
     '<div class="fld"><label for="s-df">Student documents folder <span class="req">*</span></label><div style="display:flex;gap:8px"><input id="s-df" class="in' + fxCls(eg.docsFolder) + '" style="flex:1;min-width:0;font-weight:600;font-size:15px" value="' + h(f.docsFolder) + '" oninput="setF(\'docsFolder\',this.value)"><button type="button" class="btn b-soft" disabled title="Browse works in the PC app; type the path here">Browse</button></div>' + errTxt(eg.docsFolder) + '</div>' +
-    '<div class="fld"><span class="lbl">Backup folder</span><div style="display:flex;gap:8px"><span class="in" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;font-weight:600;font-size:15px;' + (BK_DIR ? '' : 'color:#A08F86') + '">' + FOLDER_ICON + h(BK_DIR ? BK_DIR.name : FS_OK ? 'No folder chosen' : 'Downloads folder') + '</span>' + (FS_OK ? '<button type="button" class="btn b-soft" onclick="BK.pick()">' + (BK_DIR ? 'Change' : 'Choose') + '</button>' : '') + '</div><span class="hint">Backups and safety backups are saved here. Also set on the Backup &amp; restore page.</span></div>' +
+    '<div class="fld"><span class="lbl">Backup folder</span><div style="display:flex;gap:8px"><span class="in" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;font-weight:600;font-size:15px;' + (BK_DIR ? '' : 'color:#A08F86') + '">' + FOLDER_ICON + h(BK_DIR ? BK_DIR.name : FS_OK ? 'No folder chosen' : 'Downloads folder') + '</span>' + (FS_OK ? '<button type="button" class="btn b-soft" onclick="BK.pick()">' + (BK_DIR ? 'Change' : 'Choose') + '</button>' : '') + '</div><span class="hint">Backups and safety backups are saved here. Also set in the Backup section below.</span></div>' +
     '<div class="fld"><label for="s-mx">Maximum upload size <span class="req">*</span></label><div class="suffix' + fxCls(eg.maxUploadMb) + '" style="width:200px"><input id="s-mx" inputmode="numeric" value="' + h(f.maxUploadMb) + '" oninput="setDigits(\'maxUploadMb\',this,2)"><span>MB</span></div>' + (eg.maxUploadMb ? errTxt(eg.maxUploadMb) : '<span class="hint">Applies to the photo and document uploads.</span>') + '</div></div>');
-  const saveBar = '<div style="position:sticky;bottom:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;border-radius:12px;background:#7A1428;color:#fff"><span style="font-size:14px">' + (genBad ? '<strong style="color:#E8C3BC">Fix the highlighted fields to save.</strong>' : 'Academy, Student numbering and Storage apply when you save. Fees and Receipts have their own buttons.') + '</span><div class="acts"><button type="button" class="btn" style="background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);color:#fff" onclick="SET.discard()">Discard</button><button type="button" class="btn" style="background:#FFFDF9;color:#7A1428" onclick="SET.saveGen()">Save settings</button></div></div>';
+  const saveBar = '<div style="position:sticky;bottom:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;border-radius:12px;background:#7A1428;color:#fff"><span style="font-size:14px">' + (genBad ? '<strong style="color:#E8C3BC">Fix the highlighted fields to save.</strong>' : 'Academy, Student numbering and Storage apply when you save. Fees, Receipts and Lists have their own buttons.') + '</span><div class="acts"><button type="button" class="btn" style="background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);color:#fff" onclick="SET.discard()">Discard</button><button type="button" class="btn" style="background:#FFFDF9;color:#7A1428" onclick="SET.saveGen()">Save settings</button></div></div>';
 
   const fees = '<section id="fees" class="card" style="padding:24px;display:flex;flex-direction:column;gap:22px;scroll-margin-top:20px">' + band('F', 'Fees') + '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))"><div class="fld"><label for="s-reg">Registration fee <span class="req">*</span></label><div class="suffix' + fxCls(ef.regFee) + '"><input id="s-reg" inputmode="numeric" placeholder="Not set yet" value="' + h(f.regFee) + '" oninput="setDigits(\'regFee\',this,7)"><span>AED</span></div>' + (ef.regFee ? errTxt(ef.regFee) : '<span class="hint">One-time, added to the student\'s first fee payment. Whole dirhams only. A change applies to first payments not yet due; saved dues keep their amount.' + (st.regFee ? '' : ' Not set yet, so no registration fee is charged.') + '</span>') + '</div>' +
     '<div class="fld"><label for="s-day">Overdue after day <span class="req">*</span></label><div class="suffix' + fxCls(ef.overdueDay) + '"><input id="s-day" inputmode="numeric" value="' + h(f.overdueDay) + '" oninput="setDigits(\'overdueDay\',this,2)"><span>of the month</span></div>' + (ef.overdueDay ? errTxt(ef.overdueDay) : '<span class="hint">1 to 28. An unpaid due turns Overdue from the next day.</span>') + '</div></div>' +
@@ -2261,17 +2527,20 @@ PAGES.settings = function (mode) {
     '<div class="grid">' + fld('s-addr', 'address', 'Academy address', { max: 200, ph: 'Printed at the bottom of every receipt' }) + fld('s-phone', 'phone', 'Phone number', { max: 30, ph: 'e.g. +971 4 000 0000', on: 'oninput="setPhone(\'phone\',this)"' }) + fld('s-mail', 'email', 'Email', { max: 120, ph: 'e.g. info@example.com', err: er.email }) + '</div>' +
     '<div class="acts" style="justify-content:flex-end"><button type="button" class="btn b-white" onclick="SET.resetRec()">Reset</button><button type="button" class="btn b-blue" onclick="SET.saveRec()">' + I.check + 'Save receipt settings</button></div></section>';
 
+  const lists = '<section id="lists" class="card" style="padding:24px;display:flex;flex-direction:column;gap:22px;scroll-margin-top:20px">' + band('L', 'Lists') +
+    '<div class="fld" style="max-width:320px"><label for="s-ps">Rows per page <span class="req">*</span></label><div class="suffix' + fxCls(el) + '"><input id="s-ps" inputmode="numeric" autocomplete="off" value="' + h(f.pageSize) + '" oninput="setDigits(\'pageSize\',this,3)"><span>ROWS</span></div>' + (el ? errTxt(el) : '<span class="hint">5 to 100. Default 10.</span>') + '</div>' +
+    '<span class="small muted">Used by every list, history, student attendance grid and pop-up list. Coach attendance is not paged. Totals always add up every matching row, not just the page shown.</span>' +
+    '<div class="acts" style="justify-content:flex-end"><button type="button" class="btn b-white" onclick="SET.resetPage()">Reset</button><button type="button" class="btn b-blue" onclick="SET.savePage()">' + I.check + 'Save list settings</button></div></section>';
   const devCard = card('devdata', 'Development', '<div style="display:flex;flex-direction:column;gap:4px">%T%<span class="small muted">Prototype · data is kept in this browser (local storage). These buttons are for development only.</span></div>' +
     '<div class="acts" style="gap:12px"><button type="button" class="btn b-white" onclick="clearStudents()">Clear student data</button><button type="button" class="btn b-red" onclick="resetData()">Clear all data</button></div>');
-  return topbar('Administration', 'Settings') + '<div class="page" style="gap:24px;max-width:none">' + flashHtml() + academy + numbering + storage + saveBar + fees + receipts + pwCard + devCard + '</div>';
+  return topbar('Administration', 'Settings') + '<div class="page" style="gap:24px;max-width:none">' + flashHtml() + academy + numbering + storage + saveBar + fees + receipts + lists + backupSection() + pwCard + devCard + '</div>';
 };
 
-/* ============ BACKUP & RESTORE (folders on this PC) ============ */
+/* ============ BACKUP (folders on this PC) ============ */
 const BK_OVERDUE_DAYS = 30;
 const BK_FILE = 'psa-backup.json';
 const FS_OK = typeof window.showDirectoryPicker === 'function';
 let BK_DIR = null;            // chosen backup folder (directory handle)
-let BK_SRC = null;            // chosen restore source: { name, items: [{ name, meta, text, ok, why }], pick }
 const lastVerified = () => (S.backups || []).filter((b) => b.check === 'Verified').sort((a, b) => (a.at < b.at ? 1 : -1))[0] || null;
 const daysSince = (iso) => Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
 const backupOverdue = () => { const l = lastVerified(); return !l || daysSince(l.at) > BK_OVERDUE_DAYS; };
@@ -2312,11 +2581,6 @@ async function writeBackup(kind) {
   }
   S.backups = (S.backups || []).concat(entry); save(); return entry;
 }
-function readPayload(text) {
-  let p; try { p = JSON.parse(text); } catch (e) { return { ok: false, why: 'The file can\'t be read.' }; }
-  if (!p || p.app !== 'Peak Sports Academy' || !p.data || !Array.isArray(p.data.students) || !p.data.settings) return { ok: false, why: 'This is not a PSA backup.' };
-  return { ok: true, meta: { takenAt: p.takenAt, kind: p.kind, counts: p.counts || countsOf(p.data), size: fmtSize(text.length) }, data: p.data };
-}
 const BK = {
   pick: async () => {
     if (!FS_OK) { alert('This browser can\'t open folders. Use Chrome or Edge, or backups will be downloaded as files.'); return; }
@@ -2331,28 +2595,9 @@ const BK = {
     } catch (e) { flash(e.message || 'The backup could not be written.', true); }
     render();
   },
-  pickFile: async (el) => { const f = el.files && el.files[0]; if (!f) return; const text = await f.text(); const r = readPayload(text); BK_SRC = { name: f.name, items: [Object.assign({ name: f.name, text }, r)], pick: r.ok ? 0 : -1 }; el.value = ''; if (r.ok) BK.askRestore(); else render(); },
-  choose: (i) => { BK_SRC.pick = i; render(); },
-  askRestore: () => { const it = BK_SRC && BK_SRC.items[BK_SRC.pick]; if (!it || !it.ok) return; U.dlg = { type: 'restore', ack: false, err: false }; render(); },
-  restore: async () => {
-    const d = U.dlg; if (!d.ack) { d.err = true; render(); return; }
-    const it = BK_SRC.items[BK_SRC.pick]; const r = readPayload(it.text);
-    if (!r.ok) { U.dlg = null; flash(r.why + ' Nothing was changed.', true); render(); return; }
-    let safety;
-    try { safety = await writeBackup('Safety · before restore'); } catch (e) { safety = null; }
-    if (FS_OK && !safety) { d.err = false; U.dlg = null; flash('Choose a backup folder first. A safety backup of today’s data is saved there before restoring.', true); render(); return; }
-    if (safety && safety.check !== 'Verified') { U.dlg = null; flash('The safety backup failed, so nothing was restored.', true); render(); return; }
-    const keep = S.backups; S = r.data; S.backups = keep; if (!S.tournaments) S.tournaments = []; plEnsure();
-    Object.keys(SETTING_DEFAULTS).forEach((k) => { if (S.settings[k] === undefined) S.settings[k] = SETTING_DEFAULTS[k]; });
-    if (BK_DIR) S.settings.backupFolder = BK_DIR.name;
-    S.backups.push({ id: uid('k'), action: 'Restore', at: new Date().toISOString(), kind: 'Manual', folder: it.name, contents: 'Backup taken ' + fmtD(r.meta.takenAt.slice(0, 10)) + ' ' + fmtWhen(r.meta.takenAt).slice(-5) + ' · ' + plural(r.meta.counts.students, 'student'), size: r.meta.size, check: 'Completed' });
-    save(); U.dlg = null; U.f = null; BK_SRC = null;
-    flash('Restored the backup from ' + fmtD(r.meta.takenAt.slice(0, 10)) + ' ' + fmtWhen(r.meta.takenAt).slice(-5) + '. A safety backup of today’s data was saved to ' + safety.folder + '.'); render();
-  }
 };
 // load the remembered folder once at start
-IDB.get('backupDir').then((d) => { if (d) { BK_DIR = d; if (U.page === 'backup' || U.page === 'settings') render(); } });
-MENU.push(['Data', [['backup', 'Backup & restore', '<ellipse cx="12" cy="5.5" rx="8" ry="2.5"/><path d="M4 5.5v13c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-13"/><path d="M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5"/>']]]); // Data stays last in the menu
+IDB.get('backupDir').then((d) => { if (d) { BK_DIR = d; if (U.page === 'settings') render(); } });
 const DB_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5.5" rx="8" ry="2.5"/><path d="M4 5.5v13c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-13"/><path d="M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5"/></svg>';
 const FOLDER_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
 function changesSince(iso) {
@@ -2360,49 +2605,27 @@ function changesSince(iso) {
   S.students.forEach((s) => { const n = (s.history || []).filter((x) => x.at > iso).length; if (n) st++; ev += n; Object.values(s.docs || {}).forEach((d) => { if (d && d.at > iso) docs++; }); });
   return plural(st, 'student') + ', ' + plural(docs, 'document') + ' and ' + plural(ev, 'history event') + ' have changed since.';
 }
-PAGES.backup = function () {
+// Settings › Backup section: back up now and the backup history
+function backupSection() {
   const l = lastVerified(); const over = backupOverdue(); const days = l ? daysSince(l.at) : null; const col = over ? '#9C1C33' : '#2F6B3A';
-  const hero = '<section style="border-radius:16px;background:#FFFDF9;box-shadow:inset 0 0 0 2px ' + (over ? '#9C1C33' : '#2F6B3A') + ';padding:30px 32px;display:flex;flex-wrap:wrap;align-items:center;gap:28px">' +
-    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:150px;height:150px;flex:none;border-radius:50%;background:' + (over ? '#F6E3E3' : '#E7F1E2') + '"><span class="cond" style="font-weight:800;font-size:' + (l ? '72' : '40') + 'px;line-height:.9;color:' + col + '">' + (l ? days : 'None') + '</span><span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:' + col + '">' + (l ? (days === 1 ? 'day' : 'days') : 'yet') + '</span></div>' +
-    '<div style="flex:1 1 260px;display:flex;flex-direction:column;gap:10px"><span class="eyebrow" style="color:' + (over ? '#9C1C33' : '#2F6B3A') + '">' + (over ? 'Backup overdue' : 'Backup up to date') + '</span><h2 class="cond" style="margin:0;font-weight:800;font-size:36px;line-height:1;text-transform:uppercase">' + (l ? 'Last verified backup: <span style="white-space:nowrap">' + fmtD(l.at.slice(0, 10)) + '</span>' : 'No verified backup yet') + '</h2>' +
-    '<p style="margin:0;font-size:15px;line-height:1.5;color:#4A3A35">' + (l ? changesSince(l.at) + ' ' : '') + 'Backups older than ' + BK_OVERDUE_DAYS + ' days are flagged.</p></div></section>';
+  const hero = '<div style="border-radius:12px;background:#FFFDF9;box-shadow:inset 0 0 0 2px ' + (over ? '#9C1C33' : '#2F6B3A') + ';padding:20px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:28px">' +
+    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:110px;height:110px;flex:none;border-radius:50%;background:' + (over ? '#F6E3E3' : '#E7F1E2') + '"><span class="cond" style="font-weight:800;font-size:' + (l ? '52' : '30') + 'px;line-height:.9;color:' + col + '">' + (l ? days : 'None') + '</span><span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:' + col + '">' + (l ? (days === 1 ? 'day' : 'days') : 'yet') + '</span></div>' +
+    '<div style="flex:1 1 260px;display:flex;flex-direction:column;gap:10px"><span class="eyebrow" style="color:' + (over ? '#9C1C33' : '#2F6B3A') + '">' + (over ? 'Backup overdue' : 'Backup up to date') + '</span><h2 class="cond" style="margin:0;font-weight:800;font-size:30px;line-height:1;text-transform:uppercase">' + (l ? 'Last verified backup: <span style="white-space:nowrap">' + fmtD(l.at.slice(0, 10)) + '</span>' : 'No verified backup yet') + '</h2>' +
+    '<p style="margin:0;font-size:15px;line-height:1.5;color:#4A3A35">' + (l ? changesSince(l.at) + ' ' : '') + 'Backups older than ' + BK_OVERDUE_DAYS + ' days are flagged and a gold dot shows on the Settings button.</p></div></div>';
   const folderName = BK_DIR ? BK_DIR.name : '';
-  const backupCard = '<section class="card" style="flex:1 1 420px;padding:24px;display:flex;flex-direction:column;gap:18px">' + band('B', 'Back up') +
+  const backupCard = '<div style="display:flex;flex-direction:column;gap:18px;max-width:760px">' +
     '<div class="fld"><span class="lbl">Backup folder</span><div style="display:flex;gap:8px;align-items:center"><span class="in" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;font-weight:600;' + (folderName ? '' : 'color:#A08F86') + '">' + FOLDER_ICON + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + h(FS_OK ? (folderName || 'No folder chosen') : 'Your Downloads folder') + '</span></span>' + (FS_OK ? '<button type="button" class="btn b-soft" onclick="BK.pick()">' + (folderName ? 'Change folder' : 'Choose folder') + '</button>' : '') + '</div>' +
     '<span class="hint">' + (FS_OK ? 'Each backup creates a new folder inside it, named PSA_Backup_date_time, holding ' + BK_FILE + '. Use a different drive or a USB drive from the one the app runs on.' : 'This browser can\'t choose folders, so each backup is downloaded as PSA_Backup_date_time.json. Use Chrome or Edge to choose a folder.') + '</span></div>' +
     '<button type="button" class="btn b-red" style="align-self:flex-start;min-height:50px;padding:0 26px;font-size:16px" onclick="BK.run()">' + DB_ICON + 'Back up now</button>' +
-    '<span class="small muted">The app copies all its data, then reads the copy back to check it.</span></section>';
-  let src = '';
-  if (BK_SRC) {
-    if (!BK_SRC.items.length) src = '<div class="infobox" style="box-shadow:inset 0 0 0 2px #9C1C33"><strong style="color:#9C1C33">No backup found in ' + h(BK_SRC.name) + '.</strong><span class="small">Choose a PSA_Backup folder, or the folder that holds them.</span></div>';
-    else src = '<div style="display:flex;flex-direction:column;gap:8px">' + (BK_SRC.items.length > 1 ? '<span class="lbl">' + plural(BK_SRC.items.length, 'backup') + ' found in ' + h(BK_SRC.name) + '. Pick one:</span>' : '') + BK_SRC.items.map((it, i) => {
-      const on = BK_SRC.pick === i; const m = it.meta;
-      return '<button type="button" ' + (it.ok ? 'onclick="BK.choose(' + i + ')"' : 'disabled') + ' style="display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border:0;border-radius:8px;cursor:' + (it.ok ? 'pointer' : 'default') + ';' + (on ? 'background:#F6E3E3;box-shadow:inset 0 0 0 2px #9C1C33' : 'background:#FFFDF9;box-shadow:inset 0 0 0 1px #DCCFBC') + '">' + (BK_SRC.items.length > 1 ? '<span aria-hidden="true" style="flex:none;width:18px;height:18px;border-radius:50%;background:#FFFDF9;' + (on ? 'border:5px solid #9C1C33' : 'border:2px solid #A08F86') + '"></span>' : '') +
-        '<span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-weight:700;word-break:break-all">' + h(it.name) + '</span><span class="small muted">' + (it.ok ? 'Taken ' + fmtD(m.takenAt.slice(0, 10)) + ' ' + fmtWhen(m.takenAt).slice(-5) + ' · ' + h(m.kind) + ' · ' + plural(m.counts.students, 'student') + ' · ' + m.size : h(it.why)) + '</span></span>' + pill(it.ok ? 'p-on' : 'p-bad', it.ok ? 'Readable' : 'Not restorable') + '</button>';
-    }).join('') + '</div>';
-  }
-  const restoreCard = '<section class="card" style="flex:1 1 420px;padding:24px;display:flex;flex-direction:column;gap:18px">' + band('R', 'Restore') +
-    '<input id="bk-file" type="file" accept=".json" class="sr" onchange="BK.pickFile(this)">' +
-    '<button type="button" class="btn b-blue" style="align-self:flex-start;min-height:50px;padding:0 26px;font-size:16px" onclick="document.getElementById(\'bk-file\').click()">' + I.reactivate + 'Restore</button>' +
-    '<span class="hint">Choose the backup file (psa-backup.json inside a PSA_Backup folder, or a downloaded PSA_Backup .json). You confirm before anything is replaced.</span>' + src +
-    '<span class="small muted">Before restoring, a safety backup of today\'s data is saved to the backup folder.</span></section>';
-  const list = (S.backups || []).slice().sort((a, b) => (a.at < b.at ? 1 : -1));
-  const rows = list.map((b) => { const isR = b.action === 'Restore'; return '<tr><td><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;font-size:15px;white-space:nowrap">' + fmtD(b.at.slice(0, 10)) + '</span><span class="small muted num">' + fmtWhen(b.at).slice(-5) + '</span></span></td><td>' + (isR ? '<span class="pill p-pend" style="gap:6px">' + I.reactivate + 'Restore</span>' : '<span class="pill p-up" style="gap:6px">' + DB_ICON.replace('width="20" height="20"', 'width="14" height="14"') + 'Backup</span>') + '</td><td>' + h(b.kind) + '</td><td style="color:#4A3A35;word-break:break-all"><span class="tiny muted" style="display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase">' + (isR ? 'Restored from' : 'Saved to') + '</span>' + h(b.folder || '—') + '</td><td style="color:#4A3A35">' + h(b.contents || '') + '</td><td class="num" style="white-space:nowrap">' + h(b.size) + '</td><td>' + pill(b.check === 'Incomplete' ? 'p-bad' : 'p-on', b.check) + (!isR && b.check === 'Verified' && daysSince(b.at) > BK_OVERDUE_DAYS ? ' <span class="tiny" style="color:#9C1C33;font-weight:700">Older than ' + BK_OVERDUE_DAYS + ' days</span>' : '') + '</td></tr>'; }).join('');
-  return topbar('Data protection', 'Backup & restore') + '<div class="page" style="gap:24px">' + flashHtml() + hero + '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:stretch">' + backupCard + restoreCard + '</div>' +
-    '<section class="card"><div class="cardhead" style="padding:20px 24px"><h2 class="cond" style="font-size:24px;letter-spacing:.06em">Backup &amp; restore history</h2><span class="small muted">Every backup and restore done on this PC</span></div>' +
-    (rows ? '<div class="tw"><table class="t" style="min-width:900px;font-size:14px"><thead><tr><th>Date</th><th>Action</th><th>Type</th><th>Folder</th><th>Contents</th><th>Size</th><th>Result</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : emptyBox('No backups or restores yet', 'Choose a backup folder and press Back up now.')) + '</section>' +
-    '<p style="margin:0" class="small muted">Prototype: the backup holds the app\'s data. Student documents are only file names here, so the document files themselves are not copied.</p></div>';
-};
-DIALOGS.restore = function () {
-  const d = U.dlg; const it = BK_SRC.items[BK_SRC.pick]; const when = fmtD(it.meta.takenAt.slice(0, 10)); const time = fmtWhen(it.meta.takenAt).slice(-5);
-  const step = (n, t, first) => '<li style="display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:14px' + (first ? '' : ';border-top:1px solid #EDE4D6') + '"><span class="cond" style="width:24px;height:24px;flex:none;display:flex;align-items:center;justify-content:center;background:#9C1C33;color:#fff;font-weight:800;font-size:13px;clip-path:polygon(0 0,100% 0,82% 100%,0 100%)">' + n + '</span>' + t + '</li>';
-  return '<div class="ov" role="presentation"><div role="alertdialog" aria-modal="true" aria-labelledby="rs-t" class="dlg" style="max-width:560px"><div style="height:10px;background:#9C1C33"></div><div style="padding:26px 28px 24px;display:flex;flex-direction:column;gap:18px">' +
-    '<div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">Overwrites current data</span><h2 id="rs-t" class="cond" style="margin:0;font-weight:800;font-size:30px;line-height:1;text-transform:uppercase">Restore the ' + when + ' backup?</h2><p style="margin:0;font-size:15px;line-height:1.5;color:#4A3A35">Every student, master, fee, attendance record and history event will go back to how it was at ' + time + ' that day. Changes made since will be replaced.</p><span class="small muted" style="word-break:break-all">From: ' + h(it.name) + '</span></div>' +
-    '<ol style="list-style:none;margin:0;padding:0;border-radius:10px;background:#F3ECE1">' + step(1, 'Check the backup is complete and readable', true) + step(2, 'Save a safety backup of today’s data to ' + h(BK_DIR ? BK_DIR.name : FS_OK ? 'the backup folder' : 'Downloads')) + step(3, 'Restore the data') + '<li style="display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:14px;border-top:1px solid #EDE4D6;color:#4A3A35">If the safety backup fails, nothing is changed.</li></ol>' +
-    (FS_OK && !BK_DIR ? '<div class="infobox" style="box-shadow:inset 0 0 0 2px #9C1C33"><strong style="color:#9C1C33">No backup folder chosen</strong><span class="small">Close this, choose a backup folder under Back up, then restore again.</span></div>' : '') +
-    '<label style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:10px;box-shadow:inset 0 0 0 2px #9C1C33;font-size:15px;line-height:1.45;cursor:pointer"><input type="checkbox"' + (d.ack ? ' checked' : '') + ' onchange="U.dlg.ack=this.checked;U.dlg.err=false" style="width:20px;height:20px;margin:1px 0 0;accent-color:#9C1C33">I understand changes since ' + when + ' will be replaced.</label>' + (d.err ? errTxt('Tick the box to continue.') : '') +
-    '<div class="acts" style="justify-content:flex-end"><button type="button" class="btn b-white" onclick="closeDlg()">Cancel</button><button type="button" class="btn b-red"' + (FS_OK && !BK_DIR ? ' disabled' : '') + ' onclick="BK.restore()">Restore</button></div></div></div></div>';
-};
+    '<span class="small muted">The app copies all its data, then reads the copy back to check it.</span></div>';
+  const list = (S.backups || []).filter((b) => b.action !== 'Restore').slice().sort((a, b) => (a.at < b.at ? 1 : -1));
+  const rows = list.map((b) => '<tr><td><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;font-size:15px;white-space:nowrap">' + fmtD(b.at.slice(0, 10)) + '</span><span class="small muted num">' + fmtWhen(b.at).slice(-5) + '</span></span></td><td>' + h(b.kind) + '</td><td style="color:#4A3A35;word-break:break-all"><span class="tiny muted" style="display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Saved to</span>' + h(b.folder || '—') + '</td><td style="color:#4A3A35">' + h(b.contents || '') + '</td><td class="num" style="white-space:nowrap">' + h(b.size) + '</td><td>' + pill(b.check === 'Incomplete' ? 'p-bad' : 'p-on', b.check) + (b.check === 'Verified' && daysSince(b.at) > BK_OVERDUE_DAYS ? ' <span class="tiny" style="color:#9C1C33;font-weight:700">Older than ' + BK_OVERDUE_DAYS + ' days</span>' : '') + '</td></tr>');
+  const P = paged('backupLog', rows, '', { inner: 1 });
+  return '<section id="backup" class="card" style="padding:24px;display:flex;flex-direction:column;gap:22px;scroll-margin-top:20px">' + band('B', 'Backup') + hero + backupCard +
+    '<div style="display:flex;flex-direction:column;gap:12px"><div class="acts" style="justify-content:space-between"><h3 class="cond" style="margin:0;font-size:22px;letter-spacing:.06em">Backup history</h3><span class="small muted">Every backup taken on this PC, newest first</span></div>' +
+    (rows.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD"><table class="t" style="min-width:860px;font-size:14px"><thead><tr><th>Date</th><th>Type</th><th>Folder</th><th>Contents</th><th>Size</th><th>Result</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager : '<div class="empty" style="background:#F3ECE1;border-radius:10px;padding:32px"><b style="font-size:22px">No backups yet</b><span class="muted small">Choose a backup folder and press Back up now.</span></div>') + '</div>' +
+    '<p style="margin:0" class="small muted">Prototype: the backup holds the app\'s data. Student documents are only file names here, so the document files themselves are not copied.</p></section>';
+}
 /* ============ LOGIN ============ */
 // SHA-256 (the password is never stored as plain text)
 function sha256(str) {
@@ -2446,7 +2669,7 @@ const AUTH = {
   },
   logout: (msg) => {
     AUTH.mem = false; try { sessionStorage.removeItem(SESS_KEY); sessionStorage.removeItem(LAST_KEY); } catch (e) { /* none */ }
-    AUTH.msg = msg || null; AUTH.err = null; AUTH.show = false; U = freshU(); BK_SRC = null; render();
+    AUTH.msg = msg || null; AUTH.err = null; AUTH.show = false; U = freshU(); render();
   },
   reset: () => {
     if (!confirm('Reset the login to username admin and password admin? Your student data is not affected.')) return;
@@ -2507,6 +2730,8 @@ const HELP = {
       'Click ' + hk('Save settings', 'b') + ' on the dark bar.',
       '<b>Fees:</b> registration fee and the day after which an unpaid fee becomes overdue. Click <b>Save fee settings</b>.',
       '<b>Receipts:</b> book number (up to 5 digits), starting receipt number and the address printed on receipts. Click <b>Save receipt settings</b>.',
+      '<b>Lists:</b> type how many rows each list shows per page (5 to 100, default 10). Click <b>Save list settings</b>.',
+      '<b>Backup:</b> click ' + hk('Choose folder') + ' and pick a folder on a USB stick or another drive, then click ' + hk('Back up now', 'r') + '. The backup is checked and added to the Backup history. A gold dot on the Settings button means there has been no backup for 30 days.',
       '<b>Change password (optional):</b> only when needed. Type the current password, then the new one twice. Click <b>Update password</b>.'],
     imp: 'Open Settings with the settings button at the top right, next to <b>Sign out</b>. <b>Clear all data</b> in the Development card at the bottom of Settings deletes every student, master, fee and setting. Only the password stays.' },
   locations: { step: 3, page: 4, title: 'Locations',
@@ -2548,6 +2773,15 @@ const HELP = {
       'To stop using one, open it and click <b>Deactivate</b>, then choose the inactivated date.'],
     imp: 'Deactivating a category also deactivates its sub categories. When a category\'s last active sub category is deactivated, the category becomes inactive too. Reactivating a sub category reactivates its category; reactivating a category reactivates all its sub categories. Deleting a category deletes its sub categories.',
     tip: 'Click ' + hk('History') + ' on the P &amp; L page to see every change, including deleted records.' },
+  expenses: { title: 'Expenses',
+    intro: 'Record what the academy spends. Each expense uses a category and sub category from Masters › P &amp; L.',
+    steps: ['In the menu, under <b>P &amp; L</b>, click <b>Expenses</b>.',
+      'Click ' + hk('New expense', 'r') + '. The date starts as today; change it if needed.',
+      'Choose the <b>Category</b>, then the <b>Sub category</b> (it lists the sub categories of that category).',
+      'Type the <b>Description</b>, the <b>Invoice number</b> if there is one, and the <b>Amount</b> in AED (up to 2 decimals). Add remarks if needed. Click <b>Save expense</b>.',
+      'Use the month arrows and the <b>Category</b> and <b>Sub category</b> filters to find expenses. The total of the rows shown is at the bottom.'],
+    imp: 'Only active categories and sub categories can be chosen for a new expense. A sub category that expenses use can\'t be deleted in Masters › P &amp; L; deactivate it instead.',
+    tip: 'Double-click an expense to open it, then edit or delete it. Click ' + hk('History') + ' to see every change, including deleted expenses.' },
   register: { step: 7, page: 8, title: 'Register a student',
     intro: 'Only Full name, Gender and Date of birth are required; the rest can be filled in later.',
     steps: ['In the menu, click <b>All students</b>.',
@@ -2591,13 +2825,6 @@ const HELP = {
       'Each number in the sheet is the number of sessions that coach took that day. Hover over it to see the batches.',
       'The <b>Sessions</b> and <b>Amount AED</b> columns show the month\'s total. Amount = sessions × rate per session.',
       'Click a coach\'s name to open their statement: one line per session with date, batch, rate and amount.'] },
-  backup: { step: 12, page: 14, title: 'Backup & restore',
-    intro: 'A backup is a copy of all the app\'s data. Keep it on a USB stick or another drive. The menu shows a gold dot when there has been no backup for 30 days.',
-    steps: ['Under <b>Back up</b>, click ' + hk('Choose folder') + ' and pick a folder (USB stick or another drive).',
-      'Click ' + hk('Back up now', 'r') + '. The backup is checked and added to the history.',
-      'To restore: under <b>Restore</b>, click <b>Restore</b>, choose the backup file (<b>psa-backup.json</b>), tick the box and click <b>Restore</b>.'],
-    imp: 'Restoring replaces everything with the copy. The app first saves a safety backup of today\'s data, so nothing is lost by mistake.',
-    tip: 'Choosing folders works in Chrome and Edge. Other browsers download the backup as a file instead.' },
   tournaments: { step: 13, page: 15, title: 'Tournaments',
     intro: 'A tournament is a match, cup or league that the academy plays in. Add it once here. Then pick the players in <b>Squads</b>.',
     steps: ['In the menu, under <b>Students</b>, click <b>Tournaments</b>.',

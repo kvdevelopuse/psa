@@ -487,7 +487,7 @@ function seed(keepPw) {
     seq: { student: 0 },
     settings: { academyName: '', academyPhone: '', academyEmail: '', lockMinutes: '', passwordChanged: keepPw || '', regPrefix: '', regSep: '', docsFolder: '', backupFolder: '', maxUploadMb: '', startWithWindows: false, logo: null,
       regFee: '', overdueDay: '', book: '', start: '', nextNo: '', address: '', phone: '', email: '', pageSize: 10 },
-    locations: [], batches: [], routes: [], coaches: [], students: [], tournaments: [], plCats: [], plSubs: [], plHist: [], expenses: [], expHist: [],
+    locations: [], batches: [], routes: [], coaches: [], students: [], tournaments: [], plCats: [], plSubs: [], plHist: [], expenses: [], expHist: [], revenue: [], revHist: [], revAutoDel: [],
     brec: {}, trec: {}, dues: [], duesRun: {},
     att: { absent: {}, plans: {}, overrides: {}, coachMin: {} },
     backups: []
@@ -507,6 +507,7 @@ function load() {
   if (!S.tournaments) S.tournaments = []; // data saved before tournaments existed
   plEnsure(); // data saved before the P & L master existed
   exEnsure(); // data saved before expenses existed
+  rvEnsure(); // data saved before revenue existed
   (S.backups || []).forEach((b) => { delete b.data; });
   save();
 }
@@ -586,6 +587,7 @@ const MENU = [
     ['reports', 'Reports', '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>']
   ]],
   ['P & L', [
+    ['revenue', 'Revenue', '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>'],
     ['expenses', 'Expenses', '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4M16 15h1"/>']
   ]]
 ];
@@ -1368,6 +1370,185 @@ DIALOGS.exDel = function () {
   return dlgWrap(dlgHead('Delete expense', x.description, fmtD(x.date) + ' · ' + exPair(x) + ' · AED ' + money2(x.amount)) +
     '<div class="db"><div class="note" style="background:#F6E3E3">' + PL_WARN + '<span>Delete this expense? This can’t be undone. The expenses history keeps a record of the delete.</span></div></div>' +
     '<div class="df"><button type="button" class="btn b-white" onclick="closeDlg()">Keep expense</button><button type="button" class="btn b-red" onclick="EX.saveDel()">' + PL_TRASH + 'Delete expense</button></div>');
+};
+/* ============ P & L › REVENUE ============ */
+function rvEnsure() { if (!Array.isArray(S.revenue)) S.revenue = []; if (!Array.isArray(S.revHist)) S.revHist = []; if (!Array.isArray(S.revAutoDel)) S.revAutoDel = []; }
+// Automatic entries: every fee month gets a Registration Fee, Transport Fee and Batch Fee entry per location.
+// Amounts = paid dues of that fee month, by the location of the student's batch (students with no batch are left out).
+// The due's discount comes off the Batch Fee. An entry follows the fee payments until it is edited by hand;
+// a deleted automatic entry is remembered in S.revAutoDel and is not made again.
+const RV_AUTO = { reg: 'Registration Fee', transport: 'Transport Fee', batch: 'Batch Fee' }; // listed in this order
+function rvAutoTotals() {
+  const t = {};
+  S.dues.forEach((d) => {
+    if (!d.payment || !d.month) return;
+    const r = S.brec[d.studentId]; const b = r && byId(S.batches, r.batchId); if (!b || !byId(S.locations, b.locationId)) return;
+    const part = { batch: Math.max(0, (d.batchFee || 0) - (d.discount ? d.discount.amount : 0)), transport: d.transportFee || 0, reg: d.regFee || 0 };
+    Object.keys(RV_AUTO).forEach((k) => { if (part[k] > 0) { const key = d.month + '|' + k + '|' + b.locationId; t[key] = (t[key] || 0) + part[k]; } });
+  });
+  Object.keys(t).forEach((k) => { t[k] = Math.round(t[k] * 100) / 100; });
+  return t;
+}
+function rvAutoSync() {
+  const t = rvAutoTotals(); const now = new Date().toISOString(); let changed = false;
+  const byKey = {}; S.revenue.forEach((x) => { if (x.autoKey) byKey[x.autoKey] = x; });
+  const ord = Object.keys(RV_AUTO); const kOf = (k) => k.split('|');
+  Object.keys(t).sort((a, b) => { const x = kOf(a), y = kOf(b); return x[0].localeCompare(y[0]) || locName(x[2]).localeCompare(locName(y[2])) || ord.indexOf(x[1]) - ord.indexOf(y[1]); }).forEach((key) => {
+    const x = byKey[key];
+    if (x) {
+      if (!x.edited && x.amount !== t[key]) { rvLog(x.id, fmtD(x.date) + ' · ' + x.description, locName(x.locationId), 'Amount updated from fee payments', money2(x.amount), money2(t[key])); x.amount = t[key]; changed = true; }
+      return;
+    }
+    if (S.revAutoDel.includes(key)) return;
+    const [ym, k, loc] = key.split('|');
+    const n = { id: uid('rv'), at: now, date: ym + '-01', locationId: loc, description: RV_AUTO[k], remarks: '', amount: t[key], autoKey: key, edited: false };
+    S.revenue.push(n); rvLog(n.id, fmtD(n.date) + ' · ' + n.description, locName(loc), 'Created from fee payments', '—', rvSum(n)); changed = true;
+  });
+  // a payment was removed and nothing is left for that month and location: drop the entry (it comes back if fees are paid again)
+  const gone = S.revenue.filter((x) => x.autoKey && !x.edited && !t[x.autoKey]);
+  gone.forEach((x) => { rvLog(x.id, fmtD(x.date) + ' · ' + x.description, locName(x.locationId), 'Removed, no fee payments left', rvSum(x), '—'); changed = true; });
+  if (gone.length) S.revenue = S.revenue.filter((x) => !gone.includes(x));
+  if (changed) save();
+}
+const RV_AUTO_TAG = '<span style="display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;background:#EFE6D6;color:#6B5A3A;font-size:12px;font-weight:700;vertical-align:1px">Auto</span>';
+const rvOf = (id) => byId(S.revenue, id);
+const rvSum = (x) => fmtD(x.date) + ' · ' + locName(x.locationId) + ' · AED ' + money2(x.amount) + ' · ' + x.description;
+const rvCmp = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : (b.at || '').localeCompare(a.at || '')); // newest date first
+let RVF = { ym: '', loc: 'all', q: '' }; // list filters, kept while moving between Revenue screens
+let RV_G = null;
+function rvLog(id, label, loc, change, old, nw) {
+  if (!RV_G) { RV_G = uid('g'); Promise.resolve().then(() => { RV_G = null; }); }
+  S.revHist.push({ at: new Date().toISOString(), g: RV_G, rvId: id, label, loc, change, old: old || '—', nw: nw || '—' });
+}
+const RV = {
+  view: () => U.v.view || 'list',
+  ym: () => RVF.ym || CUR_YM,
+  list: () => { U.v = { view: 'list' }; U.f = null; render(); },
+  month: (k) => { RVF.ym = k === 0 ? CUR_YM : ymShift(RV.ym(), k); U.flash = null; render(); },
+  setLoc: (v) => { RVF.loc = v; U.flash = null; render(); },
+  search: (el) => { RVF.q = el.value; U.refocus = el.id; render(); },
+  open: (id) => { U.v = { view: 'detail', id }; U.f = null; U.flash = null; render(); window.scrollTo(0, 0); },
+  hist: () => { U.v = { view: 'hist', q: '' }; U.f = null; U.flash = null; render(); window.scrollTo(0, 0); },
+  histSearch: (el) => { U.v.q = el.value; U.refocus = el.id; render(); },
+  // form
+  newRv: () => {
+    if (!S.locations.length) { flash('There is no location. Add one in Masters › Batches and Locations first.', true); render(); return; }
+    U.v = { view: 'form', id: null }; U.f = { date: TODAY, locationId: RVF.loc !== 'all' ? RVF.loc : '', description: '', remarks: '', amount: '', _sub: false }; U.flash = null; render(); window.scrollTo(0, 0);
+  },
+  edit: () => { const x = rvOf(U.v.id); U.v = { view: 'form', id: x.id }; U.f = { date: x.date, locationId: x.locationId, description: x.description, remarks: x.remarks || '', amount: String(x.amount), _sub: false }; U.flash = null; render(); },
+  leave: () => (U.v.id ? RV.open(U.v.id) : RV.list()),
+  setAmt: (el) => {
+    let v = String(el.value).replace(/[^\d.]/g, ''); const i = v.indexOf('.');
+    if (i >= 0) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/\./g, '').slice(0, 2);
+    v = v.replace(/^0+(?=\d)/, ''); if (v.startsWith('.')) v = '0' + v;
+    el.value = v; setF('amount', v);
+  },
+  errs: () => {
+    const f = U.f; const a = parseFloat(f.amount);
+    return {
+      date: f.date ? '' : 'Enter the date.',
+      locationId: byId(S.locations, f.locationId) ? '' : 'Choose a location.',
+      description: squash(f.description) ? '' : 'Enter the description.',
+      amount: !f.amount ? 'Enter the amount.' : !(a > 0) ? 'The amount must be more than zero.' : ''
+    };
+  },
+  save: () => {
+    const e = RV.errs(); if (Object.values(e).some(Boolean)) { U.f._sub = true; render(); return; }
+    const f = U.f; const v = { date: f.date, locationId: f.locationId, description: squash(f.description), remarks: f.remarks.trim(), amount: Math.round(parseFloat(f.amount) * 100) / 100 };
+    if (U.v.id) {
+      const x = rvOf(U.v.id); const ch = [];
+      if (x.date !== v.date) ch.push(['Date changed', fmtD(x.date), fmtD(v.date)]);
+      if (x.locationId !== v.locationId) ch.push(['Location changed', locName(x.locationId), locName(v.locationId)]);
+      if (x.description !== v.description) ch.push(['Description changed', x.description, v.description]);
+      if ((x.remarks || '') !== v.remarks) ch.push(['Remarks changed', x.remarks || '—', v.remarks || '—']);
+      if (x.amount !== v.amount) ch.push(['Amount changed', money2(x.amount), money2(v.amount)]);
+      Object.assign(x, v); if (x.autoKey && ch.length) x.edited = true;
+      ch.forEach((c) => rvLog(x.id, fmtD(x.date) + ' · ' + x.description, locName(x.locationId), c[0], c[1], c[2]));
+      if (!ch.length) { flash('No changes to save'); U.v = { view: 'detail', id: x.id }; U.f = null; render(); return; }
+      save(); flash('Revenue saved'); U.v = { view: 'detail', id: x.id };
+    } else {
+      const x = Object.assign({ id: uid('rv'), at: new Date().toISOString() }, v); S.revenue.push(x);
+      rvLog(x.id, fmtD(x.date) + ' · ' + x.description, locName(x.locationId), 'Created', '—', rvSum(x));
+      save(); RVF.ym = x.date.slice(0, 7); flash('Revenue added' + (x.date.slice(0, 7) !== CUR_YM ? ' to ' + ymLabel(x.date.slice(0, 7)) : '')); U.v = { view: 'list' };
+    }
+    U.f = null; render(); window.scrollTo(0, 0);
+  },
+  askDel: () => { U.dlg = { type: 'rvDel', id: U.v.id }; U.flash = null; render(); },
+  saveDel: () => {
+    const x = rvOf(U.dlg.id); rvLog(x.id, fmtD(x.date) + ' · ' + x.description, locName(x.locationId), 'Deleted', rvSum(x), '—');
+    if (x.autoKey && !S.revAutoDel.includes(x.autoKey)) S.revAutoDel.push(x.autoKey);
+    S.revenue = S.revenue.filter((y) => y.id !== x.id); save(); U.dlg = null; U.v = { view: 'list' }; U.f = null; flash('Revenue deleted'); render(); window.scrollTo(0, 0);
+  }
+};
+PAGES.revenue = function () {
+  rvEnsure(); rvAutoSync();
+  let v = RV.view();
+  if (v === 'detail' && !rvOf(U.v.id)) { U.v = { view: 'list' }; v = 'list'; }
+  const right = v === 'list' ? '<button type="button" class="btn b-white" onclick="RV.hist()">' + PL_HIST + 'History</button><button type="button" class="btn b-red" onclick="RV.newRv()">' + I.plus + 'New revenue</button>' : '';
+  const body = v === 'form' ? rvForm() : v === 'detail' ? rvDetail() : v === 'hist' ? rvHistory() : rvList();
+  return topbar('P & L', v === 'hist' ? 'Revenue history' : 'Revenue', right) + body;
+};
+function rvList() {
+  if (RVF.loc !== 'all' && !byId(S.locations, RVF.loc)) RVF.loc = 'all';
+  const ym = RV.ym(); const qq = squash(RVF.q).toLowerCase();
+  // the search box looks in every column shown in the grid
+  const hit = (x) => !qq || [fmtD(x.date), locName(x.locationId), x.description, x.remarks, money2(x.amount), String(x.amount)].some((y) => String(y || '').toLowerCase().includes(qq));
+  const shown = S.revenue.filter((x) => x.date.slice(0, 7) === ym && (RVF.loc === 'all' || x.locationId === RVF.loc) && hit(x)).sort(rvCmp);
+  const total = shown.reduce((a, x) => a + x.amount, 0);
+  const tr = shown.map((x) => '<tr class="row" ondblclick="RV.open(\'' + x.id + '\')" title="Double-click to open"><td class="num" style="white-space:nowrap;font-weight:700">' + fmtD(x.date) + '</td><td>' + h(locName(x.locationId)) + '</td><td style="font-weight:600;word-break:break-word">' + h(x.description) + (x.autoKey ? RV_AUTO_TAG : '') + '</td><td style="color:#4A3A35"><span class="clip">' + h(x.remarks || '—') + '</span></td><td class="r num" style="font-weight:700;white-space:nowrap">' + money2(x.amount) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="RV.open(\'' + x.id + '\')">Open</button></td></tr>');
+  const P = paged('revenue', tr, ym + '|' + RVF.loc + '|' + qq);
+  const locOpts = [['all', 'All locations']].concat(S.locations.map((l) => [l.id, l.name]));
+  const filters = '<div class="acts" style="gap:12px 20px;padding:16px 28px;border-bottom:1px solid #EDE4D6;background:#FBF6EE">' + monthNav(ym, 'RV.month') +
+    plSel('rv-fl', 'Location', RVF.loc, 'RV.setLoc', locOpts, 180) +
+    '<div class="search" style="max-width:380px;flex:1 1 280px">' + I.search + '<input id="rv-q" aria-label="Search revenue" value="' + h(RVF.q) + '" oninput="RV.search(this)" placeholder="Search date, location, description, remarks or amount"></div></div>';
+  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:1000px"><thead><tr><th style="width:128px">Date</th><th style="width:12%">Location</th><th>Description</th><th style="width:24%">Remarks</th><th class="r" style="width:140px">Amount (AED)</th><th style="width:92px"><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody>' +
+      '<tfoot><tr class="ex-tot"><td colspan="4">Total · ' + plural(shown.length, 'entry', 'entries') + '</td><td class="r num">' + money2(total) + '</td><td></td></tr></tfoot></table></div>' + P.pager
+    : S.revenue.length ? emptyBox('No revenue here', 'No revenue in ' + ymLabel(ym) + ' for this location and search. Change the month, the location or the search.')
+      : emptyBox('No revenue yet', 'Add the first revenue entry with New revenue.', '<button type="button" class="btn b-blue lg" onclick="RV.newRv()">New revenue</button>');
+  return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Revenue · ' + h(ymLabel(ym)) + '</h2><span class="count">' + plural(shown.length, 'entry', 'entries') + '</span></div><span class="small muted">Newest date first. Double-click a row to open it.</span></div>' + filters + table + '</section></div>';
+}
+function rvForm() {
+  const f = U.f; const e = f._sub ? RV.errs() : {}; const x = U.v.id ? rvOf(U.v.id) : null; const n = Object.values(e).filter(Boolean).length;
+  return '<div class="page tight">' + backBtn(x ? 'Back to revenue details' : 'Back to revenue', 'RV.leave()') +
+    '<form class="card" onsubmit="event.preventDefault();RV.save()" novalidate><div class="formhead"><span class="eyebrow">' + (x ? 'Edit revenue' : 'Peak Sports Academy') + '</span><h2 class="bigtitle">' + (x ? h(x.description) : 'New revenue') + '</h2><span class="small muted">Fields marked <span class="req">*</span> are required.</span></div>' +
+    (x && x.autoKey && !x.edited ? '<div style="padding:0 32px"><div class="note" style="background:#F3ECE1;margin-top:20px"><span>This entry is made from fee payments. After you save a change, it keeps your values and no longer updates from fee payments.</span></div></div>' : '') +
+    '<section class="sec">' + band('A', 'Revenue details') +
+    '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">' +
+    '<div class="fld"><label for="rv-date">Date <span class="req">*</span></label><input id="rv-date" type="date" class="in' + fxCls(e.date) + '" value="' + h(f.date) + '" onchange="setF(\'date\',this.value)">' + (e.date ? errTxt(e.date) : '<span class="hint">Defaults to today. Any date can be used.</span>') + '</div>' +
+    '<div class="fld"><label for="rv-loc">Location <span class="req">*</span></label><select id="rv-loc" class="in' + fxCls(e.locationId) + '" onchange="setF(\'locationId\',this.value)"><option value="" disabled' + (f.locationId ? '' : ' selected') + '>Select location</option>' + S.locations.map((l) => '<option value="' + l.id + '"' + sel(f.locationId, l.id) + '>' + h(l.name) + '</option>').join('') + '</select>' + (e.locationId ? errTxt(e.locationId) : '<span class="hint">From Masters › Batches and Locations.</span>') + '</div>' +
+    '<div class="fld"><label for="rv-amt">Amount <span class="req">*</span></label><div class="suffix' + fxCls(e.amount) + '"><input id="rv-amt" inputmode="decimal" autocomplete="off" value="' + h(f.amount) + '" oninput="RV.setAmt(this)" placeholder="0.00"><span>AED</span></div>' + (e.amount ? errTxt(e.amount) : '<span class="hint">More than zero. Up to 2 decimal places.</span>') + '</div>' +
+    '<div class="fld" style="grid-column:1/-1"><label for="rv-desc">Description <span class="req">*</span></label><input id="rv-desc" class="in' + fxCls(e.description) + '" maxlength="255" value="' + h(f.description) + '" oninput="setF(\'description\',this.value);PL.cnt(this,255)" placeholder="What the revenue is for">' + (e.description ? errTxt(e.description) : '<span class="hint">Up to 255 characters.</span>') + '<span class="pl-cc" id="rv-desc-n">' + f.description.length + ' / 255</span></div>' +
+    '</div></section>' +
+    '<section class="sec">' + band('B', 'Remarks') + '<div class="fld"><label for="rv-rem">Remarks</label><textarea id="rv-rem" class="in" rows="4" maxlength="510" oninput="setF(\'remarks\',this.value);PL.cnt(this,510)" placeholder="Optional notes">' + h(f.remarks) + '</textarea><span class="pl-cc" id="rv-rem-n">' + f.remarks.length + ' / 510</span></div></section>' +
+    plFoot(n, x ? 'Changes are recorded in the revenue history.' : 'The revenue is listed under the month of its date.', 'RV.leave()', x ? 'Save changes' : 'Save revenue') + '</form></div>';
+}
+function rvDetail() {
+  const x = rvOf(U.v.id);
+  return '<div class="page wide tight">' + backBtn('Back to revenue', 'RV.list()') + flashHtml() +
+    '<section class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px;min-width:0"><span class="eyebrow">Revenue details</span><h2 class="bigtitle" style="word-break:break-word">' + h(x.description) + '</h2><div class="acts" style="gap:8px"><span class="chip">' + fmtD(x.date) + '</span><span class="chip">' + h(locName(x.locationId)) + '</span><span class="chip" style="font-weight:800">AED ' + money2(x.amount) + '</span>' + (x.autoKey ? '<span class="chip">' + (x.edited ? 'Auto · edited by hand' : 'Auto · from fee payments') + '</span>' : '') + '</div></div>' +
+    '<div class="acts"><button type="button" class="btn b-white lg" onclick="RV.edit()">' + I.edit + 'Edit details</button><button type="button" class="btn lg b-white" style="color:#9C1C33" onclick="RV.askDel()">' + PL_TRASH + 'Delete</button></div></div>' +
+    '<div class="sec">' + band('A', 'Details') + '<div class="tiles">' + plTile('Date', fmtD(x.date)) + plTile('Location', locName(x.locationId)) + plTile('Amount (AED)', money2(x.amount)) + plTile('Description', x.description, true) + '</div></div>' +
+    (x.autoKey ? '<div class="sec">' + band('B', 'From fee payments') + '<div class="tiles">' + plTile('Fee month', ymLabel(x.autoKey.slice(0, 7))) + plTile('Fee payments total (AED)', money2(rvAutoTotals()[x.autoKey] || 0)) + plTile('Updates', x.edited ? 'No, edited by hand' : 'Yes, follows fee payments', true) + '</div></div>' : '') +
+    '<div class="sec">' + band(x.autoKey ? 'C' : 'B', 'Remarks') + '<div class="tiles">' + plTile('Remarks', x.remarks || '—', true) + '</div></div></section></div>';
+}
+function rvHistory() {
+  const v = U.v; const qq = (v.q || '').trim().toLowerCase();
+  const gTop = {}; S.revHist.forEach((x, i) => { gTop[x.g || 'i' + i] = i; });
+  const list = S.revHist.map((x, i) => Object.assign({ i, gi: gTop[x.g || 'i' + i] }, x))
+    .filter((x) => !qq || [x.label, x.loc, x.change, x.old, x.nw, fmtWhen(x.at)].some((y) => String(y || '').toLowerCase().includes(qq)))
+    .sort((a, b) => b.gi - a.gi || a.i - b.i);
+  const rows = list.map((x) => '<tr><td class="num" style="white-space:nowrap;color:#4A3A35">' + fmtWhen(x.at) + '</td><td style="font-weight:700;word-break:break-word">' + h(x.label) + '<div class="tiny muted" style="font-weight:500">' + h(x.loc) + '</div></td><td style="font-weight:600">' + h(x.change) + '</td><td style="color:#4A3A35;word-break:break-word">' + h(x.old) + '</td><td style="color:#4A3A35;word-break:break-word">' + h(x.nw) + '</td></tr>');
+  const P = paged('revHist', rows, v.q || '');
+  const filters = '<div class="acts" style="gap:12px 16px;padding:16px 28px;border-bottom:1px solid #EDE4D6;background:#FBF6EE"><div class="search" style="max-width:440px">' + I.search + '<input id="rvh-q" aria-label="Search history" value="' + h(v.q || '') + '" oninput="RV.histSearch(this)" placeholder="Search revenue, change or values"></div></div>';
+  const body = list.length ? '<div class="tw"><table class="t" style="min-width:1100px;font-size:14px"><thead><tr><th style="width:15%">Date and time</th><th style="width:24%">Revenue</th><th style="width:15%">Change</th><th>Old value</th><th>New value</th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
+    : emptyBox(S.revHist.length ? 'Nothing matches' : 'No changes yet', S.revHist.length ? 'Change the search.' : 'New, changed and deleted revenue entries are listed here.');
+  return '<div class="page wide tight">' + backBtn('Back to revenue', 'RV.list()') + '<section class="card"><div class="cardhead"><div class="acts"><h2>Revenue history</h2><span class="count">' + plural(list.length, 'change') + '</span></div><span class="small muted">Newest first. Deleted revenue stays in the history.</span></div>' + filters + body + '</section></div>';
+}
+DIALOGS.rvDel = function () {
+  const x = rvOf(U.dlg.id);
+  return dlgWrap(dlgHead('Delete revenue', x.description, fmtD(x.date) + ' · ' + locName(x.locationId) + ' · AED ' + money2(x.amount)) +
+    '<div class="db"><div class="note" style="background:#F6E3E3">' + PL_WARN + '<span>Delete this revenue entry? This can’t be undone. The revenue history keeps a record of the delete.' + (x.autoKey ? ' This entry is made from fee payments; once deleted, it is not made again for this month and location.' : '') + '</span></div></div>' +
+    '<div class="df"><button type="button" class="btn b-white" onclick="closeDlg()">Keep revenue</button><button type="button" class="btn b-red" onclick="RV.saveDel()">' + PL_TRASH + 'Delete revenue</button></div>');
 };
 /* ============ STUDENTS ============ */
 const NATIONALITIES = ['Emirati', 'Indian', 'Pakistani', 'Sri Lankan', 'Bangladeshi', 'Nepali', 'Filipino', 'British', 'Australian', 'South African', 'Egyptian', 'Jordanian', 'Lebanese', 'Syrian', 'Other'];
@@ -2773,6 +2954,15 @@ const HELP = {
       'To stop using one, open it and click <b>Deactivate</b>, then choose the inactivated date.'],
     imp: 'Deactivating a category also deactivates its sub categories. When a category\'s last active sub category is deactivated, the category becomes inactive too. Reactivating a sub category reactivates its category; reactivating a category reactivates all its sub categories. Deleting a category deletes its sub categories.',
     tip: 'Click ' + hk('History') + ' on the P &amp; L page to see every change, including deleted records.' },
+  revenue: { title: 'Revenue',
+    intro: 'Record what the academy earns. Each revenue entry uses a location from Masters › Batches and Locations. Fee payments are added for you: every month gets a <b>Registration Fee</b>, <b>Transport Fee</b> and <b>Batch Fee</b> entry for each location.',
+    steps: ['In the menu, under <b>P &amp; L</b>, click <b>Revenue</b>.',
+      'The automatic entries are dated the 1st of the fee month and marked <b>Auto</b>. Their amount is the fees paid for that month by students in batches at that location; a discount comes off the Batch Fee. They update as more fees are paid.',
+      'To add other revenue, click ' + hk('New revenue', 'r') + '. The date starts as today; change it if needed.',
+      'Choose the <b>Location</b>, type the <b>Description</b> and the <b>Amount</b> in AED (more than zero, up to 2 decimals). Add remarks if needed. Click <b>Save revenue</b>.',
+      'Use the month arrows and the <b>Location</b> filter to list revenue. Type in the search box to find any text in the list. The total of the rows shown is at the bottom.'],
+    imp: 'Once you edit an Auto entry, it keeps your values and stops updating from fee payments. A deleted Auto entry is not made again. Fees of students with no batch are not added.',
+    tip: 'Double-click a revenue entry to open it, then edit or delete it. Click ' + hk('History') + ' to see every change, including deleted revenue.' },
   expenses: { title: 'Expenses',
     intro: 'Record what the academy spends. Each expense uses a category and sub category from Masters › P &amp; L.',
     steps: ['In the menu, under <b>P &amp; L</b>, click <b>Expenses</b>.',

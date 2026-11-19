@@ -487,7 +487,7 @@ function seed(keepPw) {
     seq: { student: 0 },
     settings: { academyName: '', academyPhone: '', academyEmail: '', lockMinutes: '', passwordChanged: keepPw || '', regPrefix: '', regSep: '', docsFolder: '', backupFolder: '', maxUploadMb: '', startWithWindows: false, logo: null,
       regFee: '', overdueDay: '', book: '', start: '', nextNo: '', address: '', phone: '', email: '', pageSize: 10 },
-    locations: [], batches: [], routes: [], coaches: [], students: [], tournaments: [], camps: [], plCats: [], plSubs: [], plHist: [], expenses: [], expHist: [], revenue: [], revHist: [], revAutoDel: [],
+    locations: [], batches: [], routes: [], coaches: [], students: [], tournaments: [], camps: [], campStu: [], plCats: [], plSubs: [], plHist: [], expenses: [], expHist: [], revenue: [], revHist: [], revAutoDel: [],
     brec: {}, trec: {}, dues: [], duesRun: {},
     att: { absent: {}, plans: {}, overrides: {}, coachMin: {} },
     backups: []
@@ -507,6 +507,14 @@ function load() {
   if (!S.tournaments) S.tournaments = []; // data saved before tournaments existed
   if (!S.camps) S.camps = []; // data saved before camps existed
   S.camps.forEach((c) => { if (c.fees.f === undefined) c.fees.f = null; c.students.forEach((r) => { if (!r.payments) r.payments = []; }); }); // camps saved before full camp fee and part payments
+  if (!S.campStu) S.campStu = []; if (!S.seq.camp) S.seq.camp = 0; // camp students: own table and CMP numbers
+  // camp-only students saved inside the PSA student list (earlier version) move to the camp student table, unless they were given a batch or have fee dues
+  S.students.filter((s) => s.campOnly).forEach((s) => {
+    if (S.brec[s.id] || S.trec[s.id] || S.dues.some((d) => d.studentId === s.id)) { delete s.campOnly; return; }
+    S.seq.camp += 1; const reg = campNo(S.seq.camp);
+    S.campStu.push({ id: s.id, reg, camp: true, active: true, name: s.name, dob: s.dob, gender: s.gender, phone1: s.phone1 || '', phone1cc: s.phone1cc || '+971', created: s.joinDate || TODAY, psaId: null, convertedOn: '', history: (s.history || []).concat([{ at: new Date().toISOString(), type: 'Registration', title: 'Moved to camp students', old: s.reg, nw: reg, note: 'Camp students are kept apart from PSA students.' }]) });
+    S.students = S.students.filter((x) => x.id !== s.id);
+  });
   plEnsure(); // data saved before the P & L master existed
   exEnsure(); // data saved before expenses existed
   rvEnsure(); // data saved before revenue existed
@@ -525,7 +533,7 @@ function reportLogo(px) {
   if (lg && lg.data) return '<span style="flex:none;width:' + px + 'px;height:' + px + 'px;display:flex;align-items:center;justify-content:center;padding:6px;border-radius:8px;background:#FFFDF9"><img src="' + lg.data + '" alt="' + h((S.settings.academyName || 'Academy') + ' logo') + '" style="max-width:100%;max-height:100%;object-fit:contain"></span>';
   return '<img src="' + SHIELD_W + '" alt="" style="height:' + px + 'px;width:auto;flex:none">';
 }
-function clearStudents() { if (!confirm('Clear all student data? Every student, their batch and transport records, fees, payments, student attendance, documents, tournament squads and camp students saved in this browser is deleted, and student numbers start again from 1. Masters (locations, batches, routes, coaches), tournaments, camps and settings stay.')) return; Object.assign(S, { students: [], brec: {}, trec: {}, dues: [], duesRun: {} }); (S.tournaments || []).forEach((t) => { t.squad = []; }); (S.camps || []).forEach((c) => { c.students = []; }); S.seq.student = 0; S.att.absent = {}; save(); U = freshU(); location.hash = '#registration'; U.page = 'registration'; flash('All student data cleared'); render(); }
+function clearStudents() { if (!confirm('Clear all student data? Every student, their batch and transport records, fees, payments, student attendance, documents, tournament squads, camp students and camp enrolments saved in this browser is deleted, and student numbers start again from 1. Masters (locations, batches, routes, coaches), tournaments, camps and settings stay.')) return; Object.assign(S, { students: [], brec: {}, trec: {}, dues: [], duesRun: {} }); (S.tournaments || []).forEach((t) => { t.squad = []; }); (S.camps || []).forEach((c) => { c.students = []; }); S.campStu = []; S.seq.camp = 0; S.seq.student = 0; S.att.absent = {}; save(); U = freshU(); location.hash = '#registration'; U.page = 'registration'; flash('All student data cleared'); render(); }
 function resetData() { if (!confirm('Clear all data? Every student, master, fee, attendance record, backup log entry and setting saved in this browser is deleted. Only the login password stays.')) return; S = seed(S.settings && S.settings.passwordChanged); save(); U = freshU(); location.hash = '#batches'; render(); }
 
 const U0 = () => ({ flash: null, flashBad: false, dlg: null });
@@ -1422,10 +1430,11 @@ function rvAutoSync() {
     S.revenue.push(n); rvLog(n.id, fmtD(n.date) + ' · ' + n.description, locName(loc), 'Created from fee payments', '—', rvSum(n)); changed = true;
   });
   // a payment was removed and nothing is left for that month and location: drop the entry (it comes back if fees are paid again)
-  const gone = S.revenue.filter((x) => x.autoKey && !x.edited && !t[x.autoKey]);
+  const gone = S.revenue.filter((x) => x.autoKey && !rvIsCamp(x) && !x.edited && !t[x.autoKey]);
   gone.forEach((x) => { rvLog(x.id, fmtD(x.date) + ' · ' + x.description, locName(x.locationId), 'Removed, no fee payments left', rvSum(x), '—'); changed = true; });
   if (gone.length) S.revenue = S.revenue.filter((x) => !gone.includes(x));
   if (changed) save();
+  rvCampSync(); // camp payments: separate automatic entries
 }
 const RV_AUTO_TAG = '<span style="display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;background:#EFE6D6;color:#6B5A3A;font-size:12px;font-weight:700;vertical-align:1px">Auto</span>';
 const rvOf = (id) => byId(S.revenue, id);
@@ -1542,10 +1551,11 @@ function rvForm() {
 function rvDetail() {
   const x = rvOf(U.v.id);
   return '<div class="page wide tight">' + backBtn('Back to revenue', 'RV.list()') + flashHtml() +
-    '<section class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px;min-width:0"><span class="eyebrow">Revenue details</span><h2 class="bigtitle" style="word-break:break-word">' + h(x.description) + '</h2><div class="acts" style="gap:8px"><span class="chip">' + fmtD(x.date) + '</span><span class="chip">' + h(locName(x.locationId)) + '</span><span class="chip" style="font-weight:800">AED ' + money2(x.amount) + '</span>' + (x.autoKey ? '<span class="chip">' + (x.edited ? 'Auto · edited by hand' : 'Auto · from fee payments') + '</span>' : '') + '</div></div>' +
+    '<section class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px;min-width:0"><span class="eyebrow">Revenue details</span><h2 class="bigtitle" style="word-break:break-word">' + h(x.description) + '</h2><div class="acts" style="gap:8px"><span class="chip">' + fmtD(x.date) + '</span><span class="chip">' + h(locName(x.locationId)) + '</span><span class="chip" style="font-weight:800">AED ' + money2(x.amount) + '</span>' + (x.autoKey ? '<span class="chip">' + (x.edited ? 'Auto · edited by hand' : rvIsCamp(x) ? 'Auto · from camp payment' : 'Auto · from fee payments') + '</span>' : '') + '</div></div>' +
     '<div class="acts"><button type="button" class="btn b-white lg" onclick="RV.edit()">' + I.edit + 'Edit details</button><button type="button" class="btn lg b-white" style="color:#9C1C33" onclick="RV.askDel()">' + PL_TRASH + 'Delete</button></div></div>' +
     '<div class="sec">' + band('A', 'Details') + '<div class="tiles">' + plTile('Date', fmtD(x.date)) + plTile('Location', locName(x.locationId)) + plTile('Amount (AED)', money2(x.amount)) + plTile('Description', x.description, true) + '</div></div>' +
-    (x.autoKey ? '<div class="sec">' + band('B', 'From fee payments') + '<div class="tiles">' + plTile('Fee month', ymLabel(x.autoKey.slice(0, 7))) + plTile('Fee payments total (AED)', money2(rvAutoTotals()[x.autoKey] || 0)) + plTile('Updates', x.edited ? 'No, edited by hand' : 'Yes, follows fee payments', true) + '</div></div>' : '') +
+    (rvIsCamp(x) ? (() => { const f = rvCampFind(x.autoKey.slice(5)); return '<div class="sec">' + band('B', 'From camp payment') + '<div class="tiles">' + plTile('Camp', f ? f.c.name : 'Payment deleted') + plTile('Receipt no.', f ? f.p.receiptNo : '—') + plTile('Student', f && f.s ? f.s.reg + ' ' + f.s.name : '—') + plTile('Payment amount (AED)', f ? money2(f.p.amount) : '—') + plTile('Updates', x.edited ? 'No, edited by hand' : 'Yes, follows the camp payment', true) + '</div></div>'; })() : '') +
+    (x.autoKey && !rvIsCamp(x) ? '<div class="sec">' + band('B', 'From fee payments') + '<div class="tiles">' + plTile('Fee month', ymLabel(x.autoKey.slice(0, 7))) + plTile('Fee payments total (AED)', money2(rvAutoTotals()[x.autoKey] || 0)) + plTile('Updates', x.edited ? 'No, edited by hand' : 'Yes, follows fee payments', true) + '</div></div>' : '') +
     '<div class="sec">' + band(x.autoKey ? 'C' : 'B', 'Remarks') + '<div class="tiles">' + plTile('Remarks', x.remarks || '—', true) + '</div></div></section></div>';
 }
 function rvHistory() {
@@ -1620,6 +1630,8 @@ const ST = {
       S.seq.student += 1; const reg = regNo(S.seq.student);
       const s = Object.assign({ id: uid('s'), reg, active: true, history: [] }, rec);
       S.students.push(s); addHist(s.id, 'Registration', 'Student registered', '', '', 'Registration no. ' + reg + '.');
+      const cs = f._camp ? campStuOf(f._camp) : null; // converted from a camp student: link the PSA number back
+      if (cs && !cs.psaId) { cs.psaId = s.id; cs.convertedOn = TODAY; pHist(cs.id, 'Registration', 'Converted to PSA student', cs.reg, reg, ''); addHist(s.id, 'Registration', 'Converted from camp student', cs.reg, reg, 'Camp history stays with camp student ' + cs.reg + '.'); }
       save(); U.f = null; U.v = { view: 'student', id: s.id, tab: 'details', from: U.page, ltab: 'active' }; flash('Student registered as ' + reg); render(); window.scrollTo(0, 0);
     }
   },
@@ -1909,9 +1921,27 @@ const CAMP_PILL = { upcoming: ['p-bad', 'Upcoming'], running: ['p-on', 'Running'
 const campPill = (c) => { const p = CAMP_PILL[campStatus(c)]; return pill(p[0], p[1], 1); };
 const campsSorted = () => S.camps.slice().sort((a, b) => (a.from < b.from ? 1 : a.from > b.from ? -1 : a.name.localeCompare(b.name)));
 const campFeeText = (c) => CAMP_OPTS.filter((o) => c.fees[o[0]] != null).map((o) => o[1] + ' AED ' + money(c.fees[o[0]])).join(' · ');
-// a camp-only student turns Regular once they are given a batch
-const campType = (s) => (s.campOnly && !S.brec[s.id] ? 'Camp only' : 'Regular');
-const typePill = (s) => (campType(s) === 'Camp only' ? pill('p-bad', 'Camp only') : pill('p-off', 'Regular'));
+// camp students are kept apart from PSA students: own table (S.campStu), own number series CMP-0001, no PSA dues
+// camp student: { id, reg: 'CMP-0001', camp: true, active: true, name, dob, gender, phone1, created, psaId, convertedOn, history }
+// an enrolment's sid points to a PSA student or a camp student; who() finds either
+const campStuOf = (id) => byId(S.campStu || [], id);
+const who = (id) => studentOf(id) || campStuOf(id);
+const campNo = (n) => 'CMP-' + String(n).padStart(4, '0');
+const campType = (s) => (s.camp ? 'Camp student' : 'PSA student');
+const typePill = (s) => (s.camp ? pill('p-bad', 'Camp student') : pill('p-off', 'PSA student'));
+const noLabel = (s) => (s.camp ? 'Camp no.' : 'Reg. no.');
+// Emirates ID is optional for camp students; same format as registration (xxx-xxxx-xxxxxxx-x) and checked against PSA and camp students
+function campEidErr(eid, selfId) {
+  if (!eid) return '';
+  if (!/^\d{3}-\d{4}-\d{7}-\d$/.test(eid)) return 'Enter the Emirates ID as xxx-xxxx-xxxxxxx-x.';
+  const p = S.students.find((x) => x.eid === eid); if (p) return 'This Emirates ID is already registered to ' + p.reg + ' ' + p.name + '. Use Add existing student.';
+  const c = S.campStu.find((x) => x.id !== selfId && x.eid === eid); if (c) return 'This Emirates ID is already registered to camp student ' + c.reg + ' ' + c.name + '.';
+  return '';
+}
+const eidField = (id, val, err) => '<div class="fld"><label for="' + id + '">Emirates ID</label><input id="' + id + '" class="in' + fxCls(err) + '" inputmode="numeric" placeholder="xxx-xxxx-xxxxxxx-x" value="' + h(val) + '" oninput="CP.eid(this)" style="font-weight:600;letter-spacing:.04em">' + (err ? errTxt(err) : '<span class="hint"><span style="font-family:monospace;padding:2px 6px;border-radius:4px;background:#F7F2EA">xxx-xxxx-xxxxxxx-x</span> optional · dashes added as you type · checked for duplicates when entered</span>') + '</div>';
+const psaOf = (cs) => (cs && cs.psaId ? studentOf(cs.psaId) : null);
+// history goes to the PSA student, or to the camp student's own history
+function pHist(id, type, title, old, nw, note) { const cs = campStuOf(id); if (cs) cs.history.push({ at: new Date().toISOString(), type, title, old: old || '', nw: nw || '', note: note || '' }); else addHist(id, type, title, old, nw, note); }
 const isoAdd = (iso, days) => { const d = toD(iso); d.setDate(d.getDate() + days); return isoOf(d); };
 // end date: daily = qty days, weekly = qty × 7 days, monthly = same day qty months later less one day (05-Jul + 1 month = 04-Aug), full camp = camp To date
 function campEnd(c, start, opt, qty) {
@@ -1938,11 +1968,11 @@ const CP = {
   view: () => U.v.view || 'list',
   list: () => { U.v = { view: 'list', filter: U.v.filter || 'all', cid: U.v.cid }; U.f = null; render(); },
   filter: (v) => { U.v.filter = v; U.flash = null; render(); },
-  newC: () => { U.v = { view: 'form', id: null, filter: U.v.filter, cid: U.v.cid }; U.f = { name: '', description: '', from: '', to: '', on: { d: false, w: false, m: false, f: false }, fee: { d: '', w: '', m: '', f: '' }, _sub: false }; U.flash = null; render(); window.scrollTo(0, 0); },
+  newC: () => { U.v = { view: 'form', id: null, filter: U.v.filter, cid: U.v.cid }; U.f = { name: '', description: '', locationId: '', from: '', to: '', on: { d: false, w: false, m: false, f: false }, fee: { d: '', w: '', m: '', f: '' }, _sub: false }; U.flash = null; render(); window.scrollTo(0, 0); },
   edit: (id) => {
     const c = campOf(id); const on = {}, fee = {};
     CAMP_OPTS.forEach(([k]) => { on[k] = c.fees[k] != null; fee[k] = c.fees[k] != null ? String(c.fees[k]) : ''; });
-    U.v = { view: 'form', id, filter: U.v.filter, cid: U.v.cid }; U.f = { name: c.name, description: c.description || '', from: c.from, to: c.to, on, fee, _sub: false }; U.flash = null; render(); window.scrollTo(0, 0);
+    U.v = { view: 'form', id, filter: U.v.filter, cid: U.v.cid }; U.f = { name: c.name, description: c.description || '', locationId: c.locationId || '', from: c.from, to: c.to, on, fee, _sub: false }; U.flash = null; render(); window.scrollTo(0, 0);
   },
   cnt: (el, k, cid) => { setF(k, el.value); const c = document.getElementById(cid); if (c) c.textContent = el.value.length + ' / ' + el.maxLength; },
   toggle: (k, on) => { U.f.on[k] = on; render(); },
@@ -1951,6 +1981,7 @@ const CP = {
     const f = U.f; const e = {};
     if (!squash(f.name)) e.name = 'Enter a camp name.';
     else if (S.camps.some((c) => c.id !== U.v.id && c.name.toLowerCase() === squash(f.name).toLowerCase())) e.name = 'A camp with this name already exists.';
+    if (!f.locationId || !byId(S.locations, f.locationId)) e.locationId = 'Choose a location.';
     if (!f.from) e.from = 'Choose the From date.';
     if (!f.to) e.to = 'Choose the To date.'; else if (f.from && f.to < f.from) e.to = 'The To date must be the same as or after the From date.';
     if (!CAMP_OPTS.some(([k]) => f.on[k])) e.fees = 'Tick at least one fee option.';
@@ -1960,15 +1991,15 @@ const CP = {
   save: () => {
     const e = CP.errs(); if (Object.keys(e).length) { U.f._sub = true; render(); const first = document.querySelector('.in.bad,.suffix.bad,.err'); if (first) first.scrollIntoView({ block: 'center' }); return; }
     const f = U.f; const fees = {}; CAMP_OPTS.forEach(([k]) => { fees[k] = f.on[k] ? parseInt(f.fee[k], 10) : null; });
-    const rec = { name: squash(f.name), description: f.description.trim(), from: f.from, to: f.to, fees };
+    const rec = { name: squash(f.name), description: f.description.trim(), locationId: f.locationId, from: f.from, to: f.to, fees };
     if (U.v.id) { const c = campOf(U.v.id); Object.assign(c, rec); c.students.forEach((r) => { if (r.opt === 'f') r.end = c.to; }); flash('Changes saved'); }
     else { S.camps.push(Object.assign({ id: uid('k') }, rec, { students: [] })); flash('Camp ' + q(rec.name) + ' created'); }
     save(); U.f = null; U.v = { view: 'list', filter: U.v.filter || 'all', cid: U.v.cid }; render();
   },
   del: () => {
     const c = campOf(U.v.id); const n = c.students.length; const pays = c.students.flatMap((r) => r.payments || []); const amt = pays.reduce((a, p) => a + p.amount, 0);
-    if (!confirm('Delete ' + q(c.name) + '?' + (n ? ' This also removes ' + plural(n, 'student') + ' from the camp. Camp-only students stay in All students.' : '') + (pays.length ? ' ' + plural(pays.length, 'camp payment') + ' (' + money(amt) + ' AED) are deleted too, and their receipts can no longer be printed.' : '') + ' It can’t be undone.')) return;
-    c.students.forEach((r) => addHist(r.sid, 'Camp', 'Removed from ' + c.name, '', '', 'The camp was deleted.' + ((r.payments || []).length ? ' Payments deleted: ' + r.payments.map((p) => p.receiptNo + ' (' + money(p.amount) + ' AED)').join(', ') + '.' : '')));
+    if (!confirm('Delete ' + q(c.name) + '?' + (n ? ' This also removes ' + plural(n, 'student') + ' from the camp. Camp students stay in the Campers tab.' : '') + (pays.length ? ' ' + plural(pays.length, 'camp payment') + ' (' + money(amt) + ' AED) are deleted too, and their receipts can no longer be printed.' : '') + ' It can’t be undone.')) return;
+    c.students.forEach((r) => pHist(r.sid, 'Camp', 'Removed from ' + c.name, '', '', 'The camp was deleted.' + ((r.payments || []).length ? ' Payments deleted: ' + r.payments.map((p) => p.receiptNo + ' (' + money(p.amount) + ' AED)').join(', ') + '.' : '')));
     S.camps = S.camps.filter((x) => x.id !== c.id); save();
     U.f = null; U.v = { view: 'list', filter: U.v.filter || 'all', cid: U.v.cid === c.id ? null : U.v.cid }; flash('Camp ' + q(c.name) + ' deleted'); render();
   },
@@ -1984,11 +2015,11 @@ const CP = {
     if (mode === 'old' && !sid) { CP.picker(null); return; }
     const first = CAMP_OPTS.find(([k]) => c.fees[k] != null)[0];
     const start = TODAY >= c.from && TODAY <= c.to ? TODAY : c.from;
-    if (mode === 'new' && !/^[A-Za-z]{1,6}$/.test(S.settings.regPrefix || '')) { flash(missing('The student number prefix'), true, ['Open Settings', "fixIt('numbering','s-px')"]); render(); return; }
     if (mode === 'edit') { const r = c.students.find((x) => x.id === rid); U.dlg = { type: 'campEnr', mode, rid, sid: r.sid, opt: r.opt, qty: String(r.qty), ffee: r.opt === 'f' ? String(r.rate) : String(c.fees.f || ''), start: r.start, pct: r.pct || '', disc: r.discount ? String(r.discount) : '', remarks: r.remarks || '', _sub: false }; }
-    else U.dlg = { type: 'campEnr', mode, sid: sid || '', name: '', dob: '', gender: '', phone: '', opt: first, qty: '1', ffee: c.fees.f != null ? String(c.fees.f) : '', start, pct: '', disc: '', remarks: '', _sub: false };
+    else U.dlg = { type: 'campEnr', mode, sid: sid || '', name: '', dob: '', gender: '', phone: '', eid: '', opt: first, qty: '1', ffee: c.fees.f != null ? String(c.fees.f) : '', start, pct: '', disc: '', remarks: '', _sub: false };
     render();
   },
+  eid: (el) => { const v = fmtEid(el.value); el.value = v; U.dlg.eid = v; },
   set: (k, el, rerender) => { U.dlg[k] = el.value; if (rerender) { U.refocus = el.id; render(); } },
   pick: (k, v) => { U.dlg[k] = v; if (k === 'opt' && U.dlg.pct) CP.fillPct(); render(); },
   qty: (el) => { const v = digits(el.value).replace(/^0+(?=\d)/, '').slice(0, 3); el.value = v; U.dlg.qty = v; if (U.dlg.pct) CP.fillPct(); U.refocus = el.id; render(); },
@@ -2014,6 +2045,7 @@ const CP = {
       if (!d.dob) e.dob = 'Enter the date of birth.'; else if (d.dob > TODAY) e.dob = 'Date of birth can’t be in the future.';
       if (!d.gender) e.gender = 'Choose a gender.';
       const n = digits(d.phone).length; if (d.phone && (n < 7 || n > 12)) e.phone = 'Enter a valid phone number.';
+      const ee = campEidErr(d.eid || '', null); if (ee) e.eid = ee;
     }
     if (c.fees[d.opt] == null && !(old && old.opt === d.opt)) e.opt = 'This camp doesn’t offer this option.';
     if (!d.start) e.start = 'Choose the start date.'; else if (d.start < c.from || d.start > c.to) e.start = 'Pick a date from ' + fmtD(c.from) + ' to ' + fmtD(c.to) + '.';
@@ -2029,30 +2061,58 @@ const CP = {
     const d = U.dlg; const c = campOf(U.v.cid); const k = CP.calc();
     const rec = { opt: d.opt, qty: k.qty, start: d.start, end: k.end, rate: k.rate, discount: k.disc, pct: d.pct, remarks: d.remarks.trim() };
     const note = optName(d.opt) + ' · ' + (d.opt === 'f' ? 'whole camp' : optUnit(d.opt, k.qty)) + ' · ' + fmtD(d.start) + ' to ' + fmtD(k.end) + ' · ' + money(k.pay) + ' AED' + (k.disc ? ' after ' + money(k.disc) + ' AED discount' : '') + '.';
-    if (d.mode === 'edit') { Object.assign(CP.rec(), rec); addHist(d.sid, 'Camp', c.name + ' changed', '', '', note); save(); U.dlg = null; flash('Camp details saved for ' + studentOf(d.sid).name); render(); return; }
+    if (d.mode === 'edit') { Object.assign(CP.rec(), rec); pHist(d.sid, 'Camp', c.name + ' changed', '', '', note); save(); U.dlg = null; flash('Camp details saved for ' + who(d.sid).name); render(); return; }
     let sid = d.sid;
     if (d.mode === 'new') {
-      S.seq.student += 1; const reg = regNo(S.seq.student);
-      const s = Object.assign({ id: uid('s'), reg, active: true, history: [], campOnly: true }, blankStudent(), { name: squash(d.name), dob: d.dob, gender: d.gender, phone1: d.phone.trim(), joinDate: TODAY, docs: {} });
-      S.students.push(s); sid = s.id; addHist(s.id, 'Registration', 'Student registered', '', '', 'Registration no. ' + reg + '. Camp-only student, added from ' + c.name + '.');
+      S.seq.camp = (S.seq.camp || 0) + 1; const reg = campNo(S.seq.camp);
+      const s = { id: uid('c'), reg, camp: true, active: true, name: squash(d.name), dob: d.dob, gender: d.gender, phone1: d.phone.trim(), phone1cc: '+971', eid: d.eid || '', created: TODAY, psaId: null, convertedOn: '', history: [] };
+      S.campStu.push(s); sid = s.id; pHist(s.id, 'Registration', 'Camp student registered', '', '', 'Camp no. ' + reg + '. Added from ' + c.name + '.');
     }
-    c.students.push(Object.assign({ id: uid('e'), sid, added: TODAY, payments: [] }, rec)); addHist(sid, 'Camp', 'Added to ' + c.name, '', '', note);
-    save(); const s = studentOf(sid); U.dlg = null; flash(s.name + (d.mode === 'new' ? ' registered as ' + s.reg + ' and' : '') + ' added to ' + c.name); render();
+    c.students.push(Object.assign({ id: uid('e'), sid, added: TODAY, payments: [] }, rec)); pHist(sid, 'Camp', 'Added to ' + c.name, '', '', note);
+    save(); const s = who(sid); U.dlg = null; flash(s.name + (d.mode === 'new' ? ' registered as camp student ' + s.reg + ' and' : '') + ' added to ' + c.name); render();
   },
   remove: () => {
-    const c = campOf(U.v.cid); const r = CP.rec(); const s = studentOf(r.sid); const pays = r.payments || [];
-    if (!confirm('Remove ' + s.name + ' (' + s.reg + ') from ' + c.name + '?' + (pays.length ? ' ' + plural(pays.length, 'payment') + ' (' + money(enrPaid(r)) + ' AED) for this camp are deleted too, and their receipts can no longer be printed.' : '') + (s.campOnly ? ' The student stays in All students.' : ''))) return;
-    c.students = c.students.filter((x) => x.id !== r.id); addHist(s.id, 'Camp', 'Removed from ' + c.name, '', '', pays.length ? 'Payments deleted: ' + pays.map((p) => p.receiptNo + ' (' + money(p.amount) + ' AED)').join(', ') + '.' : ''); save(); U.dlg = null; flash(s.name + ' removed from the camp'); render();
+    const c = campOf(U.v.cid); const r = CP.rec(); const s = who(r.sid); const pays = r.payments || [];
+    if (!confirm('Remove ' + s.name + ' (' + s.reg + ') from ' + c.name + '?' + (pays.length ? ' ' + plural(pays.length, 'payment') + ' (' + money(enrPaid(r)) + ' AED) for this camp are deleted too, and their receipts can no longer be printed.' : '') + (s.camp ? ' The camp student stays in the Campers tab.' : ''))) return;
+    c.students = c.students.filter((x) => x.id !== r.id); pHist(s.id, 'Camp', 'Removed from ' + c.name, '', '', pays.length ? 'Payments deleted: ' + pays.map((p) => p.receiptNo + ' (' + money(p.amount) + ' AED)').join(', ') + '.' : ''); save(); U.dlg = null; flash(s.name + ' removed from the camp'); render();
+  },
+  // Campers tab: PSA students who joined a camp + every camp student
+  people: () => { U.v = { view: 'people', cid: U.v.cid, filter: U.v.filter, kind: U.v.kind || '', camp: '', q: '' }; U.f = null; U.flash = null; render(); },
+  pcamp: (v) => { U.v.camp = v; render(); },
+  pkind: (v) => { U.v.kind = v; render(); },
+  editCs: (id) => { const cs = campStuOf(id); U.dlg = { type: 'campStu', id, name: cs.name, dob: cs.dob, gender: cs.gender, phone: cs.phone1 || '', eid: cs.eid || '', _sub: false }; render(); },
+  cserrs: () => {
+    const d = U.dlg; const e = {}; const nm = squash(d.name);
+    if (!nm) e.name = 'Enter the full name.'; else if (!/^[A-Za-z ]+$/.test(nm)) e.name = 'Use English letters and spaces only, as on the passport.';
+    if (!d.dob) e.dob = 'Enter the date of birth.'; else if (d.dob > TODAY) e.dob = 'Date of birth can’t be in the future.';
+    if (!d.gender) e.gender = 'Choose a gender.';
+    const n = digits(d.phone).length; if (d.phone && (n < 7 || n > 12)) e.phone = 'Enter a valid phone number.';
+    const ee = campEidErr(d.eid || '', d.id); if (ee) e.eid = ee;
+    return e;
+  },
+  saveCs: () => {
+    if (Object.keys(CP.cserrs()).length) { U.dlg._sub = true; render(); return; }
+    const d = U.dlg; const cs = campStuOf(d.id); const nw = { name: squash(d.name), dob: d.dob, gender: d.gender, phone1: d.phone.trim(), eid: d.eid || '' };
+    [['Full name', 'name'], ['Date of birth', 'dob', fmtD], ['Gender', 'gender'], ['Phone 1', 'phone1'], ['Emirates ID', 'eid']].forEach(([lab, k, fn]) => { if ((cs[k] || '') !== (nw[k] || '')) pHist(cs.id, 'Details', lab + ' changed', fn ? fn(cs[k]) : cs[k] || '—', fn ? fn(nw[k]) : nw[k] || '—', ''); });
+    Object.assign(cs, nw); save(); U.dlg = null; flash('Details saved for ' + cs.reg); render();
+  },
+  // Convert to PSA: opens New registration filled in from the camp student; saving links the new PSA number back
+  convert: (id) => {
+    const cs = campStuOf(id); if (!cs || cs.psaId) return;
+    U.dlg = null; location.hash = '#registration'; go('registration'); ST.newS(); if (U.v.view !== 'form') return;
+    Object.assign(U.f, { name: cs.name, dob: cs.dob, gender: cs.gender, phone1: cs.phone1 || '', phone1cc: cs.phone1cc || '+971', eid: cs.eid || '', _camp: cs.id });
+    flash('Converting camp student ' + cs.reg + ' ' + cs.name + ' to a PSA student. Check the details and save. The new PSA number is linked back to the camp student.'); render();
   },
   // student picker for Add existing student: filter, click a row, then Select (or double-click the row)
-  picker: (back) => { U.dlg = { type: 'campPick', q: '', batch: '', sel: back ? back.sid : '', back }; render(); const el = document.getElementById('cpk-q'); if (el) el.focus(); },
-  pickAvail: () => { const c = campOf(U.v.cid); return S.students.filter((x) => x.active && !c.students.some((r) => r.sid === x.id)); },
+  picker: (back) => { U.dlg = { type: 'campPick', q: '', batch: '', kind: '', sel: back ? back.sid : '', back }; render(); const el = document.getElementById('cpk-q'); if (el) el.focus(); },
+  pickAvail: () => { const c = campOf(U.v.cid); return S.students.filter((x) => x.active).concat(S.campStu.filter((x) => !x.psaId)).filter((x) => !c.students.some((r) => r.sid === x.id)); },
   pickShown: () => {
     const d = U.dlg; const qq = d.q.trim().toLowerCase();
-    return CP.pickAvail().filter((x) => { const b = activeBatchRec(x.id); return (!qq || x.reg.toLowerCase().includes(qq) || x.name.toLowerCase().includes(qq)) && (!d.batch || (d.batch === '_none' ? !b : b && b.batchId === d.batch)); }).sort((a, b) => a.reg.localeCompare(b.reg));
+    return CP.pickAvail().filter((x) => { const b = activeBatchRec(x.id); return (!qq || x.reg.toLowerCase().includes(qq) || x.name.toLowerCase().includes(qq)) && (!d.batch || (d.batch === '_none' ? !b : b && b.batchId === d.batch)) && (!d.kind || campType(x) === d.kind); }).sort((a, b) => (a.camp === b.camp ? a.reg.localeCompare(b.reg) : a.camp ? 1 : -1));
   },
   pq: (el) => { U.dlg.q = el.value; U.refocus = el.id; render(); },
   pb: (v) => { U.dlg.batch = v; render(); },
+  pk: (v) => { U.dlg.kind = v; render(); },
   psel: (sid) => { U.dlg.sel = sid; render(); },
   choose: (sid) => {
     const d = U.dlg; sid = sid || d.sel; if (!sid) return;
@@ -2079,39 +2139,39 @@ const CP = {
   },
   savePay: () => {
     const e = CP.perrs(); if (Object.keys(e).length) { U.dlg._sub = true; render(); return; }
-    const x = U.dlg; const c = campOf(U.v.cid); const r = CP.enr(x.rid); const s = studentOf(r.sid);
+    const x = U.dlg; const c = campOf(U.v.cid); const r = CP.enr(x.rid); const s = who(r.sid);
     const det = { amount: parseInt(x.amount, 10), date: x.date, mode: x.mode, ref: x.mode === 'Card' || x.mode === 'Bank transfer' ? (x.ref || '').trim() : '', chequeNo: x.mode === 'Cheque' ? (x.chequeNo || '').trim() : '', bank: x.mode === 'Cheque' ? (x.bank || '').trim() : '', chequeDate: x.mode === 'Cheque' ? x.chequeDate : '', remarks: (x.remarks || '').trim() };
     if (x.pid) {
       const p = r.payments.find((y) => y.id === x.pid);
-      [['Amount', 'amount', money], ['Paid on', 'date', fmtD], ['Payment mode', 'mode'], ['Reference no.', 'ref'], ['Cheque no.', 'chequeNo'], ['Bank', 'bank'], ['Cheque date', 'chequeDate', fmtD], ['Remarks', 'remarks']].forEach(([lab, k, fn]) => { if (String(p[k] || '') !== String(det[k] || '')) addHist(s.id, 'Camp', c.name + ' payment ' + p.receiptNo + ': ' + lab + ' changed', fn ? fn(p[k]) : p[k] || '—', fn ? fn(det[k]) : det[k] || '—', ''); });
+      [['Amount', 'amount', money], ['Paid on', 'date', fmtD], ['Payment mode', 'mode'], ['Reference no.', 'ref'], ['Cheque no.', 'chequeNo'], ['Bank', 'bank'], ['Cheque date', 'chequeDate', fmtD], ['Remarks', 'remarks']].forEach(([lab, k, fn]) => { if (String(p[k] || '') !== String(det[k] || '')) pHist(s.id, 'Camp', c.name + ' payment ' + p.receiptNo + ': ' + lab + ' changed', fn ? fn(p[k]) : p[k] || '—', fn ? fn(det[k]) : det[k] || '—', ''); });
       Object.assign(p, det); save(); U.dlg = { type: 'campPays', rid: r.id }; flash('Payment ' + p.receiptNo + ' saved'); render(); return;
     }
     const no = CP.recNo(x).trim(); if (recSet() && no === nextReceipt(x.date)) S.settings.nextNo += 1;
     const p = Object.assign({ id: uid('p'), receiptNo: no, by: 'admin' }, det); r.payments.push(p);
-    addHist(s.id, 'Camp', c.name + ' payment received', '', '', money(p.amount) + ' AED · ' + p.mode + ' · receipt ' + no + '. Balance ' + money(enrBal(r)) + ' AED.');
+    pHist(s.id, 'Camp', c.name + ' payment received', '', '', money(p.amount) + ' AED · ' + p.mode + ' · receipt ' + no + '. Balance ' + money(enrBal(r)) + ' AED.');
     save(); U.dlg = { type: 'campReceipt', rid: r.id, pid: p.id }; flash('Payment saved · receipt ' + no); render();
   },
   pays: (rid) => { U.dlg = { type: 'campPays', rid }; U.flash = null; render(); },
   delPay: (rid, pid) => {
-    const c = campOf(U.v.cid); const r = CP.enr(rid); const p = r.payments.find((y) => y.id === pid); const s = studentOf(r.sid);
+    const c = campOf(U.v.cid); const r = CP.enr(rid); const p = r.payments.find((y) => y.id === pid); const s = who(r.sid);
     if (!confirm('Delete payment ' + p.receiptNo + ' of ' + money(p.amount) + ' AED for ' + s.name + '? The balance goes up by this amount. It can’t be undone.')) return;
-    r.payments = r.payments.filter((y) => y.id !== pid); addHist(s.id, 'Camp', c.name + ' payment deleted', '', '', 'Receipt ' + p.receiptNo + ' · ' + money(p.amount) + ' AED · paid on ' + fmtD(p.date) + '.');
+    r.payments = r.payments.filter((y) => y.id !== pid); pHist(s.id, 'Camp', c.name + ' payment deleted', '', '', 'Receipt ' + p.receiptNo + ' · ' + money(p.amount) + ' AED · paid on ' + fmtD(p.date) + '.');
     save(); flash('Payment ' + p.receiptNo + ' deleted'); render();
   },
   receipt: (rid, pid) => { U.dlg = { type: 'campReceipt', rid, pid, back: U.dlg && U.dlg.type === 'campPays' }; render(); }
 };
 PAGES.camps = function () {
-  const v = CP.view(); const st = v === 'students'; const fe = v === 'fees';
+  const v = CP.view(); const st = v === 'students'; const fe = v === 'fees'; const pp = v === 'people';
   const tab = (on, fn, l) => '<button type="button" class="' + (on ? 'on' : '') + '" onclick="' + fn + '">' + l + '</button>';
-  const tabs = '<nav class="tabsbar" aria-label="Camps">' + tab(!st && !fe, 'CP.list()', 'Camps') + tab(st, 'CP.students()', 'Camp students') + tab(fe, 'CP.fees()', 'Camp fees') + '</nav>';
+  const tabs = '<nav class="tabsbar" aria-label="Camps">' + tab(!st && !fe && !pp, 'CP.list()', 'Camps') + tab(st, 'CP.students()', 'Enrol students') + tab(fe, 'CP.fees()', 'Camp fees') + tab(pp, 'CP.people()', 'Campers') + '</nav>';
   const right = v === 'list' ? '<button type="button" class="btn b-red" onclick="CP.newC()">' + I.plus + 'New camp</button>' : '';
-  return topbar('Students', st ? 'Camp students' : fe ? 'Camp fees' : 'Camps', right, tabs) + (st ? campStudentsPage() : fe ? campFeesPage() : v === 'form' ? campForm() : campList());
+  return topbar('Camps', st ? 'Enrol students' : fe ? 'Camp fees' : pp ? 'Campers' : 'Camps', right, tabs) + (pp ? campPeoplePage() : st ? campStudentsPage() : fe ? campFeesPage() : v === 'form' ? campForm() : campList());
 };
 function campList() {
   const filter = U.v.filter || 'all';
   const shown = campsSorted().filter((c) => filter === 'all' || campStatus(c) === filter);
   const feeLines = (c) => CAMP_OPTS.map(([k, n]) => '<div>' + n + ' · ' + (c.fees[k] != null ? '<strong>AED ' + money(c.fees[k]) + '</strong>' : '<span class="muted">Not offered</span>') + '</div>').join('');
-  const rows = shown.map((c) => '<tr class="row" ondblclick="CP.edit(\'' + c.id + '\')" title="Double-click to edit"><td style="max-width:320px"><div style="font-weight:700">' + h(c.name) + '</div><div class="small muted">' + h(c.description || '') + '</div></td>' +
+  const rows = shown.map((c) => '<tr class="row" ondblclick="CP.edit(\'' + c.id + '\')" title="Double-click to edit"><td style="max-width:320px"><div style="font-weight:700">' + h(c.name) + '</div><div class="small" style="font-weight:600">' + (c.locationId && byId(S.locations, c.locationId) ? h(locName(c.locationId)) : '<span style="color:#9C1C33">No location · edit to set</span>') + '</div><div class="small muted">' + h(c.description || '') + '</div></td>' +
     '<td style="white-space:nowrap"><div>' + fmtD(c.from) + '</div><div class="small muted">to ' + fmtD(c.to) + ' · ' + plural(campDays(c), 'day') + '</div></td>' +
     '<td class="small" style="white-space:nowrap;line-height:1.7">' + feeLines(c) + '</td>' +
     '<td class="r"><button type="button" class="count" style="border:0;cursor:pointer" onclick="CP.students(\'' + c.id + '\')" title="Open camp students">' + plural(c.students.length, 'student') + '</button></td><td>' + campPill(c) + '</td>' +
@@ -2135,7 +2195,8 @@ function campForm() {
     '<form class="card" onsubmit="event.preventDefault();CP.save()" novalidate><div class="formhead"><span class="eyebrow">' + (editing ? 'Edit camp' : 'Peak Sports Academy') + '</span><h2 class="bigtitle">' + h(editing ? c.name : 'New camp') + '</h2><span class="small muted">Fields marked <span class="req">*</span> are required.</span></div>' +
     '<section class="sec">' + band('A', 'Camp details') + '<div class="grid">' +
     '<div class="fld full"><label for="cp-name">Camp name <span class="req">*</span></label><input id="cp-name" class="in' + fxCls(e.name) + '" maxlength="255" value="' + h(f.name) + '" oninput="CP.cnt(this,\'name\',\'cp-name-c\')" placeholder="e.g. Summer Camp 2027"><div style="display:flex;justify-content:space-between;gap:12px">' + (errTxt(e.name) || '<span></span>') + '<span id="cp-name-c" class="cnt">' + f.name.length + ' / 255</span></div></div>' +
-    '<div class="fld full"><label for="cp-desc">Description</label><textarea id="cp-desc" class="in" rows="3" maxlength="510" oninput="CP.cnt(this,\'description\',\'cp-desc-c\')" placeholder="Venue, timings, age group or anything else to note">' + h(f.description) + '</textarea><span id="cp-desc-c" class="cnt">' + f.description.length + ' / 510</span></div></div></section>' +
+    '<div class="fld full"><label for="cp-desc">Description</label><textarea id="cp-desc" class="in" rows="3" maxlength="510" oninput="CP.cnt(this,\'description\',\'cp-desc-c\')" placeholder="Venue, timings, age group or anything else to note">' + h(f.description) + '</textarea><span id="cp-desc-c" class="cnt">' + f.description.length + ' / 510</span></div>' +
+    '<div class="fld full"><label for="cp-loc">Location <span class="req">*</span></label><select id="cp-loc" class="in' + fxCls(e.locationId) + '" onchange="setF(\'locationId\',this.value)"><option value="">Choose a location</option>' + S.locations.map((l) => '<option value="' + l.id + '"' + sel(f.locationId, l.id) + '>' + h(l.name) + '</option>').join('') + '</select>' + (e.locationId ? errTxt(e.locationId) : '<span class="hint">Camp payments are added to P &amp; L › Revenue under this location.</span>') + '</div></div></section>' +
     '<section class="sec">' + band('B', 'Camp dates') + '<div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">' + dateF('cp-from', 'from', 'From date') + dateF('cp-to', 'to', 'To date') + '</div>' +
     (out ? '<div class="note">' + I.info + '<span><strong>' + plural(out, 'student attends', 'students attend') + '</strong> outside these dates. They stay in the camp with a red tag until their dates are changed.</span></div>' : '') + '</section>' +
     '<section class="sec">' + band('C', 'Fee options') + '<p style="margin:0;font-size:14px;color:#4A3A35">Tick each option this camp offers and enter its fee. <strong>At least one is required</strong> <span class="req">*</span></p>' +
@@ -2153,10 +2214,10 @@ function campHead(c, fn, extra) {
 function campStudentsPage() {
   const c = campOf(U.v.cid);
   const head = campHead(c, 'CP.students', c ? '<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px"><div class="acts" style="gap:10px">' + campPill(c) + '<span class="small">Fees: <strong>' + h(campFeeText(c)) + '</strong></span></div>' +
-      '<div class="acts"><button type="button" class="btn b-white lg" onclick="CP.open(\'old\')">' + I.plus + 'Add existing student</button><button type="button" class="btn b-red lg" onclick="CP.open(\'new\')">' + I.plus + 'New camp-only student</button></div></div>' : '');
+      '<div class="acts"><button type="button" class="btn b-white lg" onclick="CP.open(\'old\')">' + I.plus + 'Add existing student</button><button type="button" class="btn b-red lg" onclick="CP.open(\'new\')">' + I.plus + 'New camp student</button></div></div>' : '');
   if (!c) return '<div class="page wide">' + flashHtml() + head + '<section class="card">' + emptyBox('Select a camp', S.camps.length ? 'Pick a camp above to see and add its students.' : 'Create a camp on the Camps tab first.') + '</section></div>';
   const qq = (U.v.q || '').trim().toLowerCase(); const type = U.v.type || '';
-  const list = c.students.map((r) => ({ r, s: studentOf(r.sid) })).filter((x) => x.s)
+  const list = c.students.map((r) => ({ r, s: who(r.sid) })).filter((x) => x.s)
     .filter((x) => (!type || campType(x.s) === type) && (!qq || x.s.reg.toLowerCase().includes(qq) || x.s.name.toLowerCase().includes(qq)))
     .sort((a, b) => a.s.reg.localeCompare(b.s.reg));
   let tf = 0, td = 0; list.forEach(({ r }) => { tf += enrFee(r); td += r.discount || 0; });
@@ -2168,16 +2229,16 @@ function campStudentsPage() {
       '<td class="r">' + money(enrFee(r)) + '</td><td class="r">' + (r.discount ? '−' + money(r.discount) : '<span class="muted">—</span>') + '</td><td class="r" style="font-weight:700">' + money(enrPay(r)) + '</td><td>' + enrPill(r) + '</td></tr>';
   });
   const P = paged('campStu', rows, c.id + '|' + type + '|' + qq);
-  const tsel = '<div style="display:inline-flex;align-items:center;gap:10px"><label for="cs-t" class="lbl">Type</label><select id="cs-t" class="sel" onchange="CP.type(this.value)"><option value="">All</option><option' + sel(type, 'Regular') + '>Regular</option><option' + sel(type, 'Camp only') + '>Camp only</option></select></div>';
+  const tsel = '<div style="display:inline-flex;align-items:center;gap:10px"><label for="cs-t" class="lbl">Type</label><select id="cs-t" class="sel" onchange="CP.type(this.value)"><option value="">All</option><option' + sel(type, 'PSA student') + '>PSA student</option><option' + sel(type, 'Camp student') + '>Camp student</option></select></div>';
   const search = '<div class="search"><label for="cs-q" class="sr">Search students</label>' + I.search + '<input id="cs-q" type="search" value="' + h(U.v.q || '') + '" oninput="CP.search(this)" placeholder="Registration no. or name"></div>';
-  const body = list.length ? '<div class="tw"><table class="t" style="min-width:1100px"><thead><tr><th>Reg. no.</th><th>Student</th><th>Type</th><th>Fee option</th><th>Attends</th><th class="r">Fee (AED)</th><th class="r">Discount</th><th class="r">To pay</th><th>Payment</th></tr></thead><tbody>' + P.rows.join('') +
+  const body = list.length ? '<div class="tw"><table class="t" style="min-width:1100px"><thead><tr><th>No.</th><th>Student</th><th>Type</th><th>Fee option</th><th>Attends</th><th class="r">Fee (AED)</th><th class="r">Discount</th><th class="r">To pay</th><th>Payment</th></tr></thead><tbody>' + P.rows.join('') +
       '</tbody><tfoot><tr class="ex-tot"><td colspan="5">Total · ' + plural(list.length, 'student') + '</td><td class="r">' + money(tf) + '</td><td class="r">' + (td ? '−' + money(td) : '—') + '</td><td class="r">' + money(tf - td) + '</td><td></td></tr></tfoot></table></div>' + P.pager
-    : c.students.length ? emptyBox('No students to show', 'Change the search or the Type filter.') : emptyBox('No students in this camp', 'Use Add existing student or New camp-only student.');
+    : c.students.length ? emptyBox('No students to show', 'Change the search or the Type filter.') : emptyBox('No students in this camp', 'Use Add existing student or New camp student.');
   return '<div class="page wide">' + flashHtml() + head + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Students in this camp</h2><span class="count">' + plural(c.students.length, 'student') + '</span>' + tsel + search + '</div><span class="small muted">Click a row to change or remove. Payments are taken on the Camp fees tab.</span></div>' + body + '</section></div>';
 }
 function campFeesPage() {
   const c = campOf(U.v.cid);
-  let all = c ? c.students.map((r) => ({ r, s: studentOf(r.sid) })).filter((x) => x.s) : [];
+  let all = c ? c.students.map((r) => ({ r, s: who(r.sid) })).filter((x) => x.s) : [];
   const tot = { pay: 0, paid: 0 }; all.forEach(({ r }) => { tot.pay += enrPay(r); tot.paid += enrPaid(r); });
   const nPaid = all.filter(({ r }) => enrStatus(r) === 'Paid').length;
   const tile = (l, v, sub, bg, col) => '<div style="flex:1 1 200px;padding:16px 20px;border-radius:12px;background:' + bg + ';color:' + col + '"><div class="small" style="font-weight:700;letter-spacing:.08em;text-transform:uppercase">' + l + '</div><div style="font-family:\'Young Serif\',Georgia,serif;font-size:28px;margin-top:4px">AED ' + money(v) + '</div><div class="small">' + sub + '</div></div>';
@@ -2199,13 +2260,52 @@ function campFeesPage() {
   const search = '<div class="search"><label for="cf-q" class="sr">Search students</label>' + I.search + '<input id="cf-q" type="search" value="' + h(U.v.q || '') + '" oninput="CP.search(this)" placeholder="Registration no. or name"></div>';
   const body = list.length ? '<div class="tw"><table class="t" style="min-width:1040px"><thead><tr><th>Reg. no.</th><th>Student</th><th>Fee option</th><th class="r">To pay</th><th class="r">Paid</th><th class="r">Balance</th><th>Status</th><th>Last payment</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') +
       '</tbody><tfoot><tr class="ex-tot"><td colspan="3">Total · ' + plural(list.length, 'student') + '</td><td class="r">' + money(lp) + '</td><td class="r">' + money(lpd) + '</td><td class="r">' + money(lp - lpd) + '</td><td colspan="3"></td></tr></tfoot></table></div>' + P.pager
-    : c.students.length ? emptyBox('No students to show', 'Change the search or the Show filter.') : emptyBox('No students in this camp', 'Add students on the Camp students tab first.');
+    : c.students.length ? emptyBox('No students to show', 'Change the search or the Show filter.') : emptyBox('No students in this camp', 'Enrol students on the Enrol students tab first.');
   return '<div class="page wide">' + flashHtml() + head + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Camp fees</h2><span class="count">' + plural(c.students.length, 'student') + '</span>' + ssel + search + '</div><span class="small muted">A camp fee can be paid in parts. Click a row to see its payments.</span></div>' + body + '</section></div>';
 }
+// everyone who has joined a camp: PSA students with a camp, and every camp student (CMP numbers)
+function campPeoplePage() {
+  const kind = U.v.kind || ''; const qq = (U.v.q || '').trim().toLowerCase(); const camp = U.v.camp || '';
+  const campsOf = (id) => campsSorted().filter((c) => c.students.some((r) => r.sid === id));
+  const psa = S.students.filter((s) => campsOf(s.id).length);
+  const all = psa.concat(S.campStu);
+  const nP = psa.length, nC = S.campStu.length, nConv = S.campStu.filter((x) => x.psaId).length;
+  const list = all.filter((s) => (!kind || (kind === 'converted' ? s.camp && s.psaId : campType(s) === kind)) && (!camp || campsOf(s.id).some((c) => c.id === camp)) && (!qq || [s.reg, s.name, s.phone1, s.eid, (psaOf(s) || {}).reg].some((x) => String(x || '').toLowerCase().includes(qq))))
+    .sort((a, b) => (a.camp === b.camp ? a.reg.localeCompare(b.reg) : a.camp ? 1 : -1));
+  const rows = list.map((s) => {
+    const cs = campsOf(s.id); const p = psaOf(s); const age = ageOf(s.dob);
+    const conv = s.camp ? (p ? pill('p-on', 'Converted', 1) : '<span class="muted">No</span>') : '<span class="muted">—</span>';
+    const psaNo = s.camp ? (p ? '<span class="chip">' + p.reg + '</span><div class="small muted">' + fmtD(s.convertedOn) + '</div>' : '<span class="muted">—</span>') : '<span class="chip">' + s.reg + '</span>';
+    const act = s.camp ? '<button type="button" class="btn b-link sm" onclick="CP.editCs(\'' + s.id + '\')">Edit</button>' + (p ? '' : '<button type="button" class="btn b-red sm" onclick="CP.convert(\'' + s.id + '\')">Convert to PSA</button>') : '<button type="button" class="btn b-link sm" onclick="location.hash=\'#registration\';go(\'registration\');ST.open(\'' + s.id + '\')">Open</button>';
+    return '<tr' + (s.camp ? ' class="row" ondblclick="CP.editCs(\'' + s.id + '\')" title="Double-click to edit"' : '') + '><td><span class="chip">' + s.reg + '</span></td><td><div style="font-weight:700">' + h(s.name) + '</div><div class="small muted">' + h([s.gender, age != null ? age + ' yrs' : ''].filter(Boolean).join(' · ')) + '</div>' + (s.phone1 ? '<div class="small muted" style="white-space:nowrap">' + h((s.phone1cc || '+971') + ' ' + s.phone1) + '</div>' : '') + (s.eid ? '<div class="small muted" style="white-space:nowrap">EID ' + h(s.eid) + '</div>' : '') + '</td>' +
+      '<td>' + typePill(s) + (s.camp || s.active ? '' : ' ' + pill('p-off', 'Inactive')) + '</td><td class="small">' + (cs.length ? cs.map((c) => '<div style="padding:2px 0"><strong>' + h(c.name) + '</strong><div class="muted" style="white-space:nowrap">' + fmtD(c.from) + ' to ' + fmtD(c.to) + '</div></div>').join('') : '<span class="muted">No camp yet</span>') + '</td>' +
+      '<td>' + conv + '</td><td style="white-space:nowrap">' + psaNo + '</td><td class="r" style="white-space:nowrap">' + act + '</td></tr>';
+  });
+  const P = paged('campPeople', rows, kind + '|' + camp + '|' + qq);
+  const ksel = '<div style="display:inline-flex;align-items:center;gap:10px"><label for="cpp-k" class="lbl">Show</label><select id="cpp-k" class="sel" onchange="CP.pkind(this.value)"><option value="">All students</option><option value="PSA student"' + sel(kind, 'PSA student') + '>PSA students</option><option value="Camp student"' + sel(kind, 'Camp student') + '>Camp students</option><option value="converted"' + sel(kind, 'converted') + '>Camp students converted to PSA</option></select></div>' +
+    '<div style="display:inline-flex;align-items:center;gap:10px"><label for="cpp-c" class="lbl">Camp</label><select id="cpp-c" class="sel" onchange="CP.pcamp(this.value)"><option value="">All camps</option>' + campsSorted().map((c) => '<option value="' + c.id + '"' + sel(camp, c.id) + '>' + h(c.name) + '</option>').join('') + '</select></div>';
+  const search = '<div class="search"><label for="cpp-q" class="sr">Search</label>' + I.search + '<input id="cpp-q" type="search" value="' + h(U.v.q || '') + '" oninput="CP.search(this)" placeholder="Number, name, phone, Emirates ID or PSA number"></div>';
+  const tiles = '<section class="card" style="padding:22px 28px;display:flex;flex-wrap:wrap;gap:14px">' + [['PSA students in camps', nP, '#F3ECE1', '#4A3A35'], ['Camp students', nC, '#F6E3E3', '#7A1428'], ['Converted to PSA', nConv, '#E7F1E2', '#2F6B3A']].map(([l, n, bg, col]) => '<div style="flex:1 1 200px;padding:16px 20px;border-radius:12px;background:' + bg + ';color:' + col + '"><div class="small" style="font-weight:700;letter-spacing:.08em;text-transform:uppercase">' + l + '</div><div style="font-family:\'Young Serif\',Georgia,serif;font-size:28px;margin-top:4px">' + n + '</div></div>').join('') + '</section>';
+  const body = list.length ? '<div class="tw"><table class="t" style="min-width:1040px"><thead><tr><th>No.</th><th>Student</th><th>Type</th><th>Camps attended</th><th>Converted to PSA</th><th>PSA no.</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody></table></div>' + P.pager
+    : emptyBox(all.length ? 'No students to show' : 'No camp participants yet', all.length ? 'Change the filters or the search.' : 'Enrol students in a camp on the Enrol students tab.');
+  return '<div class="page wide">' + flashHtml() + tiles + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Campers</h2><span class="count">' + plural(list.length, 'student') + '</span>' + ksel + search + '</div><span class="small muted">Camp students (CMP numbers) are kept apart from PSA students.</span></div>' + body + '</section></div>';
+}
+DIALOGS.campStu = function () {
+  const d = U.dlg; const cs = campStuOf(d.id); const e = d._sub ? CP.cserrs() : {}; const p = psaOf(cs);
+  const hist = cs.history.slice().reverse().slice(0, 8).map((x) => '<li style="padding:6px 0;border-bottom:1px solid #EFE6D8"><span class="small muted">' + fmtD(x.at.slice(0, 10)) + '</span> · <strong>' + h(x.title) + '</strong>' + (x.old || x.nw ? ' <span class="small">' + h(x.old) + ' → ' + h(x.nw) + '</span>' : '') + (x.note ? '<div class="small muted">' + h(x.note) + '</div>' : '') + '</li>').join('');
+  return dlgWrap(dlgHead('Camp student · ' + cs.reg, cs.name, p ? 'Converted to PSA ' + p.reg + ' on ' + fmtD(cs.convertedOn) : 'Not a PSA student') +
+    '<div class="db"><div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">' +
+    '<div class="fld"><label for="cs-n">Full name <span class="req">*</span></label><input id="cs-n" class="in' + fxCls(e.name) + '" maxlength="255" value="' + h(d.name) + '" oninput="U.dlg.name=this.value">' + errTxt(e.name) + '</div>' +
+    '<div class="fld"><label for="cs-dob">Date of birth <span class="req">*</span></label><input id="cs-dob" type="date" class="in' + fxCls(e.dob) + '" value="' + h(d.dob) + '" onchange="U.dlg.dob=this.value">' + errTxt(e.dob) + '</div>' +
+    '<div class="fld"><span class="lbl">Gender <span class="req">*</span></span><div class="choice">' + ['Male', 'Female'].map((g) => '<label class="opt' + (d.gender === g ? ' on' : '') + '"><input type="radio" name="cs-g"' + (d.gender === g ? ' checked' : '') + ' onchange="U.dlg.gender=\'' + g + '\';render()">' + g + '</label>').join('') + '</div>' + errTxt(e.gender) + '</div>' +
+    '<div class="fld"><label for="cs-ph">Phone 1</label><div class="suffix' + fxCls(e.phone) + '"><span style="padding-left:14px">+971</span><input id="cs-ph" inputmode="tel" value="' + h(d.phone) + '" oninput="U.dlg.phone=this.value.replace(/[^\\d ]/g,\'\');this.value=U.dlg.phone"></div>' + errTxt(e.phone) + '</div>' + eidField('cs-eid', d.eid || '', e.eid) + '</div>' +
+    (hist ? '<div><span class="lbl">Recent history</span><ul style="list-style:none;margin:6px 0 0;padding:0">' + hist + '</ul></div>' : '') + '</div>' +
+    '<div class="df" style="justify-content:space-between"><div>' + (p ? '' : '<button type="button" class="btn b-red" onclick="CP.convert(\'' + cs.id + '\')">Convert to PSA</button>') + '</div><div class="acts"><button type="button" class="btn b-white" onclick="closeDlg()">Cancel</button><button type="button" class="btn b-blue" onclick="CP.saveCs()">' + I.check + 'Save changes</button></div></div>', true);
+};
 DIALOGS.campEnr = function () {
   const d = U.dlg; const c = campOf(U.v.cid); const e = d._sub ? CP.derrs() : {}; const k = CP.calc();
-  const rec = CP.rec(); const s = d.sid ? studentOf(d.sid) : null;
-  const title = d.mode === 'new' ? 'New camp-only student' : d.mode === 'old' ? 'Add existing student' : 'Change camp details';
+  const rec = CP.rec(); const s = d.sid ? who(d.sid) : null;
+  const title = d.mode === 'new' ? 'New camp student' : d.mode === 'old' ? 'Add existing student' : 'Change camp details';
   let top = '';
   if (d.mode === 'old') {
     const b = s ? activeBatchRec(s.id) : null;
@@ -2217,8 +2317,8 @@ DIALOGS.campEnr = function () {
       '<div class="fld"><label for="ce-n">Full name <span class="req">*</span></label><input id="ce-n" class="in' + fxCls(e.name) + '" maxlength="255" value="' + h(d.name) + '" oninput="CP.set(\'name\',this)">' + errTxt(e.name) + '</div>' +
       '<div class="fld"><label for="ce-dob">Date of birth <span class="req">*</span></label><input id="ce-dob" type="date" class="in' + fxCls(e.dob) + '" value="' + h(d.dob) + '" onchange="U.dlg.dob=this.value">' + errTxt(e.dob) + '</div>' +
       '<div class="fld"><span class="lbl">Gender <span class="req">*</span></span><div class="choice">' + ['Male', 'Female'].map((g) => '<label class="opt' + (d.gender === g ? ' on' : '') + '"><input type="radio" name="ce-g"' + (d.gender === g ? ' checked' : '') + ' onchange="CP.pick(\'gender\',\'' + g + '\')">' + g + '</label>').join('') + '</div>' + errTxt(e.gender) + '</div>' +
-      '<div class="fld"><label for="ce-ph">Phone 1</label><div class="suffix' + fxCls(e.phone) + '"><span style="padding-left:14px">+971</span><input id="ce-ph" inputmode="tel" value="' + h(d.phone) + '" oninput="U.dlg.phone=this.value.replace(/[^\\d ]/g,\'\');this.value=U.dlg.phone"></div>' + errTxt(e.phone) + '</div></div>' +
-      '<div class="note">' + I.info + '<span>Registers a student marked <strong>Camp only</strong> with the next registration number (' + h(regNo(S.seq.student + 1)) + '). No monthly batch or transport dues are made. Fill in the rest later from All students. If the student is given a batch later, they show as Regular.</span></div>';
+      '<div class="fld"><label for="ce-ph">Phone 1</label><div class="suffix' + fxCls(e.phone) + '"><span style="padding-left:14px">+971</span><input id="ce-ph" inputmode="tel" value="' + h(d.phone) + '" oninput="U.dlg.phone=this.value.replace(/[^\\d ]/g,\'\');this.value=U.dlg.phone"></div>' + errTxt(e.phone) + '</div>' + eidField('ce-eid', d.eid || '', e.eid) + '</div>' +
+      '<div class="note">' + I.info + '<span>Registers a <strong>camp student</strong> with the next camp number (' + h(campNo((S.seq.camp || 0) + 1)) + '). Camp students are kept apart from PSA students: they are not in All students and get no monthly dues. To make one a PSA student, use <strong>Convert to PSA</strong> on the Campers tab.</span></div>';
   } else {
     top = '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;background:#F3ECE1"><span class="chip">' + s.reg + '</span><span style="font-weight:700">' + h(s.name) + '</span>' + typePill(s) + '<span class="small muted" style="margin-left:auto">Added ' + fmtD(rec.added) + (enrPaid(rec) ? ' · paid ' + money(enrPaid(rec)) + ' AED' : '') + '</span></div>';
   }
@@ -2247,7 +2347,7 @@ DIALOGS.campEnr = function () {
 };
 DIALOGS.campPick = function () {
   const d = U.dlg; const c = campOf(U.v.cid); const shown = CP.pickShown(); const avail = CP.pickAvail();
-  const P = paged('campPick', shown, c.id + '|' + d.q + '|' + d.batch, { dlg: 1, inner: 1 });
+  const P = paged('campPick', shown, c.id + '|' + d.q + '|' + d.batch + '|' + d.kind, { dlg: 1, inner: 1 });
   const rows = P.rows.map((x) => {
     const on = d.sel === x.id; const b = activeBatchRec(x.id); const age = ageOf(x.dob);
     return '<tr class="row" style="cursor:pointer' + (on ? ';background:#F6E3E3;box-shadow:inset 4px 0 0 #9C1C33' : '') + '" onclick="CP.psel(\'' + x.id + '\')" ondblclick="CP.choose(\'' + x.id + '\')" title="Click to select, double-click to use this student">' +
@@ -2257,18 +2357,19 @@ DIALOGS.campPick = function () {
       '<td>' + (b ? h(batchOf(b.batchId).name) : '<span class="muted">—</span>') + '</td><td>' + typePill(x) + '</td></tr>';
   }).join('');
   const batches = '<option value="">All batches</option>' + S.batches.map((b) => '<option value="' + b.id + '"' + sel(d.batch, b.id) + '>' + h(b.name) + '</option>').join('') + '<option value="_none"' + sel(d.batch, '_none') + '>No batch</option>';
-  const pick = d.sel ? studentOf(d.sel) : null;
-  return '<div class="ov" role="presentation"><section class="dlg w xw" role="dialog" aria-modal="true" aria-labelledby="dlg-t">' + dlgHead('Select student', c.name, 'Active students not already in this camp') +
+  const pick = d.sel ? who(d.sel) : null;
+  return '<div class="ov" role="presentation"><section class="dlg w xw" role="dialog" aria-modal="true" aria-labelledby="dlg-t">' + dlgHead('Select student', c.name, 'Active PSA students and camp students not yet converted, not already in this camp') +
     '<div class="db"><div class="acts" style="gap:12px"><div class="search"><label for="cpk-q" class="sr">Search students</label>' + I.search + '<input id="cpk-q" type="search" value="' + h(d.q) + '" oninput="CP.pq(this)" placeholder="Registration no. or name"></div>' +
+    '<label for="cpk-k" class="sr">Type</label><select id="cpk-k" class="sel" style="height:44px;min-width:180px" onchange="CP.pk(this.value)"><option value="">All students</option><option' + sel(d.kind, 'PSA student') + '>PSA student</option><option' + sel(d.kind, 'Camp student') + '>Camp student</option></select>' +
     '<label for="cpk-b" class="sr">Batch</label><select id="cpk-b" class="sel" style="height:44px;min-width:200px" onchange="CP.pb(this.value)">' + batches + '</select></div>' +
-    (shown.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD;max-height:52vh;overflow:auto"><table class="t"><thead><tr><th style="width:48px"><span class="sr">Select</span></th><th>Reg. no.</th><th>Student</th><th>Date of birth</th><th>Batch</th><th>Type</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + P.pager
-      : '<div class="empty" style="background:#F3ECE1;border-radius:10px;padding:32px"><b style="font-size:22px">No students to show</b><span class="muted small">' + (avail.length ? 'Change the search or the batch filter.' : 'Every active student is already in this camp.') + '</span></div>') +
+    (shown.length ? '<div class="tw" style="border-radius:10px;box-shadow:0 0 0 1px #E6DCCD;max-height:52vh;overflow:auto"><table class="t"><thead><tr><th style="width:48px"><span class="sr">Select</span></th><th>No.</th><th>Student</th><th>Date of birth</th><th>Batch</th><th>Type</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + P.pager
+      : '<div class="empty" style="background:#F3ECE1;border-radius:10px;padding:32px"><b style="font-size:22px">No students to show</b><span class="muted small">' + (avail.length ? 'Change the search or the filters.' : 'Every student is already in this camp.') + '</span></div>') +
     '<span class="small muted">' + plural(shown.length, 'student') + ' shown · click a row to select it, or double-click to use it straight away.</span></div>' +
     '<div class="df" style="justify-content:space-between;align-items:center"><strong style="color:#9C1C33">' + (pick ? h(pick.reg + ' · ' + pick.name) + ' selected' : 'No student selected') + '</strong><div class="acts"><button type="button" class="btn b-white lg" onclick="' + (d.back ? 'U.dlg=U.dlg.back;render()' : 'closeDlg()') + '">Cancel</button><button type="button" class="btn b-blue lg"' + (pick ? '' : ' disabled') + ' onclick="CP.choose()">' + I.check + 'Select</button></div></div></section></div>';
 };
 // collect a part (or the rest) of a camp fee, or edit a saved camp payment
 DIALOGS.campPay = function () {
-  const x = U.dlg; const c = campOf(U.v.cid); const r = CP.enr(x.rid); const s = studentOf(r.sid); const e = x._sub ? CP.perrs() : {};
+  const x = U.dlg; const c = campOf(U.v.cid); const r = CP.enr(x.rid); const s = who(r.sid); const e = x._sub ? CP.perrs() : {};
   const p = x.pid ? r.payments.find((y) => y.id === x.pid) : null; const max = enrBal(r) + (p ? p.amount : 0); const a = parseInt(x.amount, 10) || 0;
   const modes = MODES.map((m) => '<button type="button" class="mode' + (x.mode === m ? ' on' : '') + '" aria-pressed="' + (x.mode === m) + '" onclick="U.dlg.mode=\'' + m + '\';render()">' + MODE_ICON[m] + m + '</button>').join('');
   let det = '';
@@ -2286,7 +2387,7 @@ DIALOGS.campPay = function () {
     '<div class="df"><div class="acts"><button type="button" class="btn b-white lg" onclick="' + (p ? 'CP.pays(\'' + r.id + '\')' : 'closeDlg()') + '">Cancel</button><button type="button" class="btn b-blue lg" onclick="CP.savePay()">' + (p ? I.check + 'Save changes' : I.print + 'Save &amp; print receipt') + '</button></div></div></section></div>';
 };
 DIALOGS.campPays = function () {
-  const c = campOf(U.v.cid); const r = CP.enr(U.dlg.rid); if (!r) { U.dlg = null; return ''; } const s = studentOf(r.sid);
+  const c = campOf(U.v.cid); const r = CP.enr(U.dlg.rid); if (!r) { U.dlg = null; return ''; } const s = who(r.sid);
   const rows = (r.payments || []).slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).map((p, i) => '<tr><td>' + (i + 1) + '</td><td style="white-space:nowrap">' + fmtD(p.date) + '</td><td style="font-weight:700">' + h(p.receiptNo) + '</td><td>' + h(p.mode) + '</td><td class="r" style="font-weight:700">' + money(p.amount) + '</td>' +
     '<td class="r" style="white-space:nowrap"><button type="button" class="btn b-white sm" onclick="CP.receipt(\'' + r.id + '\',\'' + p.id + '\')">' + I.print + 'Receipt</button> <button type="button" class="btn b-link sm" onclick="CP.collect(\'' + r.id + '\',\'' + p.id + '\')">Edit</button> <button type="button" class="btn b-link sm" onclick="CP.delPay(\'' + r.id + '\',\'' + p.id + '\')">Delete</button></td></tr>').join('');
   return dlgWrap(dlgHead('Camp payments', s.name, s.reg + ' · ' + c.name + ' · ' + optName(r.opt)) +
@@ -2296,7 +2397,7 @@ DIALOGS.campPays = function () {
 };
 DIALOGS.campReceipt = function () {
   const x = U.dlg; const c = campOf(U.v.cid); const r = CP.enr(x.rid); const p = r && r.payments.find((y) => y.id === x.pid); if (!p) { U.dlg = null; return ''; }
-  const s = studentOf(r.sid); const st = S.settings;
+  const s = who(r.sid); const st = S.settings;
   const before = r.payments.filter((y) => y.date < p.date || (y.date === p.date && r.payments.indexOf(y) < r.payments.indexOf(p))).reduce((a, y) => a + y.amount, 0);
   const balAfter = enrPay(r) - before - p.amount;
   const row = (a, b2, c2) => '<tr><td style="padding:12px 0;border-bottom:1px solid #E6DCCD;font-weight:600">' + a + '</td><td style="padding:12px 0;border-bottom:1px solid #E6DCCD;color:#6E5D57">' + b2 + '</td><td style="padding:12px 0;border-bottom:1px solid #E6DCCD;text-align:right;font-weight:600">' + c2 + '</td></tr>';
@@ -2307,12 +2408,38 @@ DIALOGS.campReceipt = function () {
   const close = x.back ? 'CP.pays(\'' + r.id + '\')' : 'closeDlg()';
   return '<div class="ov" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:14px"><div class="rbar acts" style="width:794px;max-width:100%;justify-content:space-between;color:#fff"><span class="cond" style="font-weight:800;font-size:22px;text-transform:uppercase">Receipt ' + h(p.receiptNo) + '</span><span class="acts"><button type="button" class="btn b-red" onclick="printReceipt()">' + I.print + 'Print / save as PDF</button><button type="button" class="btn b-white" onclick="' + close + '">Close</button></span></div>' +
     '<div class="rc"><div class="rc-top"><div style="position:relative;display:flex;align-items:center;gap:14px">' + reportLogo(62) + '<div style="display:flex;flex-direction:column"><span class="cond" style="font-weight:800;font-size:40px;line-height:.9">PEAK</span><span style="font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;margin-top:4px">Sports Academy</span></div></div><div class="cond" style="position:relative;margin-top:26px;font-weight:800;font-size:46px;line-height:1;letter-spacing:.04em;text-transform:uppercase">Fee receipt</div></div>' +
-    '<div style="padding:34px 56px 0;display:grid;grid-template-columns:1fr 1fr;gap:18px 32px;font-size:15px"><div><div class="rk">Receipt no.</div><div class="cond" style="font-weight:800;font-size:24px;color:#9C1C33;white-space:nowrap">' + h(p.receiptNo) + '</div></div><div style="text-align:right"><div class="rk">Date</div><div class="cond" style="font-weight:800;font-size:26px">' + fmtD(p.date) + '</div></div><div><div class="rk">Received from</div><div style="font-weight:700;font-size:18px;margin-top:3px">' + h(s.name) + '</div><div style="color:#4A3A35">Reg. no. ' + s.reg + '</div></div><div style="text-align:right"><div class="rk">For</div><div style="font-weight:700;font-size:18px;margin-top:3px">' + h(c.name) + '</div><div style="color:#4A3A35">Camp fee</div></div></div>' +
+    '<div style="padding:34px 56px 0;display:grid;grid-template-columns:1fr 1fr;gap:18px 32px;font-size:15px"><div><div class="rk">Receipt no.</div><div class="cond" style="font-weight:800;font-size:24px;color:#9C1C33;white-space:nowrap">' + h(p.receiptNo) + '</div></div><div style="text-align:right"><div class="rk">Date</div><div class="cond" style="font-weight:800;font-size:26px">' + fmtD(p.date) + '</div></div><div><div class="rk">Received from</div><div style="font-weight:700;font-size:18px;margin-top:3px">' + h(s.name) + '</div><div style="color:#4A3A35">' + noLabel(s) + ' ' + s.reg + (s.camp && psaOf(s) ? ' · now ' + psaOf(s).reg : '') + '</div></div><div style="text-align:right"><div class="rk">For</div><div style="font-weight:700;font-size:18px;margin-top:3px">' + h(c.name) + '</div><div style="color:#4A3A35">Camp fee</div></div></div>' +
     '<div style="padding:28px 56px 0"><table style="width:100%;border-collapse:collapse;font-size:15px"><thead><tr><th style="text-align:left;padding:0 0 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6E5D57;border-bottom:2px solid #2A1619">Item</th><th style="text-align:left;padding:0 0 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6E5D57;border-bottom:2px solid #2A1619">Details</th><th style="text-align:right;padding:0 0 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6E5D57;border-bottom:2px solid #2A1619">AED</th></tr></thead><tbody>' + rows + '</tbody></table>' +
     '<div style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#F6E3E3"><span class="cond" style="font-weight:800;font-size:22px;letter-spacing:.08em;text-transform:uppercase">Total paid</span><span class="cond" style="font-weight:800;font-size:36px">' + money(p.amount) + ' AED</span></div><p style="margin:10px 0 0;font-size:14px;color:#4A3A35">' + cap(words(p.amount)) + ' dirhams only · ' + (balAfter > 0 ? 'part payment · balance ' + money(balAfter) + ' AED' : 'camp fee paid in full') + '</p></div>' +
     '<div style="padding:26px 56px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;font-size:15px"><div><div class="rk">Payment mode</div><div style="font-weight:700;margin-top:3px">' + h(p.mode) + '</div></div><div><div class="rk">' + refK + '</div><div style="font-weight:700;margin-top:3px">' + h(refV) + '</div></div><div><div class="rk">Received by</div><div style="font-weight:700;margin-top:3px">' + h(p.by || 'admin') + '</div></div>' + (p.remarks ? '<div style="grid-column:1/-1"><div class="rk">Remarks</div><div style="margin-top:3px">' + h(p.remarks) + '</div></div>' : '') + '</div>' +
     '<div style="flex:1"></div><div style="margin:0 56px;padding:22px 0 34px;border-top:1px solid #E6DCCD;display:flex;justify-content:space-between;gap:20px;font-size:13px;color:#6E5D57"><span>' + h(foot) + '</span><span>Computer-generated receipt · no signature needed</span></div><span aria-hidden="true" style="position:absolute;left:0;bottom:0;width:100%;height:8px;background:#7A1428"></span></div></div>';
-};
+};// camp payments in P & L › Revenue: one automatic entry per camp payment, dated the payment date, under the camp's location.
+// Kept apart from the Registration / Transport / Batch Fee entries. Follows the payment until edited by hand;
+// a deleted automatic entry is remembered in S.revAutoDel and is not made again. Camps without a location are left out.
+const rvIsCamp = (x) => !!(x.autoKey && x.autoKey.startsWith('camp|'));
+function rvCampFind(pid) { for (const c of S.camps) for (const r of c.students) { const p = (r.payments || []).find((y) => y.id === pid); if (p) return { c, r, p, s: who(r.sid) }; } return null; }
+function rvCampSync() {
+  const now = new Date().toISOString(); let changed = false; const want = {};
+  S.camps.forEach((c) => { if (!c.locationId || !byId(S.locations, c.locationId)) return; c.students.forEach((r) => (r.payments || []).forEach((p) => { want['camp|' + p.id] = { c, r, p, s: who(r.sid) }; })); });
+  const byKey = {}; S.revenue.forEach((x) => { if (rvIsCamp(x)) byKey[x.autoKey] = x; });
+  Object.keys(want).forEach((key) => {
+    const { c, p, s } = want[key]; const desc = 'Camp Fee · ' + c.name; const rem = 'Receipt ' + p.receiptNo + ' · ' + (s ? s.reg + ' ' + s.name : '');
+    const x = byKey[key];
+    if (x) {
+      if (x.edited) return;
+      const nw = { date: p.date, locationId: c.locationId, description: desc, amount: p.amount, remarks: rem };
+      if (Object.keys(nw).some((k) => x[k] !== nw[k])) { rvLog(x.id, fmtD(x.date) + ' · ' + x.description, locName(x.locationId), 'Updated from camp payment', rvSum(x), rvSum(Object.assign({}, x, nw))); Object.assign(x, nw); changed = true; }
+      return;
+    }
+    if (S.revAutoDel.includes(key)) return;
+    const n = { id: uid('rv'), at: now, date: p.date, locationId: c.locationId, description: desc, remarks: rem, amount: p.amount, autoKey: key, edited: false };
+    S.revenue.push(n); rvLog(n.id, fmtD(n.date) + ' · ' + n.description, locName(n.locationId), 'Created from camp payment', '—', rvSum(n)); changed = true;
+  });
+  const gone = S.revenue.filter((x) => rvIsCamp(x) && !x.edited && !want[x.autoKey]);
+  gone.forEach((x) => { rvLog(x.id, fmtD(x.date) + ' · ' + x.description, locName(x.locationId), 'Removed, camp payment deleted', rvSum(x), '—'); changed = true; });
+  if (gone.length) S.revenue = S.revenue.filter((x) => !gone.includes(x));
+  if (changed) save();
+}
 /* ============ DATE PICKER (dd-MMM-yyyy) ============ */
 // After each render every <input type="date"> becomes a dd-MMM-yyyy text box with a calendar. The original input stays as a
 // hidden ISO (yyyy-mm-dd) value and still gets its change event, so each screen's own onchange handler keeps working.
@@ -3390,7 +3517,7 @@ const HELP = {
     imp: 'Deactivating a category also deactivates its sub categories. When a category\'s last active sub category is deactivated, the category becomes inactive too. Reactivating a sub category reactivates its category; reactivating a category reactivates all its sub categories. Deleting a category deletes its sub categories.',
     tip: 'Click ' + hk('History') + ' on the P &amp; L page to see every change, including deleted records.' },
   revenue: { title: 'Revenue',
-    intro: 'Record what the academy earns. Each revenue entry uses a location from Masters › Batches and Locations. Fee payments are added for you: every month gets a <b>Registration Fee</b>, <b>Transport Fee</b> and <b>Batch Fee</b> entry for each location.',
+    intro: 'Record what the academy earns. Each revenue entry uses a location from Masters › Batches and Locations. Fee payments are added for you: every month gets a <b>Registration Fee</b>, <b>Transport Fee</b> and <b>Batch Fee</b> entry for each location. Each camp payment gets its own <b>Camp Fee</b> entry, dated the payment date, under the camp\'s location.',
     steps: ['In the menu, under <b>P &amp; L</b>, click <b>Revenue</b>.',
       'The automatic entries are dated the 1st of the fee month and marked <b>Auto</b>. Their amount is the fees paid for that month by students in batches at that location; a discount comes off the Batch Fee. They update as more fees are paid.',
       'To add other revenue, click ' + hk('New revenue', 'r') + '. The date starts as today; change it if needed.',
@@ -3476,25 +3603,25 @@ const HELP = {
       'Click a tournament to open its squad.'],
     tip: 'Students are added to tournaments only from <b>Tournaments → Squads</b>, not from this page.' },
   camps: { step: 16, title: 'Camps',
-    intro: 'A camp runs for a few weeks, two or three times a year. Add it once here with its dates and fees. Then add students in <b>Camp students</b>.',
+    intro: 'A camp runs for a few weeks, two or three times a year. Add it once here with its dates and fees. Then enrol students in <b>Enrol students</b>.',
     steps: ['In the menu, under <b>Students</b>, click <b>Camps</b>.',
       'Click ' + hk('New camp', 'r') + '.',
-      'Type the <b>camp name</b>. The description is not required.',
+      'Type the <b>camp name</b> and choose the <b>location</b>. The description is not required.',
       'Choose the <b>From date</b> and the <b>To date</b>. The To date must be the same as or after the From date.',
       'Under <b>Fee options</b>, tick Daily, Weekly, Monthly and/or Full camp and type each fee in AED. Tick at least one.',
       'Click ' + hk('Save camp', 'b') + '.'],
     imp: 'The status is worked out from the dates: <b>Upcoming</b> before the From date, <b>Running</b> during the camp, <b>Completed</b> after the To date.',
     tip: 'Click ' + hk('Edit') + ' to change a camp or to delete it. Deleting a camp also removes its students and their camp payments after a warning; camp-only students stay in All students.' },
-  campStudents: { step: 17, title: 'Camp students',
+  campStudents: { step: 17, title: 'Enrol students',
     intro: 'Camp students are the students taking part in a camp. They can be academy students or new students who join only for the camp.',
-    steps: ['On the Camps page, click the <b>Camp students</b> tab and choose the camp.',
-      'For an academy student, click ' + hk('Add existing student') + '. Search by name or number, or filter by batch. Click the student and press ' + hk('Select', 'b') + ', or double-click the row.',
-      'For a new student, click ' + hk('New camp-only student', 'r') + ' and type the full name, date of birth and gender.',
+    steps: ['On the Camps page, click the <b>Enrol students</b> tab and choose the camp.',
+      'For a PSA student or a returning camp student, click ' + hk('Add existing student') + '. Search by name or number, or filter by type or batch. Click the student and press ' + hk('Select', 'b') + ', or double-click the row.',
+      'For someone who is not a PSA student, click ' + hk('New camp student', 'r') + ' and type the full name, date of birth and gender. Phone and Emirates ID are optional. They get a camp number like CMP-0001.',
       'Choose the <b>fee option</b> and the <b>start date</b>. For Daily, Weekly or Monthly type the <b>number</b> of days, weeks or months. For Full camp the fee is filled in; change it for a student who joins late.',
       'Type a discount in % or AED if needed, then click ' + hk('Add to camp', 'b') + '.',
       'To change or remove a student, click their row.'],
     imp: 'A week is 7 days. A month runs to the day before the same date next month, for example 05-Jul-2027 to 04-Aug-2027. The end date can\'t go past the camp\'s To date.',
-    tip: 'Camp-only students get a registration number but no monthly batch or transport dues. If you give them a batch later, they show as Regular. Removing a student who has paid deletes their camp payments too, after a warning.' },
+    tip: 'Camp students are kept apart from PSA students: they are not in All students and get no monthly dues. Removing a student who has paid deletes their camp payments too, after a warning.' },
   campFees: { step: 18, title: 'Camp fees',
     intro: 'Camp fees are collected here. A camp fee can be paid in parts, and each part gets its own receipt.',
     steps: ['On the Camps page, click the <b>Camp fees</b> tab and choose the camp.',
@@ -3504,7 +3631,16 @@ const HELP = {
       'Click ' + hk('Save &amp; print receipt', 'b') + '. Print the receipt, or click <b>Close</b>.',
       'To see, reprint, edit or delete a student\'s payments, click <b>Payments</b> on their row.'],
     imp: 'Status is <b>Paid</b> when the balance is 0, <b>Part paid</b> when some is paid, and <b>Pending</b> when nothing is paid. The amount can\'t be more than the balance.',
-    tip: 'Camp receipts use the same receipt book as monthly fees, so the numbers continue in one series. Camp fees are not shown in Fee payment or Reports.' }
+    tip: 'Camp receipts use the same receipt book as monthly fees, so the numbers continue in one series. Each camp payment is also added to P &amp; L › Revenue as its own Camp Fee entry, under the camp\'s location and dated the payment date.' },
+  campPeople: { step: 19, title: 'Campers',
+    intro: 'Everyone who has joined a camp: PSA students, and camp students who are not part of PSA (camp numbers like CMP-0001).',
+    steps: ['On the Camps page, click the <b>Campers</b> tab.',
+      'Use <b>Show</b> to see all students, PSA students, camp students, or camp students converted to PSA. Use <b>Camp</b> to see one camp. Search by number, name, phone, Emirates ID or PSA number.',
+      'The <b>Camps attended</b> column shows every camp the student took part in, with its dates.',
+      'To change a camp student\'s details, click <b>Edit</b> on their row.',
+      'To make a camp student a PSA student, click ' + hk('Convert to PSA', 'r') + '. New registration opens with their details filled in. Check them and save.'],
+    imp: 'After conversion the row shows <b>Converted</b> and the new <b>PSA no.</b> The camp history and camp payments stay with the camp student.',
+    tip: 'A converted camp student is not offered in Add existing student any more. Use their PSA record for later camps.' }
 };
 // which help topic fits the screen that is open now
 function helpTopic() {
@@ -3514,7 +3650,7 @@ function helpTopic() {
     case 'batches': return v === 'locList' || v === 'locForm' ? 'locations' : 'batches';
     case 'registration': return v === 'student' ? (U.v.tab === 'tournaments' ? 'studentTours' : 'assign') : 'register';
     case 'tournaments': return v === 'squads' ? 'squads' : 'tournaments';
-    case 'camps': return v === 'students' ? 'campStudents' : v === 'fees' ? 'campFees' : 'camps';
+    case 'camps': return v === 'students' ? 'campStudents' : v === 'fees' ? 'campFees' : v === 'people' ? 'campPeople' : 'camps';
     case 'changepw': return 'settings';
     default: return HELP[U.page] ? U.page : 'batches';
   }

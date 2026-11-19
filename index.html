@@ -1217,16 +1217,23 @@ DIALOGS.plDel = function () {
     '<div class="df"><button type="button" class="btn b-white" onclick="closeDlg()">Keep sub category</button><button type="button" class="btn b-red" onclick="PL.saveDel()">' + PL_TRASH + 'Delete sub category</button></div>');
 };
 /* ============ P & L › EXPENSES ============ */
-function exEnsure() { if (!Array.isArray(S.expenses)) S.expenses = []; if (!Array.isArray(S.expHist)) S.expHist = []; }
+function exEnsure() {
+  if (!Array.isArray(S.expenses)) S.expenses = []; if (!Array.isArray(S.expHist)) S.expHist = [];
+  // expenses saved before Location existed are set to DCA (one time, logged in the history)
+  const old = S.expenses.filter((x) => !x.locationId); if (!old.length) return;
+  const dca = (S.locations || []).find((l) => l.name.trim().toLowerCase() === 'dca'); if (!dca) return;
+  old.forEach((x) => { x.locationId = dca.id; exLog(x.id, fmtD(x.date) + ' · ' + x.description, exPair(x), 'Location set', '—', dca.name); });
+  save();
+}
 const exOf = (id) => byId(S.expenses, id);
 const exCatOf = (x) => { const s = plSub(x.subId); return s ? plCat(s.catId) : null; }; // category comes from the sub category, so moving a sub category moves its expenses
 const exCode = (o) => (o ? o.code + (o.active ? '' : ' (inactive)') : '—');
 const exPair = (x) => { const s = plSub(x.subId), c = exCatOf(x); return (c ? c.code : '—') + ' · ' + (s ? s.code : '—'); };
-const exSum = (x) => fmtD(x.date) + ' · ' + exPair(x) + ' · AED ' + money2(x.amount) + ' · ' + x.description + (x.invoiceNo ? ' · Invoice ' + x.invoiceNo : '');
+const exSum = (x) => fmtD(x.date) + ' · ' + locName(x.locationId) + ' · ' + exPair(x) + ' · AED ' + money2(x.amount) + ' · ' + x.description + (x.invoiceNo ? ' · Invoice ' + x.invoiceNo : '');
 const exCmp = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : (b.at || '').localeCompare(a.at || '')); // newest date first
 const exUsable = () => plCatsSorted().filter((c) => c.active && plSubsOf(c.id).some((s) => s.active)); // active categories with an active sub category
 const EX_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>';
-let EXF = { ym: '', cat: 'all', sub: 'all' }; // list filters, kept while moving between Expenses screens
+let EXF = { ym: '', loc: 'all', cat: 'all', sub: 'all' }; // list filters, kept while moving between Expenses screens
 let EX_G = null;
 function exLog(id, label, pair, change, old, nw) {
   if (!EX_G) { EX_G = uid('g'); Promise.resolve().then(() => { EX_G = null; }); }
@@ -1237,6 +1244,7 @@ const EX = {
   ym: () => EXF.ym || CUR_YM,
   list: () => { U.v = { view: 'list' }; U.f = null; render(); },
   month: (k) => { EXF.ym = k === 0 ? CUR_YM : ymShift(EX.ym(), k); U.flash = null; render(); },
+  setLoc: (v) => { EXF.loc = v; U.flash = null; render(); },
   setCat: (v) => { EXF.cat = v; const s = plSub(EXF.sub); if (v !== 'all' && s && s.catId !== v) EXF.sub = 'all'; U.flash = null; render(); },
   setSub: (v) => { EXF.sub = v; U.flash = null; render(); },
   open: (id) => { U.v = { view: 'detail', id }; U.f = null; U.flash = null; render(); window.scrollTo(0, 0); },
@@ -1244,12 +1252,13 @@ const EX = {
   histSearch: (el) => { U.v.q = el.value; U.refocus = el.id; render(); },
   // form
   newEx: () => {
+    if (!S.locations.length) { flash('There is no location. Add one in Masters › Batches and Locations first.', true); render(); return; }
     if (!exUsable().length) { flash('There is no active P & L sub category. Add or reactivate one in Masters › P & L first.', true); render(); return; }
     const c = EXF.cat !== 'all' && exUsable().some((x) => x.id === EXF.cat) ? EXF.cat : '';
     const s = plSub(EXF.sub); const sid = c && s && s.active && s.catId === c ? s.id : '';
-    U.v = { view: 'form', id: null }; U.f = { date: TODAY, catId: c, subId: sid, description: '', invoiceNo: '', remarks: '', amount: '', _sub: false }; U.flash = null; render(); window.scrollTo(0, 0);
+    U.v = { view: 'form', id: null }; U.f = { date: TODAY, locationId: EXF.loc !== 'all' ? EXF.loc : '', catId: c, subId: sid, description: '', invoiceNo: '', remarks: '', amount: '', _sub: false }; U.flash = null; render(); window.scrollTo(0, 0);
   },
-  edit: () => { const x = exOf(U.v.id); const c = exCatOf(x); U.v = { view: 'form', id: x.id }; U.f = { date: x.date, catId: c ? c.id : '', subId: x.subId, description: x.description, invoiceNo: x.invoiceNo || '', remarks: x.remarks || '', amount: String(x.amount), _sub: false }; U.flash = null; render(); },
+  edit: () => { const x = exOf(U.v.id); const c = exCatOf(x); U.v = { view: 'form', id: x.id }; U.f = { date: x.date, locationId: x.locationId || '', catId: c ? c.id : '', subId: x.subId, description: x.description, invoiceNo: x.invoiceNo || '', remarks: x.remarks || '', amount: String(x.amount), _sub: false }; U.flash = null; render(); },
   leave: () => (U.v.id ? EX.open(U.v.id) : EX.list()),
   pickCat: (v) => { U.f.catId = v; const s = plSub(U.f.subId); if (!s || s.catId !== v) U.f.subId = ''; render(); },
   setAmt: (el) => {
@@ -1263,6 +1272,7 @@ const EX = {
     const keptC = x && exCatOf(x) && exCatOf(x).id === f.catId, keptS = x && x.subId === f.subId;
     return {
       date: f.date ? '' : 'Enter the date.',
+      locationId: byId(S.locations, f.locationId) ? '' : 'Choose a location.',
       catId: !c ? 'Choose a category.' : !c.active && !keptC ? 'This category is inactive. Choose an active category.' : '',
       subId: !s || s.catId !== f.catId ? 'Choose a sub category.' : !s.active && !keptS ? 'This sub category is inactive. Choose an active sub category.' : '',
       description: squash(f.description) ? '' : 'Enter the description.',
@@ -1271,10 +1281,11 @@ const EX = {
   },
   save: () => {
     const e = EX.errs(); if (Object.values(e).some(Boolean)) { U.f._sub = true; render(); return; }
-    const f = U.f; const v = { date: f.date, subId: f.subId, description: squash(f.description), invoiceNo: squash(f.invoiceNo), remarks: f.remarks.trim(), amount: Math.round(parseFloat(f.amount) * 100) / 100 };
+    const f = U.f; const v = { date: f.date, locationId: f.locationId, subId: f.subId, description: squash(f.description), invoiceNo: squash(f.invoiceNo), remarks: f.remarks.trim(), amount: Math.round(parseFloat(f.amount) * 100) / 100 };
     if (U.v.id) {
       const x = exOf(U.v.id); const oldPair = exPair(x); const ch = [];
       if (x.date !== v.date) ch.push(['Date changed', fmtD(x.date), fmtD(v.date)]);
+      if ((x.locationId || '') !== v.locationId) ch.push(['Location changed', x.locationId ? locName(x.locationId) : '—', locName(v.locationId)]);
       if (x.subId !== v.subId) ch.push(['Category · sub category changed', oldPair, exPair(v)]);
       if (x.description !== v.description) ch.push(['Description changed', x.description, v.description]);
       if ((x.invoiceNo || '') !== v.invoiceNo) ch.push(['Invoice number changed', x.invoiceNo || '—', v.invoiceNo || '—']);
@@ -1306,20 +1317,22 @@ PAGES.expenses = function () {
   return topbar('P & L', v === 'hist' ? 'Expenses history' : 'Expenses', right) + body;
 };
 function exList() {
+  if (EXF.loc !== 'all' && !byId(S.locations, EXF.loc)) EXF.loc = 'all';
   if (EXF.cat !== 'all' && !plCat(EXF.cat)) EXF.cat = 'all';
   if (EXF.sub !== 'all' && (!plSub(EXF.sub) || (EXF.cat !== 'all' && plSub(EXF.sub).catId !== EXF.cat))) EXF.sub = 'all';
   const ym = EX.ym();
-  const shown = S.expenses.filter((x) => x.date.slice(0, 7) === ym && (EXF.sub === 'all' ? (EXF.cat === 'all' || (exCatOf(x) && exCatOf(x).id === EXF.cat)) : x.subId === EXF.sub)).sort(exCmp);
+  const shown = S.expenses.filter((x) => x.date.slice(0, 7) === ym && (EXF.loc === 'all' || x.locationId === EXF.loc) && (EXF.sub === 'all' ? (EXF.cat === 'all' || (exCatOf(x) && exCatOf(x).id === EXF.cat)) : x.subId === EXF.sub)).sort(exCmp);
   const total = shown.reduce((a, x) => a + x.amount, 0);
   const tr = shown.map((x) => { const c = exCatOf(x), s = plSub(x.subId);
-    return '<tr class="row" ondblclick="EX.open(\'' + x.id + '\')" title="Double-click to open"><td class="num" style="white-space:nowrap;font-weight:700">' + fmtD(x.date) + '</td><td style="word-break:break-word">' + h(c ? c.code : '—') + '</td><td style="word-break:break-word">' + h(s ? s.code : '—') + '</td><td style="font-weight:600;word-break:break-word">' + h(x.description) + '</td><td style="word-break:break-word">' + h(x.invoiceNo || '—') + '</td><td style="color:#4A3A35"><span class="clip">' + h(x.remarks || '—') + '</span></td><td class="r num" style="font-weight:700;white-space:nowrap">' + money2(x.amount) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="EX.open(\'' + x.id + '\')">Open</button></td></tr>'; });
-  const P = paged('expenses', tr, ym + '|' + EXF.cat + '|' + EXF.sub);
+    return '<tr class="row" ondblclick="EX.open(\'' + x.id + '\')" title="Double-click to open"><td class="num" style="white-space:nowrap;font-weight:700">' + fmtD(x.date) + '</td><td>' + h(x.locationId ? locName(x.locationId) : '—') + '</td><td style="word-break:break-word">' + h(c ? c.code : '—') + '</td><td style="word-break:break-word">' + h(s ? s.code : '—') + '</td><td style="font-weight:600;word-break:break-word">' + h(x.description) + '</td><td style="word-break:break-word">' + h(x.invoiceNo || '—') + '</td><td style="color:#4A3A35"><span class="clip">' + h(x.remarks || '—') + '</span></td><td class="r num" style="font-weight:700;white-space:nowrap">' + money2(x.amount) + '</td><td class="r"><button type="button" class="btn b-soft sm" onclick="EX.open(\'' + x.id + '\')">Open</button></td></tr>'; });
+  const P = paged('expenses', tr, ym + '|' + EXF.loc + '|' + EXF.cat + '|' + EXF.sub);
+  const locOpts = [['all', 'All locations']].concat(S.locations.map((l) => [l.id, l.name]));
   const catOpts = [['all', 'All categories']].concat(plCatsSorted().map((c) => [c.id, exCode(c)]));
   const subList = EXF.cat === 'all' ? plCatsSorted().flatMap((c) => plSubsOf(c.id).map((s) => [s.id, c.code + ' · ' + exCode(s)])) : plSubsOf(EXF.cat).map((s) => [s.id, exCode(s)]);
   const filters = '<div class="acts" style="gap:12px 20px;padding:16px 28px;border-bottom:1px solid #EDE4D6;background:#FBF6EE">' + monthNav(ym, 'EX.month') +
-    plSel('ex-fc', 'Category', EXF.cat, 'EX.setCat', catOpts, 200) + plSel('ex-fs', 'Sub category', EXF.sub, 'EX.setSub', [['all', 'All sub categories']].concat(subList), 220) + '</div>';
-  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:1100px"><thead><tr><th style="width:128px">Date</th><th style="width:11%">Category</th><th style="width:12%">Sub category</th><th>Description</th><th style="width:12%">Invoice number</th><th style="width:15%">Remarks</th><th class="r" style="width:132px">Amount (AED)</th><th style="width:92px"><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody>' +
-      '<tfoot><tr class="ex-tot"><td colspan="6">Total · ' + plural(shown.length, 'expense') + '</td><td class="r num">' + money2(total) + '</td><td></td></tr></tfoot></table></div>' + P.pager
+    plSel('ex-fl', 'Location', EXF.loc, 'EX.setLoc', locOpts, 170) + plSel('ex-fc', 'Category', EXF.cat, 'EX.setCat', catOpts, 200) + plSel('ex-fs', 'Sub category', EXF.sub, 'EX.setSub', [['all', 'All sub categories']].concat(subList), 220) + '</div>';
+  const table = shown.length ? '<div class="tw"><table class="t" style="min-width:1100px"><thead><tr><th style="width:120px">Date</th><th style="width:9%">Location</th><th style="width:10%">Category</th><th style="width:11%">Sub category</th><th>Description</th><th style="width:11%">Invoice number</th><th style="width:13%">Remarks</th><th class="r" style="width:128px">Amount (AED)</th><th style="width:92px"><span class="sr">Actions</span></th></tr></thead><tbody>' + P.rows.join('') + '</tbody>' +
+      '<tfoot><tr class="ex-tot"><td colspan="7">Total · ' + plural(shown.length, 'expense') + '</td><td class="r num">' + money2(total) + '</td><td></td></tr></tfoot></table></div>' + P.pager
     : S.expenses.length ? emptyBox('No expenses here', 'No expenses in ' + ymLabel(ym) + ' for these filters. Change the month or the filters.')
       : emptyBox('No expenses yet', 'Add the first expense with New expense.', '<button type="button" class="btn b-blue lg" onclick="EX.newEx()">New expense</button>');
   return '<div class="page wide">' + flashHtml() + '<section class="card"><div class="cardhead"><div class="acts" style="gap:12px 16px"><h2>Expenses · ' + h(ymLabel(ym)) + '</h2><span class="count">' + plural(shown.length, 'expense') + '</span></div><span class="small muted">Newest date first. Double-click a row to open it.</span></div>' + filters + table + '</section></div>';
@@ -1335,6 +1348,7 @@ function exForm() {
     '<section class="sec">' + band('A', 'Expense details') +
     '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">' +
     '<div class="fld"><label for="ex-date">Date <span class="req">*</span></label><input id="ex-date" type="date" class="in' + fxCls(e.date) + '" value="' + h(f.date) + '" onchange="setF(\'date\',this.value)">' + (e.date ? errTxt(e.date) : '<span class="hint">Defaults to today. Any date can be used.</span>') + '</div>' +
+    '<div class="fld"><label for="ex-loc">Location <span class="req">*</span></label><select id="ex-loc" class="in' + fxCls(e.locationId) + '" onchange="setF(\'locationId\',this.value)"><option value="" disabled' + (f.locationId ? '' : ' selected') + '>Select location</option>' + S.locations.map((l) => '<option value="' + l.id + '"' + sel(f.locationId, l.id) + '>' + h(l.name) + '</option>').join('') + '</select>' + (e.locationId ? errTxt(e.locationId) : '<span class="hint">From Masters › Batches and Locations.</span>') + '</div>' +
     '<div class="fld"><label for="ex-cat">Category <span class="req">*</span></label><select id="ex-cat" class="in' + fxCls(e.catId) + '" onchange="EX.pickCat(this.value)"><option value="" disabled' + (f.catId ? '' : ' selected') + '>Select category</option>' + cats.map((c) => opt(c, f.catId)).join('') + '</select>' + (e.catId ? errTxt(e.catId) : '<span class="hint">Only active categories are listed.</span>') + '</div>' +
     '<div class="fld"><label for="ex-sub">Sub category <span class="req">*</span></label><select id="ex-sub" class="in' + fxCls(e.subId) + '"' + (f.catId ? '' : ' disabled') + ' onchange="setF(\'subId\',this.value)"><option value="" disabled' + (f.subId ? '' : ' selected') + '>' + (f.catId ? 'Select sub category' : 'Select a category first') + '</option>' + subs.map((s) => opt(s, f.subId)).join('') + '</select>' + (e.subId ? errTxt(e.subId) : '<span class="hint">Only active sub categories are listed.</span>') + '</div>' +
     '<div class="fld"><label for="ex-amt">Amount <span class="req">*</span></label><div class="suffix' + fxCls(e.amount) + '"><input id="ex-amt" inputmode="decimal" autocomplete="off" value="' + h(f.amount) + '" oninput="EX.setAmt(this)" placeholder="0.00"><span>AED</span></div>' + (e.amount ? errTxt(e.amount) : '<span class="hint">More than zero. Up to 2 decimal places.</span>') + '</div>' +
@@ -1347,9 +1361,9 @@ function exForm() {
 function exDetail() {
   const x = exOf(U.v.id); const c = exCatOf(x), s = plSub(x.subId);
   return '<div class="page wide tight">' + backBtn('Back to expenses', 'EX.list()') + flashHtml() +
-    '<section class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px;min-width:0"><span class="eyebrow">Expense details</span><h2 class="bigtitle" style="word-break:break-word">' + h(x.description) + '</h2><div class="acts" style="gap:8px"><span class="chip">' + fmtD(x.date) + '</span><span class="chip" style="font-weight:800">AED ' + money2(x.amount) + '</span></div></div>' +
+    '<section class="card"><div class="dethead"><div style="display:flex;flex-direction:column;gap:8px;min-width:0"><span class="eyebrow">Expense details</span><h2 class="bigtitle" style="word-break:break-word">' + h(x.description) + '</h2><div class="acts" style="gap:8px"><span class="chip">' + fmtD(x.date) + '</span><span class="chip">' + h(x.locationId ? locName(x.locationId) : '—') + '</span><span class="chip" style="font-weight:800">AED ' + money2(x.amount) + '</span></div></div>' +
     '<div class="acts"><button type="button" class="btn b-white lg" onclick="EX.edit()">' + I.edit + 'Edit details</button><button type="button" class="btn lg b-white" style="color:#9C1C33" onclick="EX.askDel()">' + PL_TRASH + 'Delete</button></div></div>' +
-    '<div class="sec">' + band('A', 'Details') + '<div class="tiles">' + plTile('Date', fmtD(x.date)) + plTile('Category', exCode(c)) + plTile('Sub category', exCode(s)) + plTile('Amount (AED)', money2(x.amount)) + plTile('Description', x.description, true) + plTile('Invoice number', x.invoiceNo || '—', true) + '</div></div>' +
+    '<div class="sec">' + band('A', 'Details') + '<div class="tiles">' + plTile('Date', fmtD(x.date)) + plTile('Location', x.locationId ? locName(x.locationId) : '—') + plTile('Category', exCode(c)) + plTile('Sub category', exCode(s)) + plTile('Amount (AED)', money2(x.amount)) + plTile('Description', x.description, true) + plTile('Invoice number', x.invoiceNo || '—', true) + '</div></div>' +
     '<div class="sec">' + band('B', 'Remarks') + '<div class="tiles">' + plTile('Remarks', x.remarks || '—', true) + '</div></div></section></div>';
 }
 function exHistory() {
@@ -1367,7 +1381,7 @@ function exHistory() {
 }
 DIALOGS.exDel = function () {
   const x = exOf(U.dlg.id);
-  return dlgWrap(dlgHead('Delete expense', x.description, fmtD(x.date) + ' · ' + exPair(x) + ' · AED ' + money2(x.amount)) +
+  return dlgWrap(dlgHead('Delete expense', x.description, fmtD(x.date) + ' · ' + (x.locationId ? locName(x.locationId) : '—') + ' · ' + exPair(x) + ' · AED ' + money2(x.amount)) +
     '<div class="db"><div class="note" style="background:#F6E3E3">' + PL_WARN + '<span>Delete this expense? This can’t be undone. The expenses history keeps a record of the delete.</span></div></div>' +
     '<div class="df"><button type="button" class="btn b-white" onclick="closeDlg()">Keep expense</button><button type="button" class="btn b-red" onclick="EX.saveDel()">' + PL_TRASH + 'Delete expense</button></div>');
 };
@@ -2964,12 +2978,12 @@ const HELP = {
     imp: 'Once you edit an Auto entry, it keeps your values and stops updating from fee payments. A deleted Auto entry is not made again. Fees of students with no batch are not added.',
     tip: 'Double-click a revenue entry to open it, then edit or delete it. Click ' + hk('History') + ' to see every change, including deleted revenue.' },
   expenses: { title: 'Expenses',
-    intro: 'Record what the academy spends. Each expense uses a category and sub category from Masters › P &amp; L.',
+    intro: 'Record what the academy spends. Each expense uses a location from Masters › Batches and Locations, and a category and sub category from Masters › P &amp; L.',
     steps: ['In the menu, under <b>P &amp; L</b>, click <b>Expenses</b>.',
       'Click ' + hk('New expense', 'r') + '. The date starts as today; change it if needed.',
-      'Choose the <b>Category</b>, then the <b>Sub category</b> (it lists the sub categories of that category).',
+      'Choose the <b>Location</b>, the <b>Category</b>, then the <b>Sub category</b> (it lists the sub categories of that category).',
       'Type the <b>Description</b>, the <b>Invoice number</b> if there is one, and the <b>Amount</b> in AED (up to 2 decimals). Add remarks if needed. Click <b>Save expense</b>.',
-      'Use the month arrows and the <b>Category</b> and <b>Sub category</b> filters to find expenses. The total of the rows shown is at the bottom.'],
+      'Use the month arrows and the <b>Location</b>, <b>Category</b> and <b>Sub category</b> filters to find expenses. The total of the rows shown is at the bottom.'],
     imp: 'Only active categories and sub categories can be chosen for a new expense. A sub category that expenses use can\'t be deleted in Masters › P &amp; L; deactivate it instead.',
     tip: 'Double-click an expense to open it, then edit or delete it. Click ' + hk('History') + ' to see every change, including deleted expenses.' },
   register: { step: 7, page: 8, title: 'Register a student',
